@@ -18,7 +18,11 @@
 		<license/>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<id>247790</id>
+			<name>Piotr Sokoliński</name>
+			<email>247790@edu.p.lodz.pl</email>
+		</developer>
 	</developers>
 	<scm>
 		<connection/>
