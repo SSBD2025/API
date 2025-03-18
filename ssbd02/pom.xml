@@ -19,6 +19,11 @@
 	</licenses>
 	<developers>
 		<developer>
+			<id>247654</id>
+			<name>Wojciech Florczak</name>
+			<email>247654@edu.p.lodz.pl</email>
+		</developer>
+		<developer>
 			<name>Piotr Lewkowicz</name>
 			<email>247720@edu.p.lodz.pl</email>
 			<id>247720</id>
