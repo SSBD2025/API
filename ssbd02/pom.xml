@@ -19,14 +19,19 @@
 	</licenses>
 	<developers>
 		<developer>
+			<id>247766</id>
+			<name>Bartosz Podemski</name>
+			<email>247766@edu.p.lodz.pl</email>
+		</developer>
+		<developer>
 			<id>247654</id>
 			<name>Wojciech Florczak</name>
 			<email>247654@edu.p.lodz.pl</email>
 		</developer>
 		<developer>
+			<id>247720</id>
 			<name>Piotr Lewkowicz</name>
 			<email>247720@edu.p.lodz.pl</email>
-			<id>247720</id>
 		</developer>
 		<developer>
 			<id>247790</id>
