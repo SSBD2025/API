@@ -8,9 +8,9 @@
 		<version>3.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>pl.lodz.p.it.ssbd2025</groupId>
+	<groupId>pl.lodz.p.it.ssbd2025.ssbd02</groupId>
 	<artifactId>ssbd02</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>ssbd02</name>
 	<description>ssbd02</description>
 	<url/>
@@ -56,7 +56,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>24</java.version>
+		<java.version>23</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
