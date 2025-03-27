@@ -29,10 +29,10 @@ public class Opinion {
     @Length(min = 1, max = 255)
     private String description;
     private Timestamp timestamp;
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    @ManyToOne
-    @JoinColumn(name = "diet_profile_id", nullable = false)
-    private DietProfile dietProfile;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "diet_profile_id", nullable = false)
+//    private DietProfile dietProfile;
 }
