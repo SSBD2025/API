@@ -1,10 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum Unit {
     G_DL("g/dL"),
     PERCENT("%"),
@@ -14,4 +9,12 @@ public enum Unit {
     FL("fl");
 
     private final String symbol;
+
+    Unit(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
 }
