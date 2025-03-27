@@ -1,10 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum BloodParameter {
     HGB("Hemoglobin", Unit.G_DL),
     HCT("Hematocrit", Unit.PERCENT),
@@ -26,4 +21,17 @@ public enum BloodParameter {
 
     private final String description;
     private final Unit unit;
+
+    BloodParameter(String description, Unit unit) {
+        this.description = description;
+        this.unit = unit;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
 }
