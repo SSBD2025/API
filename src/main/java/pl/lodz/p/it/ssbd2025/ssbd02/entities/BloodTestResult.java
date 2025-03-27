@@ -31,7 +31,7 @@ public class BloodTestResult {
     @Column(name = "report_id", nullable = false)
     private UUID reportId;
 
-    @ManyToOne
-    @JoinColumn(name = "blood_marker_id", insertable = false, updatable = false)
-    private BloodMarker bloodMarker;
+//    @ManyToOne
+//    @JoinColumn(name = "blood_marker_id", insertable = false, updatable = false)
+//    private BloodMarker bloodMarker;
 }

@@ -26,6 +26,6 @@ public class UserBloodTestReport {
     @Column(name = "timestamp", nullable = false)
     private Timestamp timestamp;
 
-    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BloodTestResult> results;
+//    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<BloodTestResult> results;
 }

@@ -41,7 +41,7 @@ public class User {
     //TODO potem zamienic
     private UUID dietProfileId;
 
-    @OneToOne
-    @JoinColumn(name = "dietary_restrictions_id")
-    private DietaryRestrictions dietaryRestrictions;
+//    @OneToOne
+//    @JoinColumn(name = "dietary_restrictions_id")
+//    private DietaryRestrictions dietaryRestrictions;
 }
