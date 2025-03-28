@@ -3,10 +3,11 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Data
 public class User {
     @Id
@@ -37,6 +38,9 @@ public class User {
 
     //TODO potem zamienic
     private UUID testResultsId;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserBloodTestReport> bloodTestReports;
 
     //TODO potem zamienic
     private UUID dietProfileId;

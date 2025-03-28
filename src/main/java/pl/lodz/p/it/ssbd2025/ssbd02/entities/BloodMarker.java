@@ -5,10 +5,11 @@ import lombok.*;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "blood_marker")
+@Table(name = "blood_markers")
 @Immutable
 @Getter
 @NoArgsConstructor
@@ -39,6 +40,10 @@ public class BloodMarker {
     @Enumerated(EnumType.STRING)
     @Column(name = "unit", nullable = false)
     private Unit unit;
+
+    //TODO orphanRemoval = true
+    @OneToMany(mappedBy = "bloodMarker", cascade = CascadeType.ALL)
+    private List<BloodTestResult> bloodTestResults;
 
     public BloodMarker(BloodParameter bloodParameter, Unit unit) {
         this.bloodParameter = bloodParameter;
