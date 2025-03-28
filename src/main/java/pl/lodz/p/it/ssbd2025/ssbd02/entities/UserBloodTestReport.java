@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_blood_test_report")
+@Table(name = "user_blood_test_reports")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,12 +20,13 @@ public class UserBloodTestReport {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "timestamp", nullable = false)
     private Timestamp timestamp;
 
-//    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<BloodTestResult> results;
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BloodTestResult> results;
 }

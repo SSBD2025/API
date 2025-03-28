@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "blood_test_result")
+@Table(name = "blood_test_results")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,9 +18,6 @@ public class BloodTestResult {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "blood_marker_id", nullable = false)
-    private UUID bloodMarkerId;
-
     @Column(name = "result", nullable = false)
     private String result;
 
@@ -28,10 +25,11 @@ public class BloodTestResult {
     @Column(name = "unit", nullable = false)
     private Unit unit;
 
-    @Column(name = "report_id", nullable = false)
-    private UUID reportId;
+    @ManyToOne
+    @JoinColumn(name = "report_id", nullable = false)
+    private UserBloodTestReport report;
 
-//    @ManyToOne
-//    @JoinColumn(name = "blood_marker_id", insertable = false, updatable = false)
-//    private BloodMarker bloodMarker;
+    @ManyToOne
+    @JoinColumn(name = "blood_marker_id", nullable = false)
+    private BloodMarker bloodMarker;
 }
