@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -14,11 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "survey")
-public class Survey {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class Survey extends AbstractEntity {
 //    @OneToOne
 //    @JoinColumn(name = "user_id", nullable = false, unique = true)
 //    private User user;

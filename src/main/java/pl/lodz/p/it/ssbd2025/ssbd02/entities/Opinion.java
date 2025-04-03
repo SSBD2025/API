@@ -3,9 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.DietProfile;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Opinion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Opinion extends AbstractEntity {
     @Size(min = 1, max = 5)
     private int rating;
     @Length(min = 1, max = 255)

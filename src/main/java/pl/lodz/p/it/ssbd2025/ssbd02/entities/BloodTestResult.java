@@ -3,8 +3,6 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "blood_test_results")
 @Getter
@@ -12,12 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BloodTestResult {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class BloodTestResult extends AbstractEntity {
     @Column(name = "result", nullable = false)
     private String result;
 

@@ -1,19 +1,16 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
-import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "dietary_restrictions")
-@Data
-public class DietaryRestrictions {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false, updatable = false)
-    private UUID id;
-
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class DietaryRestrictions extends AbstractEntity {
     @Column(name = "is_vegan", nullable = false)
     private boolean vegan;
 

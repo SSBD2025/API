@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,12 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "periodic_survey")
-public class PeriodicSurvey {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
-    private UUID id;
-
+public class PeriodicSurvey extends AbstractEntity {
 //    @ManyToOne
 //    @JoinColumn(name = "user_id", nullable = false)
 //    private User user;

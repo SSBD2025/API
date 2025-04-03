@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "user_blood_test_reports")
@@ -14,12 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserBloodTestReport {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class UserBloodTestReport extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
