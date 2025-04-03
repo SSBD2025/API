@@ -6,7 +6,6 @@ import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "blood_markers")
@@ -15,12 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BloodMarker {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class BloodMarker extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "blood_parameter", nullable = false)
     private BloodParameter bloodParameter;

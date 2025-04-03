@@ -3,7 +3,6 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.DietProfile;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Problem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Problem extends AbstractEntity {
     @Length(min = 1, max = 255)
     private String description;
     private Timestamp date;
