@@ -1,0 +1,24 @@
+stages:
+  - build
+  - deploy
+
+build_backend:
+  stage: build
+  script:
+    - cd /ssbd/api
+    - mvn clean package -DskipTests
+  tags:
+    - backend-shell
+  only:
+    - main
+
+deploy_backend:
+  stage: deploy
+  script:
+    - cd /ssbd/docker
+    - docker compose build backend
+    - docker compose up -d --no-deps --force-recreate backend
+  tags:
+    - backend-shell
+  only:
+    - main
