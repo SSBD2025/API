@@ -1,11 +1,15 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,6 +17,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoodPyramid extends AbstractEntity {
+
+    @OneToMany(mappedBy = "foodPyramid")
+    private List<Client> clients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "foodPyramid")
+    private List<Feedback> feedbacks = new ArrayList<>();
+
     @Min(0)
     private double A;
     @Min(0)

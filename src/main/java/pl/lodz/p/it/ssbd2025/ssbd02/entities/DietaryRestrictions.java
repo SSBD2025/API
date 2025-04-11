@@ -11,6 +11,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DietaryRestrictions extends AbstractEntity {
+
+    @OneToOne(optional = false)
+    @JoinColumn(name = "client_id", nullable = false, unique = true)
+    private Client client;
+
     @Column(name = "is_vegan", nullable = false)
     private boolean vegan;
 

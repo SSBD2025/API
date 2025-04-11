@@ -15,14 +15,10 @@ public class BloodTestResult extends AbstractEntity {
     private String result;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "unit", nullable = false)
-    private Unit unit;
+    @Column(name = "blood_marker", nullable = false)
+    private BloodParameter bloodParameter;
 
     @ManyToOne
     @JoinColumn(name = "report_id", nullable = false)
-    private UserBloodTestReport report;
-
-    @ManyToOne
-    @JoinColumn(name = "blood_marker_id", nullable = false)
-    private BloodMarker bloodMarker;
+    private ClientBloodTestReport report;
 }

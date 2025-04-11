@@ -7,20 +7,21 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Table(name = "user_blood_test_reports")
+@Table(name = "client_blood_test_reports")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserBloodTestReport extends AbstractEntity {
+public class ClientBloodTestReport extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
     @Column(name = "timestamp", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
-    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "report")
     private List<BloodTestResult> results;
 }
