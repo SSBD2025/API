@@ -1,9 +1,11 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,27 +16,27 @@ import java.util.List;
 @Builder
 @Table(name = "survey")
 public class Survey extends AbstractEntity {
-//    @OneToOne
-//    @JoinColumn(name = "user_id", nullable = false, unique = true)
-//    private User user;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "client_id", nullable = false, unique = true)
+    private Client client;
 
     @Column(nullable = false)
     private double height;
 
     @Column(nullable = false)
-    private int age;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp dateOfBirth;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Gender gender;
+    private boolean gender; //0 for female 1 for male
 
     @ElementCollection
     @Column(name = "diet_preferences", nullable = false)
-    private List<String> dietPreferences;
+    private List<String> dietPreferences = new ArrayList<>();
 
     @ElementCollection
     @Column(nullable = false)
-    private List<String> allergies;
+    private List<String> allergies = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "activity_level", nullable = false)
@@ -48,12 +50,13 @@ public class Survey extends AbstractEntity {
 
     @ElementCollection
     @Column(nullable = false)
-    private List<String> illnesses;
+    private List<String> illnesses = new ArrayList<>();
 
     @ElementCollection
     @Column(nullable = false)
-    private List<String> medications;
+    private List<String> medications = new ArrayList<>();
 
+    @Size(min = 1, max = 10)
     @Column(name = "meals_per_day", nullable = false)
     private int mealsPerDay;
 
@@ -63,7 +66,7 @@ public class Survey extends AbstractEntity {
 
     @ElementCollection
     @Column(name = "meal_times", nullable = false)
-    private List<Timestamp> mealTimes;
+    private List<Timestamp> mealTimes = new ArrayList<>();
 
     @Lob
     @Column(name = "eating_habits", nullable = false)

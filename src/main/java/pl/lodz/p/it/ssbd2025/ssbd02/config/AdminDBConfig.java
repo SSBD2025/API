@@ -40,7 +40,7 @@ public class AdminDBConfig {
             JpaProperties jpaProperties) {
         Map<String, Object> vendorProperties = hibernateProperties.determineHibernateProperties(
                 jpaProperties.getProperties(), new HibernateSettings());
-        vendorProperties.put("hibernate.hbm2ddl.auto", "create");
+        vendorProperties.put("hibernate.hbm2ddl.auto", "create-drop");
 
         return builder
                 .dataSource(dataSource)

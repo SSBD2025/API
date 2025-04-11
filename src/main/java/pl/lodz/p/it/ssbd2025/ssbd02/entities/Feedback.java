@@ -10,24 +10,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.User;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.DietProfile;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Opinion extends AbstractEntity {
+public class Feedback extends AbstractEntity {
     @Size(min = 1, max = 5)
     private int rating;
     @Length(min = 1, max = 255)
     private String description;
+    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
-//    @ManyToOne
-//    @JoinColumn(name = "diet_profile_id", nullable = false)
-//    private DietProfile dietProfile;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "food_pyramid_id", nullable = false)
+    private FoodPyramid foodPyramid;
 }
