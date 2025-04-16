@@ -8,9 +8,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "client_blood_test_reports",
-indexes = {
+    indexes = {
         @Index(name = "cbtr_client_id_index", columnList = "client_id")
-})
+    })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,13 +18,13 @@ indexes = {
 @Builder
 public class ClientBloodTestReport extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false, updatable = false)
     private Client client;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(name = "timestamp", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(mappedBy = "report", cascade = CascadeType.PERSIST)
     private List<BloodTestResult> results;
 }

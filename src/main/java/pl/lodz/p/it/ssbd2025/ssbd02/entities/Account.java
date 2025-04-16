@@ -42,7 +42,7 @@ public class Account extends AbstractEntity {
     private boolean verified = false;
 
     @Column(name = "language")
-    private String language;
+    private Language language;
 
     @Column(name = "last_successful_login_ip", length = 45)
     private String lastSuccessfulLoginIp;
@@ -50,7 +50,7 @@ public class Account extends AbstractEntity {
     @Column(name = "last_failed_login_ip", length = 45)
     private String lastFailedLoginIp;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private Collection<UserRole> userRoles = new ArrayList<>();
 
     @Column(name = "first_name", table = "user_data", nullable = false, length = 50)
@@ -58,5 +58,4 @@ public class Account extends AbstractEntity {
 
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
-
 }

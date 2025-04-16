@@ -16,6 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Dietician extends UserRole {
 
-    @OneToMany(mappedBy = "dietician")
+    @OneToMany(mappedBy = "dietician", cascade = CascadeType.REFRESH)
     private List<Client> clients = new ArrayList<>();
 }
