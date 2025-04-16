@@ -32,22 +32,22 @@ public class Account extends AbstractEntity {
     @Column(nullable = false)
     private boolean active = false;
 
-    @Column(name = "last_successful_login")
+    @Column(name = "last_successful_login", nullable = true)
     private Timestamp lastSuccessfulLogin;
 
-    @Column(name = "last_failed_login")
+    @Column(name = "last_failed_login", nullable = true)
     private Timestamp lastFailedLogin;
 
     @Column(nullable = false)
     private boolean verified = false;
 
-    @Column(name = "language")
+    @Column(name = "language", nullable = true)
     private Language language;
 
-    @Column(name = "last_successful_login_ip", length = 45)
+    @Column(name = "last_successful_login_ip", length = 45, nullable = true)
     private String lastSuccessfulLoginIp;
 
-    @Column(name = "last_failed_login_ip", length = 45)
+    @Column(name = "last_failed_login_ip", length = 45, nullable = true)
     private String lastFailedLoginIp;
 
     @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})

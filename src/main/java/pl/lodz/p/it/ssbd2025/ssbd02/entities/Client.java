@@ -21,7 +21,7 @@ import java.util.List;
 public class Client extends UserRole {
 
     @ManyToOne
-    @JoinColumn(name = "dietician_id")
+    @JoinColumn(name = "dietician_id", nullable = true)
     private Dietician dietician;
 
     @OneToMany(mappedBy = "client")
