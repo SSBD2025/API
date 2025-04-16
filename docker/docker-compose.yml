@@ -3,8 +3,8 @@ services:
     image: postgres:17.4
     restart: always
     environment:
-      POSTGRES_USER: ias
-      POSTGRES_PASSWORD: ias
+      POSTGRES_USER: ssbd02admin
+      POSTGRES_PASSWORD: magn0lia
       POSTGRES_DB: ssbd
     container_name: ssbd02-database
     ports:

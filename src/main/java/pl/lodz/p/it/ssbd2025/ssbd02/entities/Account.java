@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -25,11 +26,31 @@ public class Account extends AbstractEntity {
     @Column(name = "password", nullable = false, length = 60)
     private String password;
 
-    @Column(nullable = false)
-    private boolean active;
+    @Column(name = "email", nullable = false, unique = true, length = 60)
+    private String email;
 
-    @OneToMany
-    @Column(name = "user_role", nullable = false)
+    @Column(nullable = false)
+    private boolean active = false;
+
+    @Column(name = "last_successful_login")
+    private Timestamp lastSuccessfulLogin;
+
+    @Column(name = "last_failed_login")
+    private Timestamp lastFailedLogin;
+
+    @Column(nullable = false)
+    private boolean verified = false;
+
+    @Column(name = "language")
+    private String language;
+
+    @Column(name = "last_successful_login_ip", length = 45)
+    private String lastSuccessfulLoginIp;
+
+    @Column(name = "last_failed_login_ip", length = 45)
+    private String lastFailedLoginIp;
+
+    @OneToMany(mappedBy = "account")
     private Collection<UserRole> userRoles = new ArrayList<>();
 
     @Column(name = "first_name", table = "user_data", nullable = false, length = 50)
@@ -38,9 +59,4 @@ public class Account extends AbstractEntity {
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "email", table = "user_data", nullable = false, length = 60)
-    private String email;
-
-    @Column(name = "phone_number", table = "user_data", nullable = false)
-    private String phoneNumber;
 }

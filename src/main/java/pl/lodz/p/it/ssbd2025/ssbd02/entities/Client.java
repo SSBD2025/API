@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "client",
+indexes = {
+@Index(name = "client_dietician_id_index", columnList = "dietician_id"),
+@Index(name = "client_food_pyramid_id_index", columnList = "food_pyramid_id")
+})
 @DiscriminatorValue("CLIENT")
 @Getter
 @Setter

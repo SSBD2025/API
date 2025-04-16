@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "admin")
 @DiscriminatorValue("ADMIN")
 @Getter
 @Setter
