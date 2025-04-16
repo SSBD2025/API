@@ -1,0 +1,34 @@
+package pl.lodz.p.it.ssbd2025.ssbd02.entities;
+
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+@Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ClientFoodPyramidId implements Serializable {
+
+    private Long clientId;
+    private Long foodPyramidId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ClientFoodPyramidId that)) return false;
+        return Objects.equals(clientId, that.clientId) &&
+                Objects.equals(foodPyramidId, that.foodPyramidId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientId, foodPyramidId);
+    }
+}

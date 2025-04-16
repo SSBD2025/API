@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "client",
     indexes = {
         @Index(name = "client_dietician_id_index", columnList = "dietician_id"),
-        @Index(name = "client_food_pyramid_id_index", columnList = "food_pyramid_id")
     })
 @DiscriminatorValue("CLIENT")
 @Getter
@@ -33,9 +32,8 @@ public class Client extends UserRole {
     @OneToMany(mappedBy = "client")
     private List<ClientBloodTestReport> bloodTestReports = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "food_pyramid_id")
-    private FoodPyramid foodPyramid;
+    @OneToMany(mappedBy = "client")
+    private List<ClientFoodPyramid> foodPyramidIds = new ArrayList<>();
 
     @OneToOne(mappedBy = "client", cascade = CascadeType.PERSIST)
     private DietaryRestrictions dietaryRestrictions;

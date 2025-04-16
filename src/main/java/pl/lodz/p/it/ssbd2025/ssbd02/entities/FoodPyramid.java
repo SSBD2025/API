@@ -1,9 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +18,7 @@ import java.util.List;
 public class FoodPyramid extends AbstractEntity {
 
     @OneToMany(mappedBy = "foodPyramid")
-    private List<Client> clients = new ArrayList<>();
+    private List<ClientFoodPyramid> clientFoodPyramids = new ArrayList<>();
 
     @OneToMany(mappedBy = "foodPyramid", cascade = CascadeType.REFRESH)
     private List<Feedback> feedbacks = new ArrayList<>();
