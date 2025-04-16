@@ -6,6 +6,7 @@ build_backend:
   stage: build
   script:
     - cd /ssbd/api
+    - git pull
     - mvn clean package -DskipTests
   tags:
     - backend-shell
