@@ -11,6 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+@Table(
+    indexes = {
+    @Index(name = "feedback_client_id_index", columnList = "client_id"),
+    @Index(name = "feedback_food_pyramid_id_index", columnList = "food_pyramid_id")
+})
 @Entity
 @Getter
 @Setter

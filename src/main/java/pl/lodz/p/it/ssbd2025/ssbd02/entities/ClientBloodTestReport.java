@@ -7,7 +7,10 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Table(name = "client_blood_test_reports")
+@Table(name = "client_blood_test_reports",
+indexes = {
+        @Index(name = "cbtr_client_id_index", columnList = "client_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "dieticians")
+@Table(name = "dietician")
 @DiscriminatorValue("DIETICIAN")
 @Getter
 @Setter
