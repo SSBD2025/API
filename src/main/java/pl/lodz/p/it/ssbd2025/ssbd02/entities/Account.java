@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +22,11 @@ import java.util.Collection;
 public class Account extends AbstractEntity {
 
     @Column(updatable = false, nullable = false, unique = true, length = 50)
+    @Size(min = 4, max = 50)
     private String login;
 
     @Column(name = "password", nullable = false, length = 60)
+    @Size(min = 8, max = 60)
     private String password;
 
     @Column(name = "email", nullable = false, unique = true, length = 60)
