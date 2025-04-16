@@ -13,7 +13,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "periodic_survey")
+@Table(name = "periodic_survey",
+indexes = {
+@Index(name = "ps_client_id_index", columnList = "client_id")
+})
 public class PeriodicSurvey extends AbstractEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id", nullable = false)
