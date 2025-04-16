@@ -3,20 +3,99 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="1" author="Wojciech Florczak">
-        <insert tableName="users">
+    <changeSet id="1" author="Wojciech Florczak" runAlways="true">
+        <!--        Admin-->
+        <insert tableName="account">
+            <column name="id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="login" value="jcheddar"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="jcheddar@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" value="en_EN"/>
+        </insert>
+
+        <insert tableName="user_data">
             <column name="id" value="00000000-0000-0000-0000-000000000001"/>
             <column name="first_name" value="Justin"/>
             <column name="last_name" value="Cheddar"/>
-            <column name="email" value="justin.cheddar@example.com"/>
-            <column name="password" value="traralerotralala"/>
-            <column name="phone_number" value="123456789"/>
-            <column name="user_role" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="00000000-0000-0000-0000-000000000002"/>
+            <column name="role" value="ADMIN"/>
+            <column name="role_name" value="ADMIN"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="00000000-0000-0000-0000-000000000001"/>
             <column name="version" valueNumeric="0"/>
-            <column name="diet_profile_id" value="00000000-0000-0000-0000-000000000001"/>
-            <column name="survey_id" value="00000000-0000-0000-0000-000000000001"/>
-            <column name="test_results_id" value="00000000-0000-0000-0000-000000000001"/>
+        </insert>
+
+        <insert tableName="admin">
+            <column name="id" value="00000000-0000-0000-0000-000000000002"/>
+        </insert>
+
+        <!--        Pyramids-->
+        <insert tableName="food_pyramid">
+            <column name="id" value="00000000-0000-0000-0000-000000000003"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="a" valueNumeric="0.8"/>
+            <column name="d" valueNumeric="0.005"/>
+            <column name="e" valueNumeric="12"/>
+            <column name="k" valueNumeric="0.075"/>
+            <column name="b1" valueNumeric="1.1"/>
+            <column name="b2" valueNumeric="1.4"/>
+            <column name="b3" valueNumeric="16"/>
+            <column name="b5" valueNumeric="6"/>
+            <column name="b6" valueNumeric="1.4"/>
+            <column name="b7" valueNumeric="0.05"/>
+            <column name="b9" valueNumeric="0.2"/>
+            <column name="b12" valueNumeric="0.0025"/>
+            <column name="c" valueNumeric="80"/>
+            <column name="potassium" valueNumeric="2000"/>
+            <column name="calcium" valueNumeric="800"/>
+            <column name="phosphorus" valueNumeric="700"/>
+            <column name="magnesium" valueNumeric="375"/>
+            <column name="iron" valueNumeric="14"/>
+            <column name="zinc" valueNumeric="10"/>
+            <column name="fluorine" valueNumeric="3.5"/>
+            <column name="manganese" valueNumeric="2"/>
+            <column name="copper" valueNumeric="1"/>
+            <column name="iodine" valueNumeric="0.15"/>
+            <column name="selenium" valueNumeric="0.055"/>
+            <column name="molybdenum" valueNumeric="0.050"/>
+            <column name="chromium" valueNumeric="0.040"/>
+        </insert>
+
+        <insert tableName="food_pyramid">
+            <column name="id" value="00000000-0000-0000-0000-000000000004"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="a" valueNumeric="0.8"/>
+            <column name="d" valueNumeric="0.005"/>
+            <column name="e" valueNumeric="12"/>
+            <column name="k" valueNumeric="0.075"/>
+            <column name="b1" valueNumeric="1.1"/>
+            <column name="b2" valueNumeric="1.4"/>
+            <column name="b3" valueNumeric="16"/>
+            <column name="b5" valueNumeric="6"/>
+            <column name="b6" valueNumeric="1.4"/>
+            <column name="b7" valueNumeric="0.05"/>
+            <column name="b9" valueNumeric="0.2"/>
+            <column name="b12" valueNumeric="0.0025"/>
+            <column name="c" valueNumeric="80"/>
+            <column name="potassium" valueNumeric="2000"/>
+            <column name="calcium" valueNumeric="800"/>
+            <column name="phosphorus" valueNumeric="700"/>
+            <column name="magnesium" valueNumeric="375"/>
+            <column name="iron" valueNumeric="14"/>
+            <column name="zinc" valueNumeric="10"/>
+            <column name="fluorine" valueNumeric="3.5"/>
+            <column name="manganese" valueNumeric="2"/>
+            <column name="copper" valueNumeric="1"/>
+            <column name="iodine" valueNumeric="0.15"/>
+            <column name="selenium" valueNumeric="0.055"/>
+            <column name="molybdenum" valueNumeric="0.05"/>
+            <column name="chromium" valueNumeric="0.04"/>
         </insert>
     </changeSet>
-
 </databaseChangeLog>
