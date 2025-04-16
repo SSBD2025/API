@@ -13,7 +13,7 @@
             <column name="version" valueNumeric="0"/>
             <column name="email" value="jcheddar@example.com"/>
             <column name="verified" valueBoolean="true"/>
-            <column name="language" value="en_EN"/>
+            <column name="language" valueNumeric="1"/>
         </insert>
 
         <insert tableName="user_data">

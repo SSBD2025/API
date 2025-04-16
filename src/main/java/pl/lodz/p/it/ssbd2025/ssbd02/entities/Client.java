@@ -8,10 +8,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "client",
-indexes = {
-@Index(name = "client_dietician_id_index", columnList = "dietician_id"),
-@Index(name = "client_food_pyramid_id_index", columnList = "food_pyramid_id")
-})
+    indexes = {
+        @Index(name = "client_dietician_id_index", columnList = "dietician_id"),
+        @Index(name = "client_food_pyramid_id_index", columnList = "food_pyramid_id")
+    })
 @DiscriminatorValue("CLIENT")
 @Getter
 @Setter
@@ -37,7 +37,7 @@ public class Client extends UserRole {
     @JoinColumn(name = "food_pyramid_id")
     private FoodPyramid foodPyramid;
 
-    @OneToOne(mappedBy = "client")
+    @OneToOne(mappedBy = "client", cascade = CascadeType.PERSIST)
     private DietaryRestrictions dietaryRestrictions;
 
     @OneToMany(mappedBy = "client")

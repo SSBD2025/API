@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
-@Table(
-    indexes = {
+@Table(indexes = {
     @Index(name = "feedback_client_id_index", columnList = "client_id"),
     @Index(name = "feedback_food_pyramid_id_index", columnList = "food_pyramid_id")
 })
@@ -30,10 +29,10 @@ public class Feedback extends AbstractEntity {
     private Timestamp timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false, updatable = false)
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "food_pyramid_id", nullable = false)
+    @JoinColumn(name = "food_pyramid_id", nullable = false, updatable = false)
     private FoodPyramid foodPyramid;
 }

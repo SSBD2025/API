@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -22,7 +23,7 @@ public class FoodPyramid extends AbstractEntity {
     @OneToMany(mappedBy = "foodPyramid")
     private List<Client> clients = new ArrayList<>();
 
-    @OneToMany(mappedBy = "foodPyramid")
+    @OneToMany(mappedBy = "foodPyramid", cascade = CascadeType.REFRESH)
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @Min(0)

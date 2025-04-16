@@ -16,18 +16,18 @@ import java.util.List;
 @Builder
 @Table(name = "survey")
 public class Survey extends AbstractEntity {
-    @OneToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false, unique = true)
+    @OneToOne
+    @JoinColumn(name = "client_id", nullable = false, unique = true, updatable = false)
     private Client client;
 
     @Column(nullable = false)
     private double height;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp dateOfBirth;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private boolean gender; //0 for female 1 for male
 
     @ElementCollection
