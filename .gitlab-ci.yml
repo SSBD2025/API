@@ -18,6 +18,7 @@ deploy_backend:
     - cd /ssbd/docker
     - docker compose build backend
     - docker compose up -d --no-deps --force-recreate backend
+    -  mvn liquibase:update
   tags:
     - backend-shell
   only:
