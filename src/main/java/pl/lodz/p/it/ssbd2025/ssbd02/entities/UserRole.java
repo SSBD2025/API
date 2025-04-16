@@ -13,7 +13,7 @@ import lombok.Setter;
 public abstract class UserRole extends AbstractEntity {
 
     //Recznie dodac do bazy w init
-    @Column(name = "role_name", updatable = false, insertable=false)
+    @Column(name = "role_name", updatable = false, insertable=false, nullable = true)
     private String roleName;
 
     @Column(nullable = false)
