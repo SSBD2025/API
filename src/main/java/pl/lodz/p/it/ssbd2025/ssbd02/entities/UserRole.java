@@ -4,16 +4,21 @@ import jakarta.persistence.*;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_role",
-    indexes = {
-        @Index(name = "ur_user_id_index", columnList = "user_id")
-    })
+@Table(
+        name = "user_role",
+        indexes = {
+                @Index(name = "ur_user_id_index", columnList = "user_id")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "role"})
+        }
+)
+
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "role")
 public abstract class UserRole extends AbstractEntity {
 
-    //Recznie dodac do bazy w init
-    @Column(name = "role_name", updatable = false, insertable=false, nullable = true)
+    @Column(name = "role", updatable = false, insertable=false, nullable = true)
     private String roleName;
 
     @Column(nullable = false)
