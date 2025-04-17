@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 
 @Entity
 @Table(name = "blood_test_results",

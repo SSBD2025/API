@@ -3,6 +3,8 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.NutritionGoal;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
