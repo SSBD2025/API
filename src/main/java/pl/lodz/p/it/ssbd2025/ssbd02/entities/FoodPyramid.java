@@ -23,6 +23,10 @@ public class FoodPyramid extends AbstractEntity {
     @OneToMany(mappedBy = "foodPyramid", cascade = CascadeType.REFRESH)
     private List<Feedback> feedbacks = new ArrayList<>();
 
+    //feedback average rating here
+    @Column(name = "average_rating", nullable = false, updatable = true)
+    private double averageRating = 0.0;
+
     @Min(0)
     @Column(nullable = false, updatable = false)
     private double A;
