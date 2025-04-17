@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.entities;
+package pl.lodz.p.it.ssbd2025.ssbd02.enums;
 
 public enum Unit {
     G_DL("g/dL"),
