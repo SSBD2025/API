@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+secrets.properties
+app-realm.json
+docker-compose.yml
+Dockerfile
+init.sql
+pg_hba.conf

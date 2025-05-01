@@ -1,8 +1,10 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 @Entity
 @Table(
         name = "user_role",
@@ -13,7 +15,6 @@ import lombok.Setter;
                 @UniqueConstraint(columnNames = {"user_id", "role"})
         }
 )
-
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "role")
 public abstract class UserRole extends AbstractEntity {
