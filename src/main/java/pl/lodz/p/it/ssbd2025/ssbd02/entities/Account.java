@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,8 @@ import java.util.Collection;
 @AllArgsConstructor
 public class Account extends AbstractEntity {
 
+    @Basic(optional = false)
+    @NotBlank
     @Column(updatable = false, nullable = false, unique = true, length = 50)
     @Size(min = 4, max = 50)
     private String login;

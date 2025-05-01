@@ -33,10 +33,12 @@ public class Survey extends AbstractEntity {
     private boolean gender; //0 for female 1 for male
 
     @ElementCollection
+    @Builder.Default
     @Column(name = "diet_preferences", nullable = false)
     private List<String> dietPreferences = new ArrayList<>();
 
     @ElementCollection
+    @Builder.Default
     @Column(nullable = false)
     private List<String> allergies = new ArrayList<>();
 
@@ -51,10 +53,12 @@ public class Survey extends AbstractEntity {
     private boolean drinksAlcohol;
 
     @ElementCollection
+    @Builder.Default
     @Column(nullable = false)
     private List<String> illnesses = new ArrayList<>();
 
     @ElementCollection
+    @Builder.Default
     @Column(nullable = false)
     private List<String> medications = new ArrayList<>();
 
@@ -67,6 +71,7 @@ public class Survey extends AbstractEntity {
     private NutritionGoal nutritionGoal;
 
     @ElementCollection
+    @Builder.Default
     @Column(name = "meal_times", nullable = false)
     private List<Timestamp> mealTimes = new ArrayList<>();
 
