@@ -13,17 +13,16 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 
 @RequiredArgsConstructor
 @RestController
-//@AllArgsConstructor
-@RequestMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/account", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController {
 
     @NotNull
     private final AccountService accountService;
 
-//    @PostMapping("/changePassword") //TODO
-//    public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
-//        accountService.changePassword(changePasswordDTO);
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
+    @PostMapping("/changePassword")
+    public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        accountService.changePassword(changePasswordDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 }
