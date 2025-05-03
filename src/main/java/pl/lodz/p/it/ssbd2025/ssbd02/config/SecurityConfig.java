@@ -31,6 +31,11 @@ public class SecurityConfig {
 //                                        "/api/removelater",
                                         "/api/client/register", "/api/client/login",
                                         "/api/dietician/register", "/api/dietician/login"
+                                ).permitAll()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**"
                                 ).permitAll().
                                 anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter)))

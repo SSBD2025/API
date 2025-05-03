@@ -38,3 +38,4 @@ docker-compose.yml
 Dockerfile
 init.sql
 pg_hba.conf
+Dockerfile.dev
