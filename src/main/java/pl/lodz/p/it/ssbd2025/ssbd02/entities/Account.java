@@ -4,24 +4,26 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "account")
 @SecondaryTable(name = "user_data")
+@ToString(callSuper = true)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account extends AbstractEntity {
+public class Account extends AbstractEntity implements UserDetails { //can user details stay there?
 
     @Basic(optional = false)
     @NotBlank
@@ -31,6 +33,7 @@ public class Account extends AbstractEntity {
 
     @Column(name = "password", nullable = false, length = 60)
     @Size(min = 8, max = 60)
+    @ToString.Exclude
     private String password;
 
     @Column(name = "email", nullable = false, unique = true, length = 60)
@@ -58,6 +61,7 @@ public class Account extends AbstractEntity {
     private String lastFailedLoginIp;
 
     @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @ToString.Exclude
     private Collection<UserRole> userRoles = new ArrayList<>();
 
     @Column(name = "first_name", table = "user_data", nullable = false, length = 50)
@@ -65,4 +69,14 @@ public class Account extends AbstractEntity {
 
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return userRoles.stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).toList();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.login;
+    }
 }

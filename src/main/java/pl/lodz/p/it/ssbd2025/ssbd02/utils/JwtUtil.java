@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -16,5 +18,9 @@ public class JwtUtil {
 
     public void invalidateToken(String token) {
         blacklistedTokens.add(token);
+    }
+
+    public boolean checkPassword(String plaintext, String hash) {
+        return BCrypt.checkpw(plaintext, hash);
     }
 }

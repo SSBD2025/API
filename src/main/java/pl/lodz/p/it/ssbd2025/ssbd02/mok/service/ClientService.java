@@ -15,7 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ClientRepository;
 
 @Component
 @RequiredArgsConstructor
-@Service // It's nothing more than decoration indicating class' purpose
+@Service
 //@MethodCallLogged //todo!!
 @Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
 public class ClientService {

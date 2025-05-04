@@ -38,4 +38,5 @@ docker-compose.yml
 Dockerfile
 init.sql
 pg_hba.conf
+src/main/resources/keys/*
 Dockerfile.dev
