@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.support.SimpleTriggerContext;
@@ -41,6 +42,13 @@ public class AccountController {
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO) {
         return accountService.login(loginDTO.getLogin(), loginDTO.getPassword());
+    }
+
+    @PostMapping("/logout") //this is the normal logout for our own security implementation
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        accountService.logout(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 //    @PreAuthorize("hasRole('CLIENT')||hasRole('client_admin')||hasRole('admin')")

@@ -45,8 +45,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter, BearerTokenAuthenticationFilter.class)
-                .oauth2ResourceServer((oauth2) -> oauth2
-                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter)))
+                //to run locally: comment following 2 lines (.oauth2 ... .jwt...), comment line 5 uncomment line 6 in application.properties
+//                .oauth2ResourceServer((oauth2) -> oauth2
+//                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter)))
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers(HttpMethod.POST,

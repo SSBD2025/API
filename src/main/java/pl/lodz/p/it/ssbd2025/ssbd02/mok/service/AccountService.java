@@ -1,5 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
@@ -13,14 +17,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountWithRolesDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotActiveException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotVerifiedException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 
@@ -52,14 +64,6 @@ public class AccountService {
 //        }
 //    }
 
-    public UserDetails loadUserByUsername(String username) {
-        Account account = accountRepository.findByLogin(username);
-        if(account == null) {
-            throw new AccountNotFoundException();
-        } else {
-            return account;
-        }
-    }
 
     public String login(String username, String password) { //todo 90% sure its not correct
         Account account = accountRepository.findByLogin(username);
@@ -86,10 +90,9 @@ public class AccountService {
         }
     }
 
-    public String logout(String token) {
+    public void logout(String token) {
         jwtUtil.invalidateToken(token);
         SecurityContextHolder.clearContext();
-        return "User logged out successfully";
     }
 
     public String me() {
