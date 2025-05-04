@@ -17,7 +17,11 @@ public class JwtUtil {
     }
 
     public void invalidateToken(String token) {
-        blacklistedTokens.add(token);
+        blacklistedTokens.add(token.substring(7));
+    }
+
+    public boolean checkPassword(String plaintext, String hash) {
+        return BCrypt.checkpw(plaintext, hash);
     }
 
     public boolean checkPassword(String plaintext, String hash) {

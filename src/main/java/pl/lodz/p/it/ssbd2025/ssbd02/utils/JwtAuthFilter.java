@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
             System.out.println("Custom token accepted, context: " + SecurityContextHolder.getContext().getAuthentication());
 
-            filterChain.doFilter(request, response); //idk if i can just do that, hopefully its not wrong
+            filterChain.doFilter(request, response);//THIS HAS TO STAY NO MATTER WHAT
             return;
         }
 //        System.out.println("FILTER PASSED");
