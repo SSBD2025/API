@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
-secrets.properties
+src/main/resources/secrets.properties
 app-realm.json
 docker-compose.yml
 Dockerfile
