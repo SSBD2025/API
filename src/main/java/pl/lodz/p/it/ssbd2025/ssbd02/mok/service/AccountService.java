@@ -69,15 +69,18 @@ public class AccountService {
         }
     }
 
-//
-//    public void changePassword(ChangePasswordDTO changePasswordDTO) {
-//        //todo dodać login użytkownika odczytywany z tokenu
-//        Account account = accountRepository.findByLogin("TODO");
-//        if (true) { //TODO to trzeba będzie za pomocą keycloak zrobić
-////            BCrypt.checkpw(changePasswordDTO.oldPassword(), account.getPassword())
-//            accountRepository.updatePassword(account.getLogin(), changePasswordDTO.newPassword());
-//        }
-//    }
+
+    public void changePassword(ChangePasswordDTO changePasswordDTO) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountRepository.findByLogin(login);
+        if(account == null) {
+            throw new AccountNotFoundException();
+        }
+        if(!BCrypt.checkpw(changePasswordDTO.oldPassword(), account.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.newPassword(), BCrypt.gensalt()));
+    }
 
 
     public TokenPairDTO login(String username, String password, String ipAddress) { //todo 90% sure its not correct
@@ -134,20 +137,5 @@ public class AccountService {
     public String me() {
         return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
     }
-//    public void changePassword(ChangePasswordDTO changePasswordDTO) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        String login = auth.getName();
-//        Account account = accountRepository.findByLogin(login);
-//        if (account != null && BCrypt.checkpw(changePasswordDTO.oldPassword(), account.getPassword())) {
-//            accountRepository.updatePassword(account.getLogin(), changePasswordDTO.newPassword());
-//        }
-//    }
-//
-//    public UserDetails loadUserByUsername(String username) {
-//        Account user = accountRepository.findByLogin(username);
-//        if (user == null) { //TODO THIS NEEDS TO BE FIXED ASAP
-//            throw new AccountNotFoundException();
-//        }//ALERT ALERT
-//        return new UserPrincipal(user);
-//    }
+
 }

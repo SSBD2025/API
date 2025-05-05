@@ -40,12 +40,6 @@ public class AccountController {
     private final AccountService accountService;
     private final JwtService jwtService;
 
-//   @PostMapping("/changePassword") //TODO
-//   public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
-//       accountService.changePassword(changePasswordDTO);
-//       return ResponseEntity.status(HttpStatus.OK).build();
-//   }
-
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
     public TokenPairDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
         String ipAddress = getClientIp(request);
@@ -53,9 +47,17 @@ public class AccountController {
     }
 
 //    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')||hasRole('ADMIN')")
+
     @PostMapping(value = "/refresh")
     public TokenPairDTO refresh(@RequestBody RefreshRequestDTO refreshRequestDTO){
         return jwtService.refresh(refreshRequestDTO.refreshToken());
+    }
+
+    @PostMapping("/changePassword")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        accountService.changePassword(changePasswordDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/logout") //this is the normal logout for our own security implementation
