@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -40,8 +41,9 @@ public class AccountController {
 //   }
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
-    public String login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO) {
-        return accountService.login(loginDTO.getLogin(), loginDTO.getPassword());
+    public String login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
+        String ipAddress = getClientIp(request);
+        return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress);
     }
 
     @PostMapping("/logout") //this is the normal logout for our own security implementation
@@ -59,4 +61,11 @@ public class AccountController {
         return "Hello " + SecurityContextHolder.getContext().getAuthentication();
     }
 
+    private String getClientIp(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null || xfHeader.isEmpty()) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0]; // In case of multiple IPs
+    }
 }
