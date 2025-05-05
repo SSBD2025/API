@@ -31,20 +31,21 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.security.Timestamp;
+import java.util.*;
+
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 
 @Component
 @RequiredArgsConstructor
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
 public class AccountService {
 
     @NotNull
@@ -74,7 +75,7 @@ public class AccountService {
 //    }
 
 
-    public String login(String username, String password) { //todo 90% sure its not correct
+    public String login(String username, String password, String ipAddress) { //todo 90% sure its not correct
         Account account = accountRepository.findByLogin(username);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
         List<String> userRoles = new ArrayList<>();
@@ -92,9 +93,12 @@ public class AccountService {
 //        if (!account.isVerified()) {
 //            throw new AccountNotVerifiedException();
 //        }
+        Date currentTime = new Date(System.currentTimeMillis());
         if (jwtUtil.checkPassword(password, account.getPassword())) {
+            accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
             return jwtTokenProvider.generateToken(account, userRoles);
         } else {
+            accountRepository.updateFailedLogin(username, currentTime, ipAddress);
             throw new InvalidCredentialsException();
         }
     }
