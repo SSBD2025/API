@@ -23,6 +23,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 //@AllArgsConstructor
@@ -68,4 +70,12 @@ public class AccountController {
         }
         return xfHeader.split(",")[0]; // In case of multiple IPs
     }
+
+    @PostMapping("/{id}/block")
+    //@PreAuthorize()
+    public ResponseEntity<Void> blockAccount(@PathVariable String id) {
+        accountService.blockAccount(UUID.fromString(id));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

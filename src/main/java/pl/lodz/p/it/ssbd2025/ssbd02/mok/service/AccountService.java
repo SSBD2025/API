@@ -28,8 +28,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotVerifiedException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.Timestamp;
 import java.util.*;
@@ -39,6 +38,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 
@@ -54,6 +56,8 @@ public class AccountService {
     private final JwtUtil jwtUtil;
     @NotNull
     private final JwtTokenProvider jwtTokenProvider;
+    @NotNull
+    private final EmailService emailService;
 
     public UserDetails loadUserByUsername(String username) {
         Account account = accountRepository.findByLogin(username);
@@ -106,6 +110,24 @@ public class AccountService {
     public void logout(String token) {
         jwtUtil.invalidateToken(token);
         SecurityContextHolder.clearContext();
+    }
+
+    //@Retryable
+    public void blockAccount(UUID id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException());
+
+        if (!account.isActive())
+            throw new AccountNotActiveException(); //TODO zmienic
+
+        //TODO obsluga wyjatku
+
+        account.setActive(false);
+        accountRepository.saveAndFlush(account);
+
+        emailService.sendBlockAccountEmail(account.getEmail(), account.getUsername(), account.getLanguage());
+        //TODO logowanie
+
     }
 
     public String me() {
