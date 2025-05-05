@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.UserPrincipal;
 
 @Component
 @RequiredArgsConstructor
@@ -54,6 +53,16 @@ public class AccountService {
     private final JwtUtil jwtUtil;
     @NotNull
     private final JwtTokenProvider jwtTokenProvider;
+
+    public UserDetails loadUserByUsername(String username) {
+        Account account = accountRepository.findByLogin(username);
+        if(account == null) {
+            throw new AccountNotFoundException();
+        } else {
+            return account;
+        }
+    }
+
 //
 //    public void changePassword(ChangePasswordDTO changePasswordDTO) {
 //        //todo dodać login użytkownika odczytywany z tokenu
