@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.RefreshRequestDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
 import java.util.UUID;
@@ -35,6 +38,7 @@ public class AccountController {
 
     @NonNull
     private final AccountService accountService;
+    private final JwtService jwtService;
 
 //   @PostMapping("/changePassword") //TODO
 //   public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
@@ -43,9 +47,15 @@ public class AccountController {
 //   }
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
-    public String login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
+    public TokenPairDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
         String ipAddress = getClientIp(request);
         return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress);
+    }
+
+//    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')||hasRole('ADMIN')")
+    @PostMapping(value = "/refresh")
+    public TokenPairDTO refresh(@RequestBody RefreshRequestDTO refreshRequestDTO){
+        return jwtService.refresh(refreshRequestDTO.refreshToken());
     }
 
     @PostMapping("/logout") //this is the normal logout for our own security implementation
