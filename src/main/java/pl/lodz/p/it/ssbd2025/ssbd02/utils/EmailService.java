@@ -1,16 +1,25 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 
 @Component
 public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @Value("${spring.mail.username}")
     private String senderEmail;
@@ -23,6 +32,34 @@ public class EmailService {
         message.setSubject(subject);
         message.setText(body);
         mailSender.send(message);
+    }
+
+    @Async
+    public void sendBlockAccountEmail(String to, String username, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.block.subject", language));
+
+            Context context = new Context();
+            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
+            context.setVariable("name", username);
+            context.setVariable("body", I18n.getMessage("email.block.body", language));
+
+
+            String htmlContent = templateEngine.process("emailTemplate", context);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
     }
 
 }
