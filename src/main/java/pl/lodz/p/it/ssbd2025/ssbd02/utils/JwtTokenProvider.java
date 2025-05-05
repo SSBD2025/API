@@ -2,60 +2,58 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.UserRoleDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 
-import javax.crypto.SecretKey;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @PropertySource("classpath:secrets.properties")
 public class JwtTokenProvider {
 
-    @Value("${app.jwt_secret}")
-    private String secret;
-
     @Value("${app.jwt_expiration}")
     private long expiration;
+
+    @Value("${app.jwt_refresh_expiration}")
+    private long refreshExpiration;
 
     @Value("${app.jwt_issuer}")
     private String issuer;
 
     public String generateToken(Account account, List<String> roles) {
-
-//        Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
-//        List<String> roleNames = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()); //neither this
-//        account.getUserRoles().forEach(userRole -> roleNames.add(userRole.getRoleName())); //nor this works, as it pulls entire role by discriminator and causes permission error (dietary_restrictions etc)
-        //List<String> roleNames = roles.stream().map(UserRole::getRoleName).collect(Collectors.toList());
-//        userRoleDTOS.forEach(userRoleDTO -> roleNames.add(userRoleDTO.getRoleName()));
-
-
         return Jwts.builder()
                 .subject(account.getLogin())
                 .claim("roles", roles)
+                .claim("typ", "access")
                 .id(account.getId().toString())
                 .subject(account.getLogin())
                 .issuer(issuer) //is this needed? <- yes it is
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    public String generateRefreshToken(Account account) {
+        return Jwts.builder()
+                .id(account.getId().toString())
+                .subject(account.getLogin())
+                .claim("typ", "refresh")
+                .issuer(issuer) //is this needed? <- yes it is
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getPrivateKey())
                 .compact();
     }
@@ -75,20 +73,43 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
         return claims.get("roles", List.class);
     }
 
     public String getIssuer(String token) {
-        String issuer = Jwts.parser()
+        return Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getIssuer();
-        System.out.println("ISSUER: " + issuer);
+    }
 
-        return issuer;
+    public String getSubject(String token) {
+        return Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
+    public Date getExpiration(String token) {
+        return Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+    }
+
+    public String getType(String token) {
+        return (String) Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("typ");
     }
 
     private RSAPrivateKey getPrivateKey() {

@@ -16,9 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountWithRolesDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
@@ -58,6 +57,8 @@ public class AccountService {
     private final JwtTokenProvider jwtTokenProvider;
     @NotNull
     private final EmailService emailService;
+    @NotNull
+    private final JwtService jwtService;
 
     public UserDetails loadUserByUsername(String username) {
         Account account = accountRepository.findByLogin(username);
@@ -79,7 +80,7 @@ public class AccountService {
 //    }
 
 
-    public String login(String username, String password, String ipAddress) { //todo 90% sure its not correct
+    public TokenPairDTO login(String username, String password, String ipAddress) { //todo 90% sure its not correct
         Account account = accountRepository.findByLogin(username);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
         List<String> userRoles = new ArrayList<>();
@@ -100,7 +101,7 @@ public class AccountService {
         Date currentTime = new Date(System.currentTimeMillis());
         if (jwtUtil.checkPassword(password, account.getPassword())) {
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
-            return jwtTokenProvider.generateToken(account, userRoles);
+            return jwtService.generatePair(account, userRoles);
         } else {
             accountRepository.updateFailedLogin(username, currentTime, ipAddress);
             throw new InvalidCredentialsException();

@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -31,8 +32,8 @@ import java.util.stream.Collectors;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtUtil jwtUtil;
     private final AccountService accountService;
+    private final JwtService jwtService;
     private String issuer = "http://ssbd02-keycloak:8080/realms/app"; //make it prettier with @value or something
 
     @Override
@@ -41,8 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String token = getTokenFromRequest(request);
-        if (token != null && jwtTokenProvider.validateToken(token) && !Objects.equals(jwtTokenProvider.getIssuer(token), issuer)) { //last one makes sure it doesnt accidentally check oauth2 before its own dedicated filter
-            if (jwtUtil.checkToken(token)) { //todo i think this needs to be fixed, to be fully thread-safe
+        if (token != null && jwtTokenProvider.validateToken(token) && jwtTokenProvider.getType(token).equals("access") && !Objects.equals(jwtTokenProvider.getIssuer(token), issuer)) { //last one makes sure it doesnt accidentally check oauth2 before its own dedicated filter
+            if (!jwtService.check(token)) { //todo i think this needs to be fixed, to be fully thread-safe
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token has been invalidated");
                 return;

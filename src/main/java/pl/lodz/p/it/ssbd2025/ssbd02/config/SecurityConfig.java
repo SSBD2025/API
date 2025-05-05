@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,
                                 "/api/client/register",
                                 "/api/dietician/register",
-                                "/api/account/login"
+                                "/api/account/login",
+                                "/api/account/refresh"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/swagger-ui/**",
