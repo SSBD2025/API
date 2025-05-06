@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.repository;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,6 +25,8 @@ public interface AccountRepository extends AbstractRepository<Account> {
 //    Account findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
 
     Account findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
+
+    Account findByEmail(@Email String email);
 
     @Query("""
         select a.login as login, ur.roleName as roleName, ur.active as active

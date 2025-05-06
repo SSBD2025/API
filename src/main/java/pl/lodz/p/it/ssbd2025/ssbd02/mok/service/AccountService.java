@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,10 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.PasswordResetToken;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotActiveException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotVerifiedException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
@@ -69,6 +68,7 @@ public class AccountService {
     @NotNull
     private final JwtService jwtService;
     @NotNull
+    private final PasswordResetTokenService passwordResetTokenService;
     private final AccountMapper accountMapper;
 
     public UserDetails loadUserByUsername(String username) {
@@ -147,6 +147,34 @@ public class AccountService {
 
     public String me() {
         return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+
+    public void sendResetPasswordEmail(String email) {
+        Account account = accountRepository.findByEmail(email);
+        if(account == null) {
+            throw new AccountNotFoundException();
+        }
+        String token = UUID.randomUUID().toString();
+        passwordResetTokenService.createPasswordResetToken(account, token);
+        emailService.sendResetPasswordEmail(account.getEmail(), account.getUsername(), account.getLanguage(), token);
+    }
+
+
+    public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
+        if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Valid token")) {
+            Account account = accountRepository.findByEmail(resetPasswordDTO.email());
+            if(account == null) {
+                throw new AccountNotFoundException();
+            }
+            accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.password(), BCrypt.gensalt()));
+        }
+        else if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Invalid verification token")) {
+            throw new InvalidCredentialsException();
+        }
+        else if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Token expired")) {
+            throw new TokenExpiredException();
+        }
     }
 
     public List<AccountDTO> getAllAccounts(Boolean active, Boolean verified) {
