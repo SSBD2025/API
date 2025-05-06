@@ -1,9 +1,15 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 
-import java.util.UUID;
+import java.util.List;
 
-public interface DieticianRepository extends JpaRepository<Dietician, UUID> {
+@Repository
+@Transactional(propagation = Propagation.MANDATORY)
+public interface DieticianRepository extends AbstractRepository<Dietician> {
+    Dietician saveAndFlush(Dietician dietician);
 }
