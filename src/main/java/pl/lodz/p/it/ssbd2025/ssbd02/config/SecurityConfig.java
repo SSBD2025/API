@@ -54,7 +54,9 @@ public class SecurityConfig {
                                 "/api/client/register",
                                 "/api/dietician/register",
                                 "/api/account/login",
-                                "/api/account/refresh"
+                                "/api/account/refresh",
+                                "/api/account/reset/password/**",
+                                "/api/account/reset/password/request"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/swagger-ui/**",

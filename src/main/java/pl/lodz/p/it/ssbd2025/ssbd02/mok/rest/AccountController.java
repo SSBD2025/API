@@ -18,13 +18,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.RefreshRequestDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
@@ -92,6 +89,18 @@ public class AccountController {
     //@PreAuthorize()
     public ResponseEntity<Void> blockAccount(@PathVariable String id) {
         accountService.blockAccount(UUID.fromString(id));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("reset/password/request")
+    public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
+        accountService.sendResetPasswordEmail(resetPasswordDTO.email());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("reset/password/{token}")
+    public ResponseEntity<Void> resetPassword(@PathVariable String token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
+        accountService.resetPassword(token, resetPasswordDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
