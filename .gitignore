@@ -41,3 +41,4 @@ pg_hba.conf
 src/main/resources/keys/*
 Dockerfile.dev
 test.sql
+.mailmap

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
@@ -35,9 +36,17 @@ import java.util.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 
+import java.util.*;
+
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,6 +68,8 @@ public class AccountService {
     private final EmailService emailService;
     @NotNull
     private final JwtService jwtService;
+    @NotNull
+    private final AccountMapper accountMapper;
 
     public UserDetails loadUserByUsername(String username) {
         Account account = accountRepository.findByLogin(username);
@@ -138,4 +149,11 @@ public class AccountService {
         return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    public List<AccountDTO> getAllAccounts(Boolean active, Boolean verified) {
+        List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
+
+        return accounts.stream()
+                .map(accountMapper::toAccountDTO)
+                .collect(Collectors.toList());
+    }
 }

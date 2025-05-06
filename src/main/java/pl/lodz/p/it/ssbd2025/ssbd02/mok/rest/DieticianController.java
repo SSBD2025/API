@@ -1,13 +1,13 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
@@ -16,6 +16,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.DieticianService;
+
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -34,5 +36,19 @@ public class DieticianController {
         Dietician newDieticianData = userRoleMapper.toNewDietician(dieticianDTO.dietician());
         Account newAccount = accountMapper.toNewAccount(dieticianDTO.account());
         return dieticianMapper.toDieticianDTO(dieticianService.createDietician(newDieticianData, newAccount));
+    }
+
+//    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<DieticianDTO> getDieticianAccounts() {
+        return dieticianService.getDieticianAccounts();
+    }
+
+//    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/unverified")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AccountDTO> getUnverifiedDieticianAccounts() {
+        return dieticianService.getUnverifiedDieticianAccounts();
     }
 }

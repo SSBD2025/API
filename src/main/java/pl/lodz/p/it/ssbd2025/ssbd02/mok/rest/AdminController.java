@@ -1,14 +1,12 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AdminDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AdminMapper;
@@ -17,6 +15,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Admin;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AdminService;
+
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -40,4 +40,11 @@ public class AdminController {
     //activate dietician
     //create admin
     //activate admin
+
+//    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<AdminDTO> getAdminAccounts() {
+        return adminService.getAdminAccounts();
+    }
 }

@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.RefreshRequestDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
@@ -25,6 +28,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+
+import java.util.List;
 
 import java.util.UUID;
 
@@ -67,7 +72,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-//    @PreAuthorize("hasRole('CLIENT')||hasRole('client_admin')||hasRole('admin')")
+    //    @PreAuthorize("hasRole('CLIENT')||hasRole('client_admin')||hasRole('admin')")
 //    @PreAuthorize("permitAll()")
 //    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
@@ -90,4 +95,13 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+//    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<AccountDTO> getAllAccounts(
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Boolean verified
+    ) {
+        return accountService.getAllAccounts(active, verified);
+    }
 }
