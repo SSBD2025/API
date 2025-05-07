@@ -1,9 +1,11 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,12 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.JwtRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
@@ -54,6 +58,11 @@ public class AccountService {
     @NotNull
     private final PasswordResetTokenService passwordResetTokenService;
     private final AccountMapper accountMapper;
+    private final JwtRepository jwtRepository;
+    @Value("${mail.confirmation.url}")
+    private String confirmURL;
+    @Value("${mail.revert.url}")
+    private String revertURL;
 
     public UserDetails loadUserByUsername(String username) {
         Account account = accountRepository.findByLogin(username);
@@ -63,7 +72,6 @@ public class AccountService {
             return account;
         }
     }
-
 
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -189,6 +197,91 @@ public class AccountService {
                 .map(accountMapper::toAccountDTO)
                 .collect(Collectors.toList());
     }
+
+    public void changeEmail(String newEmail) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+        Account account = accountRepository.findByLogin(login);
+        if (account.getEmail().equals(newEmail)) {
+            throw new AccountSameEmailException();
+        }
+        if (accountRepository.findByEmail(newEmail) != null) {
+            throw new AccountEmailAlreadyInUseException();
+        }
+
+        String emailChangeToken = jwtTokenProvider.generateEmailChangeToken(account, newEmail);
+        String confirmationURL = confirmURL + emailChangeToken;
+
+        JwtEntity jwt = new JwtEntity(emailChangeToken, jwtTokenProvider.getExpiration(emailChangeToken), account);
+        jwtRepository.save(jwt);
+
+        emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
+    }
+
+    public void confirmEmail(String token) {
+        JwtEntity jwt = jwtRepository.findByTokenValue(token);
+        if (jwt.getExpiration().before(new Date())) {
+            jwtRepository.delete(jwt);
+            throw new TokenExpiredException();
+        }
+
+        String newEmail = jwtTokenProvider.getNewEmailFromToken(token);
+        UUID accountId = jwtTokenProvider.getAccountIdFromToken(token);
+
+        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+
+        String oldEmail = account.getEmail();
+
+        account.setEmail(newEmail);
+        accountRepository.saveAndFlush(account);
+        jwtRepository.delete(jwt);
+
+        String revertToken = jwtTokenProvider.generateEmailRevertToken(account, oldEmail);
+        String revertChangeURL = revertURL + revertToken;
+
+        JwtEntity jwtEntity = new JwtEntity(revertToken, jwtTokenProvider.getExpiration(revertToken), account);
+        jwtRepository.save(jwtEntity);
+
+        emailService.sendRevertChangeEmail(account.getUsername(), oldEmail, revertChangeURL, account.getLanguage());
+    }
+
+    public void revertEmailChange(String token) {
+        JwtEntity jwt = jwtRepository.findByTokenValue(token);
+        if (jwt.getExpiration().before(new Date())) {
+            jwtRepository.delete(jwt);
+            throw new TokenExpiredException();
+        }
+
+        String oldEmail = jwtTokenProvider.getOldEmailFromToken(token);
+        UUID accountId = jwtTokenProvider.getAccountIdFromToken(token);
+
+        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+
+        account.setEmail(oldEmail);
+        accountRepository.saveAndFlush(account);
+        jwtRepository.delete(jwt);
+    }
+
+    public void resendEmailChangeLink() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+        Account account = accountRepository.findByLogin(login);
+        JwtEntity jwtEntity = jwtRepository.findByAccount(account).stream()
+                .filter(jwt -> {
+                    try {
+                        String type = jwtTokenProvider.getType(jwt.getToken());
+                        return "EMAIL_CHANGE".equals(type) && jwt.getExpiration().after(new Date());
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .findFirst().orElseThrow(EmailChangeTokenNotFoundException::new);
+
+        String emailChangeToken = jwtEntity.getToken();
+        String newEmail = jwtTokenProvider.getNewEmailFromToken(emailChangeToken);
+        String confirmationURL = confirmURL + emailChangeToken;
+
+        emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
 
     public AccountReadDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login);

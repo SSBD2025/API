@@ -32,6 +32,9 @@ public class JwtTokenProvider {
     @Value("${app.jwt_issuer}")
     private String issuer;
 
+    @Value("${email.change_expiration}")
+    private int emailChangeExpiration;
+
     public String generateToken(Account account, List<String> roles) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -150,5 +153,62 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public String generateEmailChangeToken(Account account, String newEmail) {
+        return Jwts.builder()
+                .subject(account.getLogin())
+                .id(account.getId().toString())
+                .claim("newEmail", newEmail)
+                .claim("typ", "EMAIL_CHANGE")
+                .issuer(issuer)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    public String generateEmailRevertToken(Account account, String oldEmail) {
+        return Jwts.builder()
+                .subject(account.getLogin())
+                .id(account.getId().toString())
+                .claim("oldEmail", oldEmail)
+                .claim("typ", "EMAIL_REVERT")
+                .issuer(issuer)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    public String getNewEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("newEmail", String.class);
+    }
+
+    public String getOldEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("oldEmail", String.class);
+    }
+
+    public UUID getAccountIdFromToken(String token) {
+        String id = Jwts.parser()
+                .verifyWith(getPublicKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getId();
+
+        return UUID.fromString(id);
     }
 }

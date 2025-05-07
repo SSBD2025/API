@@ -18,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangeEmailDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
@@ -83,6 +86,30 @@ public class AccountController {
     public AccountReadDTO getMe() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         return accountService.getAccountByLogin(login);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<?> changeEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+        accountService.changeEmail(changeEmailDTO.email());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/confirm-email")
+    public ResponseEntity<?> confirmEmail(@RequestParam("token") String token ) {
+        accountService.confirmEmail(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/revert-email-change")
+    public ResponseEntity<?> revertEmailChange(@RequestParam("token") String token) {
+        accountService.revertEmailChange(token);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/resend-change-email")
+    public ResponseEntity<Void> resendEmailChangeLink() {
+        accountService.resendEmailChangeLink();
+        return ResponseEntity.ok().build();
     }
 
     private String getClientIp(HttpServletRequest request) {
