@@ -1,16 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.security.core.userdetails.UserDetails;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
@@ -21,31 +13,23 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.PasswordResetToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
-import java.security.Timestamp;
-import java.util.*;
-
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
+import java.security.SecureRandom;
 
 import java.util.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -93,6 +77,27 @@ public class AccountService {
         accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.newPassword(), BCrypt.gensalt()));
     }
 
+    public String setGeneratedPassword(UUID uuid) { //TODO zmienić na void
+        Optional<Account> account = accountRepository.findById(uuid);
+        if(account.isEmpty()) {
+            throw new AccountNotFoundException();
+        }
+        String password = generateRandomPassword();
+        accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
+        String token = UUID.randomUUID().toString();
+        passwordResetTokenService.createPasswordResetToken(account.get(), token);
+        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getUsername(), account.get().getLanguage(), token, password);
+        return password;
+    }
+
+    private String generateRandomPassword() {
+        int length = 12;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        SecureRandom random = new SecureRandom();
+        return random.ints(length, 0, chars.length())
+                .mapToObj(i -> String.valueOf(chars.charAt(i)))
+                .collect(Collectors.joining());
+    }
 
     public TokenPairDTO login(String username, String password, String ipAddress) { //todo 90% sure its not correct
         Account account = accountRepository.findByLogin(username);

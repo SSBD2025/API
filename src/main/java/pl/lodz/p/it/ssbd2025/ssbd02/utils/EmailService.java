@@ -100,4 +100,43 @@ public class EmailService {
         }
     }
 
+    @Async
+    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
+        String mailContent = "<p> Hi, "+ username + ", </p>"+
+                "<p><b>Admin changed your password recently,</b>"+"" +
+                "You can chamge it by following this link.</p>"+
+                "<a href=\"http://localhost:8080/api/account/reset/password/" +token+ "\">Reset password</a>"+
+                "<p> You can also change it manually. Your new, temporary password: <b>" + password + "</b></p>"+
+                "<p> Users Registration Portal Service"; //TODO zmienić link
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+//            helper.setSubject(I18n.getMessage("email.reset.subject", language));
+            helper.setSubject("Admin changed your password");
+            helper.setText(mailContent, true);
+
+//            Context context = new Context();
+//            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
+//            context.setVariable("name", username);
+//            context.setVariable("body", I18n.getMessage("email.block.body", language));
+//            //TODO co się  dzieje z językiem?
+//
+//
+//            String htmlContent = templateEngine.process("emailTemplate", context);
+//
+//            helper.setText(htmlContent, true);
+
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
+
 }
