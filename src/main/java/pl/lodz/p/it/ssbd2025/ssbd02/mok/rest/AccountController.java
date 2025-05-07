@@ -62,6 +62,13 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PostMapping("/{id}/changePassword")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> changeUserPassword(@PathVariable String id) {
+        String password = accountService.setGeneratedPassword(UUID.fromString(id));
+        return ResponseEntity.status(HttpStatus.OK).body(password); //TODO zastanowić się, czy zwracać tu tę wartość
+    }
+
     @PostMapping("/logout") //this is the normal logout for our own security implementation
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
