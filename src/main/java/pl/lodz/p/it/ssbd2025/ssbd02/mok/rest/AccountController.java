@@ -73,8 +73,9 @@ public class AccountController {
 //    @PreAuthorize("permitAll()")
 //    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public String testClient() {
-        return "Hello " + SecurityContextHolder.getContext().getAuthentication();
+    public AccountReadDTO getMe() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        return accountService.getAccountByLogin(login);
     }
 
     private String getClientIp(HttpServletRequest request) {
@@ -112,5 +113,12 @@ public class AccountController {
             @RequestParam(required = false) Boolean verified
     ) {
         return accountService.getAllAccounts(active, verified);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
+    public AccountReadDTO getAccountById(@PathVariable String id) {
+        return accountService.getAccountById(id);
     }
 }
