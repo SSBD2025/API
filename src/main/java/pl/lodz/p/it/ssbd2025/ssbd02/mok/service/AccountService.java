@@ -184,4 +184,21 @@ public class AccountService {
                 .map(accountMapper::toAccountDTO)
                 .collect(Collectors.toList());
     }
+
+    public AccountReadDTO getAccountByLogin(String login) {
+        Account account = accountRepository.findByLogin(login);
+
+        if(account == null) {
+            throw new AccountNotFoundException();
+        }
+
+        return accountMapper.toReadDTO(account);
+    }
+
+    public AccountReadDTO getAccountById(String id) {
+        Account account = accountRepository.findById(UUID.fromString(id))
+                .orElseThrow(AccountNotFoundException::new);
+
+        return accountMapper.toReadDTO(account);
+    }
 }
