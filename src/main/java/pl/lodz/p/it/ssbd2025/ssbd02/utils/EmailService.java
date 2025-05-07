@@ -63,6 +63,58 @@ public class EmailService {
     }
 
     @Async
+    public void sendChangeEmail(String username, String receiver, String confirmationURL, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(receiver);
+            helper.setSubject(I18n.getMessage("email.change.subject", language));
+
+            Context context = new Context();
+            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
+            context.setVariable("name", username);
+            context.setVariable("body", I18n.getMessage("email.change.body", language));
+            context.setVariable("url", confirmationURL);
+            context.setVariable("linkText", I18n.getMessage("email.change.link", language));
+
+            String htmlContent = templateEngine.process("changeEmailTemplate", context);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    public void sendRevertChangeEmail(String username, String receiver, String revertChangeURL, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(receiver);
+            helper.setSubject(I18n.getMessage("email.revert.change.subject", language));
+
+            Context context = new Context();
+            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
+            context.setVariable("name", username);
+            context.setVariable("body", I18n.getMessage("email.revert.change.body", language));
+            context.setVariable("url", revertChangeURL);
+            context.setVariable("linkText", I18n.getMessage("email.revert.change.link", language));
+
+            String htmlContent = templateEngine.process("changeEmailTemplate", context);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
     public void sendResetPasswordEmail(String to, String username, Language language, String token) {
         String mailContent = "<p> Hi, "+ username + ", </p>"+
             "<p><b>You recently requested to reset your password,</b>"+"" +

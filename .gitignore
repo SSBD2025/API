@@ -42,3 +42,4 @@ src/main/resources/keys/*
 Dockerfile.dev
 test.sql
 .mailmap
+init.sql

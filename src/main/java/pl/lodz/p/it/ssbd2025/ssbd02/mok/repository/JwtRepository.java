@@ -23,4 +23,7 @@ public interface JwtRepository extends JpaRepository<JwtEntity, UUID>, AbstractR
     void deleteAllByAccount(Account account);
 
     boolean existsByToken(String token);
+
+    @Query("SELECT j FROM JwtEntity j WHERE j.token = :token")
+    JwtEntity findByTokenValue(String token);
 }
