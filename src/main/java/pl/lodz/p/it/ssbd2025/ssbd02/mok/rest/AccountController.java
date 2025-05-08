@@ -74,8 +74,8 @@ public class AccountController {
 
     @PostMapping("/logout") //this is the normal logout for our own security implementation
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        accountService.logout(token);
+    public ResponseEntity<?> logout() {
+        accountService.logout();
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

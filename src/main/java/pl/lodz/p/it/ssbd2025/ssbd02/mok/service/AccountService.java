@@ -139,8 +139,9 @@ public class AccountService {
         }
     }
 
-    public void logout(String token) {
-        jwtUtil.invalidateToken(token);
+    public void logout() {
+        Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
+        jwtRepository.deleteAllByAccount(account);
         SecurityContextHolder.clearContext();
     }
 

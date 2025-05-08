@@ -9,17 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class JwtUtil {
-    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
-
-
-    public boolean checkToken(String token) {
-        return blacklistedTokens.contains(token);
-    }
-
-    public void invalidateToken(String token) {
-        blacklistedTokens.add(token.substring(7));
-    }
-
     public boolean checkPassword(String plaintext, String hash) {
         return BCrypt.checkpw(plaintext, hash);
     }
