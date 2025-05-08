@@ -35,7 +35,7 @@ public class JwtTokenProvider {
     @Value("${email.change_expiration}")
     private int emailChangeExpiration;
 
-    public String generateToken(Account account, List<String> roles) {
+    public String generateAccessToken(Account account, List<String> roles) {
         return Jwts.builder()
                 .subject(account.getLogin())
                 .claim("roles", roles)

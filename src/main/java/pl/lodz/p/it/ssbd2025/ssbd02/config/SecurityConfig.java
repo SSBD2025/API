@@ -47,7 +47,9 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error",
                                         "/api/account/confirm-email/**",
-                                        "/api/account/revert-email-change/**"
+                                        "/api/account/revert-email-change/**",
+                                        "/api/account/verify/**",
+                                        "/api/account/verify/"
                                 ).permitAll()
 //                                .requestMatchers(HttpMethod.GET,
 //                                        "/api/account/me"

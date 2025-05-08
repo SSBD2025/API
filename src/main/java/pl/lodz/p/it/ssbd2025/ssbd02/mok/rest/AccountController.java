@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
+import java.io.IOException;
 import java.util.List;
 
 import java.util.UUID;
@@ -162,6 +164,18 @@ public class AccountController {
         return accountService.getAccountById(id);
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<Void> verifyAccount(@RequestParam String token) {
+        accountService.verifyAccount(token);
+//        try {
+//            response.sendRedirect("/login");
+//        } catch (IOException e) {
+//            response.setStatus(HttpStatus.OK.value());
+//        }
+//        response.setStatus(HttpStatus.OK.value());
+        return ResponseEntity.ok().build();
+    }
+    
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
