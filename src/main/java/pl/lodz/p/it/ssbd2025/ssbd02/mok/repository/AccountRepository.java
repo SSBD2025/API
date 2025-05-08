@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import java.security.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @Component("MOKAccountRepository")

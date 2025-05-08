@@ -83,11 +83,17 @@ public class AccountController {
 //    @PreAuthorize("permitAll()")
 //    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public AccountReadDTO getMe() {
+    public AccountWithTokenDTO getMe() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         return accountService.getAccountByLogin(login);
     }
 
+    @PutMapping("/me")
+    public void updateMe(@RequestBody @Valid UpdateAccountDTO updateAccountDTO) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.updateMyAccount(login, updateAccountDTO);
+    }
+    
     @PostMapping("/change-email")
     public ResponseEntity<?> changeEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeEmail(changeEmailDTO.email());
