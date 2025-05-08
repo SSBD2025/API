@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
+import jakarta.persistence.OptimisticLockException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +35,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,6 +61,7 @@ public class AccountService {
     @NotNull
     private final PasswordResetTokenService passwordResetTokenService;
     private final AccountMapper accountMapper;
+    private final LockTokenService lockTokenService;
     private final JwtRepository jwtRepository;
     @Value("${mail.confirmation.url}")
     private String confirmURL;
@@ -158,11 +162,6 @@ public class AccountService {
 
     }
 
-    public String me() {
-        return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-
     public void sendResetPasswordEmail(String email) {
         Account account = accountRepository.findByEmail(email);
         if(account == null) {
@@ -172,7 +171,6 @@ public class AccountService {
         passwordResetTokenService.createPasswordResetToken(account, token);
         emailService.sendResetPasswordEmail(account.getEmail(), account.getUsername(), account.getLanguage(), token);
     }
-
 
     public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
         if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Valid token")) {
@@ -282,21 +280,66 @@ public class AccountService {
         String confirmationURL = confirmURL + emailChangeToken;
 
         emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
+    }
 
-    public AccountReadDTO getAccountByLogin(String login) {
+    public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login);
 
         if(account == null) {
             throw new AccountNotFoundException();
         }
 
-        return accountMapper.toReadDTO(account);
+        AccountReadDTO dto = accountMapper.toReadDTO(account);
+        String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+
+        return new AccountWithTokenDTO(dto, token);
     }
 
-    public AccountReadDTO getAccountById(String id) {
+    public AccountWithTokenDTO getAccountById(String id) {
         Account account = accountRepository.findById(UUID.fromString(id))
                 .orElseThrow(AccountNotFoundException::new);
 
-        return accountMapper.toReadDTO(account);
+        AccountReadDTO dto = accountMapper.toReadDTO(account);
+        String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+
+        return new AccountWithTokenDTO(dto, token);
+    }
+
+    public void updateMyAccount(String login, UpdateAccountDTO dto) {
+        updateAccount(() -> {
+            Account account = accountRepository.findByLogin(login);
+            if (account == null) {
+                throw new AccountNotFoundException();
+            }
+            return account;
+        }, dto);
+    }
+
+    public void updateAccountById(String id, UpdateAccountDTO dto) {
+        updateAccount(() -> accountRepository.findById(UUID.fromString(id))
+                .orElseThrow(AccountNotFoundException::new), dto);
+    }
+
+    private void updateAccount(Supplier<Account> accountSupplier, UpdateAccountDTO dto) {
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.lockToken());
+
+        Account account = accountSupplier.get();
+
+        if (!account.isActive()) {
+            throw new AccountNotActiveException();
+        }
+
+        if (!account.getId().equals(record.id())) {
+            throw new InvalidLockTokenException();
+        }
+
+        if (!Objects.equals(account.getVersion(), record.version())) {
+            throw new OptimisticLockException("Version mismatch");
+        }
+
+        account.setFirstName(dto.firstName());
+        account.setLastName(dto.lastName());
+
+        accountRepository.saveAndFlush(account);
     }
 }

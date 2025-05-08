@@ -83,11 +83,17 @@ public class AccountController {
 //    @PreAuthorize("permitAll()")
 //    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public AccountReadDTO getMe() {
+    public AccountWithTokenDTO getMe() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         return accountService.getAccountByLogin(login);
     }
 
+    @PutMapping("/me")
+    public void updateMe(@RequestBody @Valid UpdateAccountDTO updateAccountDTO) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.updateMyAccount(login, updateAccountDTO);
+    }
+    
     @PostMapping("/change-email")
     public ResponseEntity<?> changeEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeEmail(changeEmailDTO.email());
@@ -152,7 +158,16 @@ public class AccountController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public AccountReadDTO getAccountById(@PathVariable String id) {
+    public AccountWithTokenDTO getAccountById(@PathVariable String id) {
         return accountService.getAccountById(id);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateAccountById(@RequestBody @Valid UpdateAccountDTO updateAccountDTO,
+                                                  @PathVariable String id) {
+        accountService.updateAccountById(id, updateAccountDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
