@@ -5,9 +5,8 @@ stages:
 build_backend:
   stage: build
   script:
-    - cd /ssbd/api
-    - git pull
     - mvn clean package -DskipTests
+    - cp ./target/ssbd02*.jar /ssbd/api/target/ssbd02.jar
   tags:
     - backend-shell
   only:
@@ -19,7 +18,7 @@ deploy_backend:
     - cd /ssbd/docker
     - docker compose build backend
     - docker compose up -d --no-deps --force-recreate backend
-    -  mvn liquibase:update
+    # - mvn liquibase:update
   tags:
     - backend-shell
   only:
