@@ -1,8 +1,10 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
 import jakarta.persistence.OptimisticLockException;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
@@ -292,11 +295,12 @@ public class AccountService {
         if(account == null) {
             throw new AccountNotFoundException();
         }
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(login);
 
         AccountReadDTO dto = accountMapper.toReadDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
 
-        return new AccountWithTokenDTO(dto, token);
+        return new AccountWithTokenDTO(dto, token, roles);
     }
 
     public AccountWithTokenDTO getAccountById(String id) {
@@ -305,8 +309,9 @@ public class AccountService {
 
         AccountReadDTO dto = accountMapper.toReadDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
 
-        return new AccountWithTokenDTO(dto, token);
+        return new AccountWithTokenDTO(dto, token, roles);
     }
 
     public void updateAccountById(String id, UpdateAccountDTO dto) {
