@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
+import jakarta.persistence.OptimisticLockException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
@@ -58,6 +60,7 @@ public class AccountService {
     @NotNull
     private final PasswordResetTokenService passwordResetTokenService;
     private final AccountMapper accountMapper;
+    private final LockTokenService lockTokenService;
     private final JwtRepository jwtRepository;
     @Value("${mail.confirmation.url}")
     private String confirmURL;
@@ -282,15 +285,19 @@ public class AccountService {
         String confirmationURL = confirmURL + emailChangeToken;
 
         emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
+    }
 
-    public AccountReadDTO getAccountByLogin(String login) {
+    public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login);
 
         if(account == null) {
             throw new AccountNotFoundException();
         }
 
-        return accountMapper.toReadDTO(account);
+        AccountReadDTO dto = accountMapper.toReadDTO(account);
+        String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+
+        return new AccountWithTokenDTO(dto, token);
     }
 
     public AccountReadDTO getAccountById(String id) {
@@ -298,5 +305,31 @@ public class AccountService {
                 .orElseThrow(AccountNotFoundException::new);
 
         return accountMapper.toReadDTO(account);
+    }
+
+    public void updateMyAccount(String login, UpdateAccountDTO updateAccountDTO) {
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(updateAccountDTO.lockToken());
+
+        Account account = accountRepository.findByLogin(login);
+        if (account == null) {
+            throw new AccountNotFoundException();
+        }
+
+        if (!account.isActive()) {
+            throw new AccountNotActiveException();
+        }
+
+        if (!account.getId().equals(record.id())) {
+            throw new InvalidLockTokenException();
+        }
+
+        account.setFirstName(updateAccountDTO.firstName());
+        account.setLastName(updateAccountDTO.lastName());
+
+        if (!Objects.equals(account.getVersion(), record.version())) {
+            throw new OptimisticLockException("Version mismatch"); // TODO: need to catch this error because its runtime
+        }
+
+        accountRepository.saveAndFlush(account);
     }
 }
