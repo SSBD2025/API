@@ -49,7 +49,7 @@ public record AccountDTO(
         @Null(groups = {OnCreate.class, OnUpdate.class})
         Timestamp lastFailedLogin,
 
-        @Null(groups = {OnCreate.class, OnUpdate.class})
+        @NotNull(groups = {OnCreate.class, OnUpdate.class})
         Language language,
 
         @Null(groups = {OnCreate.class, OnUpdate.class})

@@ -24,7 +24,7 @@ public interface AccountMapper {
             @Mapping(target = "active", ignore = true),
             @Mapping(target = "lastSuccessfulLogin", ignore = true),
             @Mapping(target = "lastFailedLogin", ignore = true),
-            @Mapping(target = "language", ignore = true),
+            @Mapping(target = "language", ignore = false),
             @Mapping(target = "lastSuccessfulLoginIp", ignore = true),
             @Mapping(target = "lastFailedLoginIp", ignore = true),
             @Mapping(target = "userRoles", ignore = true),

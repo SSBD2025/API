@@ -35,7 +35,7 @@ public class JwtService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     public TokenPairDTO generatePair(@NotNull Account account, @NotNull List<String> roles) {// no clue if this method is correct
-        String accessToken = jwtTokenProvider.generateToken(account, roles);
+        String accessToken = jwtTokenProvider.generateAccessToken(account, roles);
         String refreshToken = jwtTokenProvider.generateRefreshToken(account);
         Date accessExpiration = jwtTokenProvider.getExpiration(accessToken);
         Date refreshExpiration = jwtTokenProvider.getExpiration(refreshToken);
@@ -61,7 +61,7 @@ public class JwtService {
                 userRoles.add(role.getRoleName());
             }
         });
-        String newAccessToken = jwtTokenProvider.generateToken(account, userRoles);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(account, userRoles);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(account);
         Date expiration = jwtTokenProvider.getExpiration(token);
         jwtRepository.deleteAllByAccount(account);

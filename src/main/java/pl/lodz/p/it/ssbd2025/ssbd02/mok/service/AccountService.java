@@ -18,11 +18,13 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.JwtRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.VerificationTokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
@@ -60,6 +62,7 @@ public class AccountService {
     private final JwtService jwtService;
     @NotNull
     private final PasswordResetTokenService passwordResetTokenService;
+    private final VerificationTokenRepository verificationTokenRepository;
     private final AccountMapper accountMapper;
     private final LockTokenService lockTokenService;
     private final JwtRepository jwtRepository;
@@ -357,5 +360,21 @@ public class AccountService {
         }
 
         accountRepository.saveAndFlush(account);
+    }
+
+    public void verifyAccount(String token){
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+        if(verificationToken.getExpiration().before(new Date())) {
+            throw new TokenExpiredException();
+        }
+        Account account = verificationToken.getAccount();
+        if(account == null) {
+            throw new AccountNotFoundException();
+        }
+        if(account.isVerified()){
+            throw new AccountAlreadyVerifiedException(); //remember to set verified = false when changing email
+        }
+        verificationTokenRepository.delete(verificationToken);
+        account.setVerified(true);
     }
 }
