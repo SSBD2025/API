@@ -158,7 +158,16 @@ public class AccountController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public AccountReadDTO getAccountById(@PathVariable String id) {
+    public AccountWithTokenDTO getAccountById(@PathVariable String id) {
         return accountService.getAccountById(id);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateAccountById(@RequestBody @Valid UpdateAccountDTO updateAccountDTO,
+                                                  @PathVariable String id) {
+        accountService.updateAccountById(id, updateAccountDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
