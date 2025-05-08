@@ -305,16 +305,6 @@ public class AccountService {
         return new AccountWithTokenDTO(dto, token);
     }
 
-    public void updateMyAccount(String login, UpdateAccountDTO dto) {
-        updateAccount(() -> {
-            Account account = accountRepository.findByLogin(login);
-            if (account == null) {
-                throw new AccountNotFoundException();
-            }
-            return account;
-        }, dto);
-    }
-
     public void updateAccountById(String id, UpdateAccountDTO dto) {
         updateAccount(() -> accountRepository.findById(UUID.fromString(id))
                 .orElseThrow(AccountNotFoundException::new), dto);
