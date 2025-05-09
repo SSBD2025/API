@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ClientRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.VerificationTokenRepository;
@@ -30,6 +31,7 @@ import java.util.stream.StreamSupport;
 @Component
 @RequiredArgsConstructor
 @Service
+@MethodCallLogged
 //@MethodCallLogged //todo!!
 @Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
 public class ClientService {
@@ -53,7 +55,6 @@ public class ClientService {
         Account createdAccount = accountRepository.saveAndFlush(newAccount);//todo check if this is correct
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
-        System.out.println(verificationURL + token);
         verificationTokenRepository.saveAndFlush(new VerificationToken(token, createdAccount));
         return clientRepository.saveAndFlush(newClient);//todo check if this is correct
     }
