@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
@@ -27,6 +28,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.JwtRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.VerificationTokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
@@ -73,6 +75,8 @@ public class AccountService {
     private String confirmURL;
     @Value("${mail.revert.url}")
     private String revertURL;
+    @NotNull
+    private final UserRoleRepository userRoleRepository;
 
     public UserDetails loadUserByUsername(String username) {
         Account account = accountRepository.findByLogin(username);
@@ -382,5 +386,56 @@ public class AccountService {
         }
         verificationTokenRepository.delete(verificationToken);
         account.setVerified(true);
+    }
+
+    public boolean assignAdminRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        boolean hasActiveAdminRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
+                .anyMatch(role -> role.getRoleName().equals("ADMIN") && role.isActive());
+
+        if (!hasActiveAdminRole) {
+            Admin admin = new Admin();
+            admin.setAccount(account);
+            admin.setActive(true);
+            userRoleRepository.save(admin);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean assignDieticianRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        boolean hasActiveDieticianRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
+                .anyMatch(role -> role.getRoleName().equals("DIETICIAN") && role.isActive());
+
+        if (!hasActiveDieticianRole) {
+            Dietician dietician = new Dietician();
+            dietician.setAccount(account);
+            dietician.setActive(true);
+            userRoleRepository.save(dietician);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean assignClientRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        boolean hasActiveClientRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
+                .anyMatch(role -> role.getRoleName().equals("CLIENT") && role.isActive());
+
+        if (!hasActiveClientRole) {
+            Client client = new Client();
+            client.setAccount(account);
+            client.setActive(true);
+            userRoleRepository.save(client);
+            return true;
+        }
+        return false;
     }
 }
