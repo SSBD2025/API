@@ -52,7 +52,7 @@ public class ClientService {
         newAccount.setActive(true); //todo can this stay? verification is required anyway
         Account createdAccount = accountRepository.saveAndFlush(newAccount);//todo check if this is correct
         String token = UUID.randomUUID().toString();
-        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getUsername(), verificationURL, newAccount.getLanguage(), token, false);
+        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
         System.out.println(verificationURL + token);
         verificationTokenRepository.saveAndFlush(new VerificationToken(token, createdAccount));
         return clientRepository.saveAndFlush(newClient);//todo check if this is correct

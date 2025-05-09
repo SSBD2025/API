@@ -219,4 +219,29 @@ public class EmailService {
         }
     }
 
+
+    @Async
+    public void sendAdminLoginEmail(String to, String username, String IP, Language language){
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.login_as_admin.subject", language));
+
+            Context context = new Context();
+            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
+            context.setVariable("name", username);
+            context.setVariable("body", I18n.getMessage("email.login_as_admin.body", language));
+            context.setVariable("ip_addr", IP);
+
+            String htmlContent = templateEngine.process("changeEmailTemplate", context);
+
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            e.printStackTrace(); //todo
+        }
+    }
 }
