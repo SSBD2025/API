@@ -22,6 +22,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
@@ -449,5 +450,65 @@ public class AccountService {
             return true;
         }
         return false;
+    }
+
+    public boolean revokeAdminRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        List<Admin> admins = userRoleRepository.findAdminsByAccount(account);
+
+        Admin activeAdmin = admins.stream()
+                .filter(Admin::isActive)
+                .findFirst()
+                .orElse(null);
+
+        if (activeAdmin == null) {
+            return false;
+        }
+
+        activeAdmin.setActive(false);
+        userRoleRepository.save(activeAdmin);
+        return true;
+    }
+
+    public boolean revokeDieticianRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        List<Dietician> dieticians = userRoleRepository.findDieticiansByAccount(account);
+
+        Dietician activeDietician = dieticians.stream()
+                .filter(Dietician::isActive)
+                .findFirst()
+                .orElse(null);
+
+        if (activeDietician == null) {
+            return false;
+        }
+
+        activeDietician.setActive(false);
+        userRoleRepository.save(activeDietician);
+        return true;
+    }
+
+    public boolean revokeClientRole(UUID accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        List<Client> clients = userRoleRepository.findClientsByAccount(account);
+
+        Client activeClient = clients.stream()
+                .filter(Client::isActive)
+                .findFirst()
+                .orElse(null);
+
+        if (activeClient == null) {
+            return false;
+        }
+
+        activeClient.setActive(false);
+        userRoleRepository.save(activeClient);
+        return true;
     }
 }
