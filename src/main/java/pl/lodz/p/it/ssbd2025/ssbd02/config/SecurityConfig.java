@@ -50,7 +50,8 @@ public class SecurityConfig {
                                         "/api/account/confirm-email/**",
                                         "/api/account/revert-email-change/**",
                                         "/api/account/verify/**",
-                                        "/api/account/verify/"
+                                        "/api/account/verify/",
+                                        "/favicon.ico"
                                 ).permitAll()
 //                                .requestMatchers(HttpMethod.GET,
 //                                        "/api/account/me"

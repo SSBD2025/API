@@ -210,10 +210,19 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public void changeEmail(String newEmail) {
+    public void changeOwnEmail(String newEmail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
         Account account = accountRepository.findByLogin(login);
+        handleEmailChange(account, newEmail);
+    }
+
+    public void changeUserEmail(UUID accountId, String newEmail) {
+        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+        handleEmailChange(account, newEmail);
+    }
+
+    private void handleEmailChange(Account account, String newEmail) {
         if (account.getEmail().equals(newEmail)) {
             throw new AccountSameEmailException();
         }

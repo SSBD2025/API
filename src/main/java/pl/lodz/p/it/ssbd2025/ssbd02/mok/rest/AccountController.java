@@ -31,6 +31,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 import java.util.UUID;
@@ -97,8 +98,9 @@ public class AccountController {
     }
     
     @PostMapping("/change-email")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<?> changeEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-        accountService.changeEmail(changeEmailDTO.email());
+        accountService.changeOwnEmail(changeEmailDTO.email());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -115,9 +117,19 @@ public class AccountController {
     }
 
     @PostMapping("/resend-change-email")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Void> resendEmailChangeLink() {
         accountService.resendEmailChangeLink();
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/change-user-email")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> changeUserEmail(
+            @PathVariable String id,
+            @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+        accountService.changeUserEmail(UUID.fromString(id), changeEmailDTO.email());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private String getClientIp(HttpServletRequest request) {
