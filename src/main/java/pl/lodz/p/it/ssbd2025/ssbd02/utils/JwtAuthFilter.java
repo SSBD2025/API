@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 
@@ -52,10 +53,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String login = jwtTokenProvider.getLogin(token);
             List<String> roles = jwtTokenProvider.getRoles(token);
 
-            UserDetails userDetails = accountService.loadUserByUsername(login);
             Collection<? extends GrantedAuthority> authorities = roles.stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .collect(Collectors.toList());
+
+            UserDetails userDetails = new UserDetailsImpl(authorities, null, login);
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userDetails, null, authorities);

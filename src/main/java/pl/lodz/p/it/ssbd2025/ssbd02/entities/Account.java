@@ -23,7 +23,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account extends AbstractEntity implements UserDetails { //can user details stay there?
+public class Account extends AbstractEntity {
 
     @Basic(optional = false)
     @NotBlank
@@ -69,14 +69,4 @@ public class Account extends AbstractEntity implements UserDetails { //can user 
 
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return userRoles.stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).toList();
-    }
-
-    @Override
-    public String getUsername() {
-        return this.login;
-    }
 }

@@ -74,14 +74,14 @@ public class AccountService {
     @Value("${mail.revert.url}")
     private String revertURL;
 
-    public UserDetails loadUserByUsername(String username) {
-        Account account = accountRepository.findByLogin(username);
-        if(account == null) {
-            throw new AccountNotFoundException();
-        } else {
-            return account;
-        }
-    }
+//    public UserDetails loadUserByUsername(String username) {
+//        Account account = accountRepository.findByLogin(username);
+//        if(account == null) {
+//            throw new AccountNotFoundException();
+//        } else {
+//            return account;
+//        }
+//    }
 
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -104,7 +104,7 @@ public class AccountService {
         accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account.get(), token);
-        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getUsername(), account.get().getLanguage(), token, password);
+        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password);
         return password;
     }
 
@@ -138,6 +138,9 @@ public class AccountService {
         Date currentTime = new Date(System.currentTimeMillis());
         if (jwtUtil.checkPassword(password, account.getPassword())) {
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
+            if(userRoles.contains("ADMIN")) {
+                emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
+            }
             return jwtService.generatePair(account, userRoles);
         } else {
             accountRepository.updateFailedLogin(username, currentTime, ipAddress);
@@ -164,7 +167,7 @@ public class AccountService {
         account.setActive(false);
         accountRepository.saveAndFlush(account);
 
-        emailService.sendBlockAccountEmail(account.getEmail(), account.getUsername(), account.getLanguage());
+        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
         //TODO logowanie
 
     }
@@ -176,7 +179,7 @@ public class AccountService {
         }
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account, token);
-        emailService.sendResetPasswordEmail(account.getEmail(), account.getUsername(), account.getLanguage(), token);
+        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
     }
 
     public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
@@ -220,7 +223,7 @@ public class AccountService {
         JwtEntity jwt = new JwtEntity(emailChangeToken, jwtTokenProvider.getExpiration(emailChangeToken), account);
         jwtRepository.save(jwt);
 
-        emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
+        emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
     public void confirmEmail(String token) {
@@ -247,7 +250,7 @@ public class AccountService {
         JwtEntity jwtEntity = new JwtEntity(revertToken, jwtTokenProvider.getExpiration(revertToken), account);
         jwtRepository.save(jwtEntity);
 
-        emailService.sendRevertChangeEmail(account.getUsername(), oldEmail, revertChangeURL, account.getLanguage());
+        emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, revertChangeURL, account.getLanguage());
     }
 
     public void revertEmailChange(String token) {
@@ -286,7 +289,7 @@ public class AccountService {
         String newEmail = jwtTokenProvider.getNewEmailFromToken(emailChangeToken);
         String confirmationURL = confirmURL + emailChangeToken;
 
-        emailService.sendChangeEmail(account.getUsername(), newEmail, confirmationURL, account.getLanguage());
+        emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
     public AccountWithTokenDTO getAccountByLogin(String login) {
