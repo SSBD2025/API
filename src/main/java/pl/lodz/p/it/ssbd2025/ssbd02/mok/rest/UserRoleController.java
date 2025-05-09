@@ -48,4 +48,37 @@ public class UserRoleController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
+
+    @DeleteMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> revokeAdminRole(@PathVariable UUID accountId) {
+        boolean revoked = accountService.revokeAdminRole(accountId);
+        if (revoked) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @DeleteMapping("/dietician")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> revokeDieticianRole(@PathVariable UUID accountId) {
+        boolean revoked = accountService.revokeDieticianRole(accountId);
+        if (revoked) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @DeleteMapping("/client")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> revokeClientRole(@PathVariable UUID accountId) {
+        boolean revoked = accountService.revokeClientRole(accountId);
+        if (revoked) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
 }
