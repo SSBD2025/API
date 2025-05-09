@@ -172,10 +172,26 @@ public class AccountService {
         account.setActive(false);
         accountRepository.saveAndFlush(account);
 
-        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
         //TODO logowanie
 
     }
+
+    public void unblockAccount(UUID id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException());
+
+        if (account.isActive())
+            throw new AccountNotActiveException(); //TODO zmienic
+
+        account.setActive(true);
+        accountRepository.saveAndFlush(account);
+
+    }
+
+    public String me() {
+        return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
 
     public void sendResetPasswordEmail(String email) {
         Account account = accountRepository.findByEmail(email);

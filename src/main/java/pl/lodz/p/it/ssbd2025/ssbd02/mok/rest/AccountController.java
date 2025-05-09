@@ -141,9 +141,16 @@ public class AccountController {
     }
 
     @PostMapping("/{id}/block")
-    //@PreAuthorize()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blockAccount(@PathVariable String id) {
         accountService.blockAccount(UUID.fromString(id));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/unblock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> unblockAccount(@PathVariable String id) {
+        accountService.unblockAccount(UUID.fromString(id));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
