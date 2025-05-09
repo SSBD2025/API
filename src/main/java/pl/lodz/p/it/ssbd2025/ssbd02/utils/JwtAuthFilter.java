@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountService accountService;
     private final JwtService jwtService;
-    @Value("${app.jwt_issuer}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer; //make it prettier with @value or something
 
     @Override
