@@ -51,7 +51,6 @@ public class DieticianService {
         Account createdAccount = accountRepository.saveAndFlush(newAccount);//todo check if this is correct
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
-        System.out.println(verificationURL + token);
         verificationTokenRepository.saveAndFlush(new VerificationToken(token, createdAccount));
         return dieticianRepository.saveAndFlush(newDietician); //todo check if this is correct
     }

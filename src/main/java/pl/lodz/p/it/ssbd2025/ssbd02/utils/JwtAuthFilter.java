@@ -35,7 +35,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountService accountService;
     private final JwtService jwtService;
-    private String issuer = "http://ssbd02-keycloak:8080/realms/app"; //make it prettier with @value or something
+    @Value("${app.jwt_issuer}")
+    private String issuer; //make it prettier with @value or something
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -44,7 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = getTokenFromRequest(request);
         if (token != null && jwtTokenProvider.validateToken(token) && jwtTokenProvider.getType(token).equals("access") && !Objects.equals(jwtTokenProvider.getIssuer(token), issuer)) { //last one makes sure it doesnt accidentally check oauth2 before its own dedicated filter
-            if (!jwtService.check(token)) { //todo i think this needs to be fixed, to be fully thread-safe
+            if (!jwtService.check(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token has been invalidated");
                 return;
@@ -63,12 +64,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
-            System.out.println("Custom token accepted, context: " + SecurityContextHolder.getContext().getAuthentication());
 
-            filterChain.doFilter(request, response);//THIS HAS TO STAY NO MATTER WHAT
+            filterChain.doFilter(request, response);
             return;
         }
-//        System.out.println("FILTER PASSED");
         filterChain.doFilter(request, response);
     }
 

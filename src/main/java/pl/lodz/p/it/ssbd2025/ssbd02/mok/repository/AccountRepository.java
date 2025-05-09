@@ -23,7 +23,6 @@ import java.util.UUID;
 @Component("MOKAccountRepository")
 @Transactional(propagation = Propagation.MANDATORY)
 public interface AccountRepository extends AbstractRepository<Account> {
-//    Account findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
 
     Account findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
 
@@ -41,7 +40,6 @@ public interface AccountRepository extends AbstractRepository<Account> {
     void updatePassword(@Param("login") String login, @Param("newPassword") String newPassword);
 
     Account saveAndFlush(Account account);
-//    void updatePassword(@NonNull @NotBlank @NotEmpty String login, @NonNull @NotBlank @NotEmpty String newPassword);
 
     @Query("""
         SELECT a FROM Account a 
