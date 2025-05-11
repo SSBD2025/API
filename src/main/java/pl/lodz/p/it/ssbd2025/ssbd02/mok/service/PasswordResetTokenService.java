@@ -7,6 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.PasswordResetToken;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.PasswordResetTokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
@@ -43,9 +48,13 @@ public class PasswordResetTokenService {
 //        passwordResetTokenRepository.saveAndFlush(passwordResetToken);
     }
 
-    public void validatePasswordResetToken(String passwordResetToken) { //sprawdz czy dziala
-        TokenEntity passwordToken = tokenRepository.findByToken(passwordResetToken).orElseThrow(TokenNotFoundException::new);
-        tokenRepository.delete(passwordToken);
+    public void validatePasswordResetToken(String passwordResetToken) {
+        Calendar calendar = Calendar.getInstance();
+        PasswordResetToken passwordToken = passwordResetTokenRepository.findByToken(passwordResetToken);
+        if(passwordToken == null){
+            throw new InvalidCredentialsException();
+        }
+        passwordResetTokenRepository.delete(passwordToken);
         if(new Date().after(passwordToken.getExpiration())){
             throw new TokenExpiredException();
         }

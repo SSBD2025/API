@@ -84,29 +84,53 @@ public class EmailService {
         }
     }
 
-//    @Async //poprawic bo nowe maile weszly !!
-//    public void sendResetPasswordEmail(String to, String username, Language language, String token) {
-//        MimeMessage mimeMessage = mailSender.createMimeMessage();
-//        try {
-//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-//            helper.setFrom(senderEmail);
-//            helper.setTo(to);
-//            helper.setSubject(I18n.getMessage("email.reset.subject", language));
-//            Context context = new Context();
-//            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
-//            context.setVariable("name", username);
-//            context.setVariable("body", I18n.getMessage("email.own.reset.body", language));
-//            context.setVariable("url", "http://localhost:8080/api/account/reset/password/"+token );
-//            context.setVariable("linkText", I18n.getMessage("email.own.reset.link", language));
-//            String htmlContent = templateEngine.process("changeEmailTemplate", context);
-//            helper.setText(htmlContent, true);
-//            mailSender.send(mimeMessage);
-//
-//        } catch (MessagingException e) {
-//            //TODO
-//            e.printStackTrace();
-//        }
-//    }
+    @Async
+    public void sendResetPasswordEmail(String to, String username, Language language, String token) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("changeEmailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage("email.own.reset.body", language))
+                    .replace("${url}", "http://localhost:8080/api/account/reset/password/"+token)
+                    .replace("${linkText}", I18n.getMessage("email.own.reset.link", language));
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.reset.subject", language));
+            helper.setText(emailBody, true);
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("adminChangedPassword.html")
+                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage("email.reset.password.body", language))
+                    .replace("${url}", "http://localhost:8080/api/account/reset/password/"+token)
+                    .replace("${linkText}", I18n.getMessage("email.reset.link", language))
+                    .replace("${manually}", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
+            ;
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.reset.subject", language));
+            helper.setText(emailBody, true);
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
 
     private String loadTemplate(String templateName) {
         try {
@@ -119,31 +143,6 @@ public class EmailService {
             throw new EmailTemplateLoadingException("TODO");
         }
     }
-
-//    @Async //poprawic bo nowe maile weszly!!
-//    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
-//        MimeMessage mimeMessage = mailSender.createMimeMessage();
-//        try {
-//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-//            helper.setFrom(senderEmail);
-//            helper.setTo(to);
-//            helper.setSubject(I18n.getMessage("email.reset.subject", language));
-//            Context context = new Context();
-//            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
-//            context.setVariable("name", username);
-//            context.setVariable("body", I18n.getMessage("email.reset.password.body", language));
-//            context.setVariable("url", "http://localhost:8080/api/account/reset/password/"+token );
-//            context.setVariable("linkText", I18n.getMessage("email.reset.link", language));
-//            context.setVariable("manually", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
-//            String htmlContent = templateEngine.process("adminChangedPassword", context);
-//            helper.setText(htmlContent, true);
-//            mailSender.send(mimeMessage);
-//
-//        } catch (MessagingException e) {
-//            //TODO
-//            e.printStackTrace();
-//        }
-//    }
 
     @Async
     @PreAuthorize("permitAll()")
