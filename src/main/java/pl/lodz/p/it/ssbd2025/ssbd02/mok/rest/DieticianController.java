@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.UserRoleMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.DieticianService;
 
@@ -40,17 +41,17 @@ public class DieticianController {
         return dieticianMapper.toDieticianDTO(dieticianService.createDietician(newDieticianData, newAccount));
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<DieticianDTO> getDieticianAccounts() {
+    public List<DieticianDTO> getDieticianAccounts() throws AppBaseException {
         return dieticianService.getDieticianAccounts();
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/unverified")
     @ResponseStatus(HttpStatus.OK)
-    public List<AccountDTO> getUnverifiedDieticianAccounts() {
+    public List<AccountDTO> getUnverifiedDieticianAccounts() throws AppBaseException {
         return dieticianService.getUnverifiedDieticianAccounts();
     }
 }

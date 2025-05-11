@@ -65,6 +65,8 @@ public class AdminService {
         return adminRepository.saveAndFlush(newAdmin);
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<AdminDTO> getAdminAccounts() {
         Iterable<Admin> admins = adminRepository.findAll();
 

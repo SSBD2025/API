@@ -2,6 +2,9 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
@@ -23,6 +27,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
@@ -35,6 +42,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
 
+import java.sql.SQLTransientConnectionException;
 import java.util.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
@@ -229,6 +237,8 @@ public class AccountService {
         accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.password(), BCrypt.gensalt()));
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<AccountDTO> getAllAccounts(Boolean active, Boolean verified) {
         List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
 
@@ -424,114 +434,85 @@ public class AccountService {
         account.setVerified(true);
     }
 
-    public boolean assignAdminRole(UUID accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(AccountNotFoundException::new);
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class,
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    public void assignRole(UUID accountId, UserRole userRole, String login) {
+        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
 
-        boolean hasActiveAdminRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
-                .anyMatch(role -> role.getRoleName().equals("ADMIN") && role.isActive());
-
-        if (!hasActiveAdminRole) {
-            Admin admin = new Admin();
-            admin.setAccount(account);
-            admin.setActive(true);
-            userRoleRepository.save(admin);
-            return true;
+        if (Objects.equals(login, account.getLogin())) {
+            throw new SelfRoleAssignmentException();
         }
-        return false;
+
+        boolean hasActiveRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
+                .anyMatch(role -> role.getRoleName().equals(userRole.getRoleName()) && role.isActive());
+
+        if (hasActiveRole) {
+            throw new RoleAlreadyAssgined();
+        }
+
+        userRole.setAccount(account);
+        userRole.setActive(true);
+
+        userRoleRepository.saveAndFlush(userRole);
     }
 
-    public boolean assignDieticianRole(UUID accountId) {
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class,
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    public void unassignRole(UUID accountId, AccessRole accessRole, String login) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(AccountNotFoundException::new);
 
-        boolean hasActiveDieticianRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
-                .anyMatch(role -> role.getRoleName().equals("DIETICIAN") && role.isActive());
-
-        if (!hasActiveDieticianRole) {
-            Dietician dietician = new Dietician();
-            dietician.setAccount(account);
-            dietician.setActive(true);
-            userRoleRepository.save(dietician);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean assignClientRole(UUID accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(AccountNotFoundException::new);
-
-        boolean hasActiveClientRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
-                .anyMatch(role -> role.getRoleName().equals("CLIENT") && role.isActive());
-
-        if (!hasActiveClientRole) {
-            Client client = new Client();
-            client.setAccount(account);
-            client.setActive(true);
-            userRoleRepository.save(client);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean revokeAdminRole(UUID accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(AccountNotFoundException::new);
-
-        List<Admin> admins = userRoleRepository.findAdminsByAccount(account);
-
-        Admin activeAdmin = admins.stream()
-                .filter(Admin::isActive)
-                .findFirst()
-                .orElse(null);
-
-        if (activeAdmin == null) {
-            return false;
+        if (Objects.equals(login, account.getLogin())) {
+            throw new SelfRoleAssignmentException();
         }
 
-        activeAdmin.setActive(false);
-        userRoleRepository.save(activeAdmin);
-        return true;
-    }
+        boolean hasActiveRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
+                .anyMatch(role -> role.getRoleName().equals(accessRole.name()) && role.isActive());
 
-    public boolean revokeDieticianRole(UUID accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(AccountNotFoundException::new);
-
-        List<Dietician> dieticians = userRoleRepository.findDieticiansByAccount(account);
-
-        Dietician activeDietician = dieticians.stream()
-                .filter(Dietician::isActive)
-                .findFirst()
-                .orElse(null);
-
-        if (activeDietician == null) {
-            return false;
+        if (!hasActiveRole) {
+            throw new RoleNotFoundException();
         }
 
-        activeDietician.setActive(false);
-        userRoleRepository.save(activeDietician);
-        return true;
-    }
+        switch (accessRole) {
+            case ADMIN -> {
+                List<Admin> admins = userRoleRepository.findAdminsByAccount(account);
+                Admin activeAdmin = admins.stream()
+                        .filter(Admin::isActive)
+                        .findFirst()
+                        .orElseThrow(RoleNotFoundException::new);
 
-    public boolean revokeClientRole(UUID accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(AccountNotFoundException::new);
+                activeAdmin.setActive(false);
+                userRoleRepository.saveAndFlush(activeAdmin);
+            }
+            case DIETICIAN -> {
+                List<Dietician> dieticians = userRoleRepository.findDieticiansByAccount(account);
+                Dietician activeDietician = dieticians.stream()
+                        .filter(Dietician::isActive)
+                        .findFirst()
+                        .orElseThrow(RoleNotFoundException::new);
 
-        List<Client> clients = userRoleRepository.findClientsByAccount(account);
+                activeDietician.setActive(false);
+                userRoleRepository.saveAndFlush(activeDietician);
+            }
+            case CLIENT -> {
+                List<Client> clients = userRoleRepository.findClientsByAccount(account);
+                Client activeClient = clients.stream()
+                        .filter(Client::isActive)
+                        .findFirst()
+                        .orElseThrow(RoleNotFoundException::new);
 
-        Client activeClient = clients.stream()
-                .filter(Client::isActive)
-                .findFirst()
-                .orElse(null);
-
-        if (activeClient == null) {
-            return false;
+                activeClient.setActive(false);
+                userRoleRepository.saveAndFlush(activeClient);
+            }
+            default -> throw new RoleNotFoundException();
         }
-
-        activeClient.setActive(false);
-        userRoleRepository.save(activeClient);
-        return true;
     }
 }

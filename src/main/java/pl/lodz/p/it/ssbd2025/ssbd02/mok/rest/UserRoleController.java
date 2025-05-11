@@ -1,11 +1,16 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Admin;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 
@@ -17,72 +22,54 @@ import java.util.UUID;
 @EnableMethodSecurity(prePostEnabled=true)
 @RequiredArgsConstructor
 public class UserRoleController {
-
+    @NotNull
     private final AccountService accountService;
 
     @PutMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> assignAdminRole(@PathVariable UUID accountId) {
-        boolean assigned = accountService.assignAdminRole(accountId);
-        if (assigned) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> assignAdminRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.assignRole(accountId, new Admin(), login);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/dietician")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> assignDieticianRole(@PathVariable UUID accountId) {
-        boolean assigned = accountService.assignDieticianRole(accountId);
-        if (assigned) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> assignDieticianRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.assignRole(accountId, new Dietician(), login);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/client")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> assignClientRole(@PathVariable UUID accountId) {
-        boolean assigned = accountService.assignClientRole(accountId);
-        if (assigned) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> assignClientRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.assignRole(accountId, new Client(), login);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> revokeAdminRole(@PathVariable UUID accountId) {
-        boolean revoked = accountService.revokeAdminRole(accountId);
-        if (revoked) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> unassignAdminRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.unassignRole(accountId, AccessRole.ADMIN, login);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/dietician")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> revokeDieticianRole(@PathVariable UUID accountId) {
-        boolean revoked = accountService.revokeDieticianRole(accountId);
-        if (revoked) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> unassignDieticianRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.unassignRole(accountId, AccessRole.DIETICIAN, login);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/client")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> revokeClientRole(@PathVariable UUID accountId) {
-        boolean revoked = accountService.revokeClientRole(accountId);
-        if (revoked) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<Void> unassignClientRole(@NotNull @PathVariable UUID accountId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.unassignRole(accountId, AccessRole.CLIENT, login);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.UserRoleMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.ClientService;
 
@@ -40,17 +41,17 @@ public class ClientController {
         return clientMapper.toClientDTO(clientService.createClient(newClientData, newAccount));
     }
 
-//    @PreAuthorize("hasRole('ADMIN')||hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('DIETICIAN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ClientDTO> getClientAccounts() {
+    public List<ClientDTO> getClientAccounts() throws AppBaseException {
         return clientService.getClientAccounts();
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/unverified")
     @ResponseStatus(HttpStatus.OK)
-    public List<AccountDTO> getUnverifiedClientAccounts() {
+    public List<AccountDTO> getUnverifiedClientAccounts() throws AppBaseException {
         return clientService.getUnverifiedClientAccounts();
     }
 }

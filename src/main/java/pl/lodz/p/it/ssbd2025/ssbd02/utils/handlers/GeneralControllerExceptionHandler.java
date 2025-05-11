@@ -1,15 +1,19 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -67,6 +71,22 @@ public class GeneralControllerExceptionHandler {
                 }
         );
         return ResponseEntity.ofNullable(error);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<Object> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex) {
+        String paramName = ex.getName();
+        String invalidValue = ex.getValue() != null ? ex.getValue().toString() : "null";
+        String errorMessage = String.format("Invalid value '%s' for parameter '%s'. Expected '%s' type.",
+                invalidValue, paramName, ex.getRequiredType().getSimpleName());
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse();
+        errorResponse.getViolations().add(
+                new ValidationErrorResponse.Violation(paramName, errorMessage)
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // requires security starter
