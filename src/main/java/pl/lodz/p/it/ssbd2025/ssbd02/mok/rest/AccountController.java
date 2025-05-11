@@ -68,6 +68,7 @@ public class AccountController {
         return jwtService.refresh(refreshRequestDTO.refreshToken());
     }
 
+    @MethodCallLogged
     @PostMapping("/changePassword")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
@@ -75,6 +76,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @MethodCallLogged
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> changeUserPassword(@PathVariable String id) {
@@ -155,12 +157,14 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @MethodCallLogged
     @PostMapping("reset/password/request")
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.email());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @MethodCallLogged
     @PostMapping("reset/password/{token}")
     public ResponseEntity<Void> resetPassword(@PathVariable String token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);

@@ -26,6 +26,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
@@ -197,6 +198,8 @@ public class AccountService {
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    //TODO tu raczej bez powtarzania ale do ustalenia
     public void unblockAccount(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException());
