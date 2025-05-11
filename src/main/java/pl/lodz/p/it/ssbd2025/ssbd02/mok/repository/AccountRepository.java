@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,21 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.security.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 @Component("MOKAccountRepository")
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.MANDATORY)
 public interface AccountRepository extends AbstractRepository<Account> {
 
-    Account findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
+    @PreAuthorize("permitAll()")
+    Optional<Account> findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
 
     Account findByEmail(@Email String email);
 
+    @PreAuthorize("permitAll()")
     @Query("""
         select a.login as login, ur.roleName as roleName, ur.active as active
         from Account a join a.userRoles ur
@@ -39,6 +48,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @Query("UPDATE Account a SET a.password = :newPassword WHERE a.login = :login")
     void updatePassword(@Param("login") String login, @Param("newPassword") String newPassword);
 
+    @PreAuthorize("permitAll()")
     Account saveAndFlush(Account account);
 
     @Query("""

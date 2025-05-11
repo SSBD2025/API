@@ -1,51 +1,54 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.PasswordResetToken;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.PasswordResetTokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 
-//@Component
 @RequiredArgsConstructor
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+@EnableMethodSecurity(prePostEnabled=true)
+@MethodCallLogged
+@Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager")
 public class PasswordResetTokenService {
 
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+//    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final TokenRepository tokenRepository;
+    private final TokenUtil tokenUtil;
 
     public void createPasswordResetToken(Account account, String token) {
-        if(passwordResetTokenRepository.findByAccount(account) != null) {
-           passwordResetTokenRepository.deleteByAccount(account);
+//        if(passwordResetTokenRepository.findByAccount(account) != null) {
+//           passwordResetTokenRepository.deleteByAccount(account);
+//        }
+        if(tokenRepository.existsByAccountWithType(account, TokenType.PASSWORD_RESET)) {
+            tokenRepository.deleteAllByAccountWithType(account, TokenType.PASSWORD_RESET);
         }
-        PasswordResetToken passwordResetToken = new PasswordResetToken(token, account);
-        passwordResetTokenRepository.saveAndFlush(passwordResetToken);
+        tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateMinuteExpiration(5), account, TokenType.PASSWORD_RESET));
+//        PasswordResetToken passwordResetToken = new PasswordResetToken(token, account);
+
+//        passwordResetTokenRepository.saveAndFlush(passwordResetToken);
     }
 
-    public String validatePasswordResetToken(String passwordResetToken) {
-        Calendar calendar = Calendar.getInstance();
-        PasswordResetToken passwordToken = passwordResetTokenRepository.findByToken(passwordResetToken);
-        if(passwordToken == null){
-            return "Invalid verification token";
+    public void validatePasswordResetToken(String passwordResetToken) { //sprawdz czy dziala
+        TokenEntity passwordToken = tokenRepository.findByToken(passwordResetToken).orElseThrow(TokenNotFoundException::new);
+        tokenRepository.delete(passwordToken);
+        if(new Date().after(passwordToken.getExpiration())){
+            throw new TokenExpiredException();
         }
-        passwordResetTokenRepository.delete(passwordToken);
-        Account account = passwordToken.getAccount();
-        if ((passwordToken.getExpiration().getTime()-calendar.getTime().getTime())<= 0){
-            return "Token expired";
-        }
-        return "Valid token";
     }
-
-
 }
 

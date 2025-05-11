@@ -1,13 +1,14 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
 import jakarta.persistence.OptimisticLockException;
-import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -19,18 +20,17 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.VerificationToken;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.JwtRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.VerificationTokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
@@ -38,7 +38,7 @@ import java.security.SecureRandom;
 import java.util.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtUtil;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +53,15 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 @Component
 @RequiredArgsConstructor
 @Service
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
 public class AccountService {
 
     @NotNull
     private final AccountRepository accountRepository;
     @NotNull
-    private final JwtUtil jwtUtil;
+    private final TokenUtil tokenUtil;
     @NotNull
     private final JwtTokenProvider jwtTokenProvider;
     @NotNull
@@ -68,10 +70,9 @@ public class AccountService {
     private final JwtService jwtService;
     @NotNull
     private final PasswordResetTokenService passwordResetTokenService;
-    private final VerificationTokenRepository verificationTokenRepository;
     private final AccountMapper accountMapper;
     private final LockTokenService lockTokenService;
-    private final JwtRepository jwtRepository;
+    private final TokenRepository tokenRepository;
     @Value("${mail.confirmation.url}")
     private String confirmURL;
     @Value("${mail.revert.url}")
@@ -79,27 +80,19 @@ public class AccountService {
     @NotNull
     private final UserRoleRepository userRoleRepository;
 
-//    public UserDetails loadUserByUsername(String username) {
-//        Account account = accountRepository.findByLogin(username);
-//        if(account == null) {
-//            throw new AccountNotFoundException();
-//        } else {
-//            return account;
-//        }
-//    }
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Account account = accountRepository.findByLogin(login);
-        if(account == null) {
-            throw new AccountNotFoundException();
-        }
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if(!BCrypt.checkpw(changePasswordDTO.oldPassword(), account.getPassword())) {
             throw new InvalidCredentialsException();
         }
         accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.newPassword(), BCrypt.gensalt()));
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    //TODO zastanowić się czy tutaj dać
     public String setGeneratedPassword(UUID uuid) { //TODO zmienić na void
         Optional<Account> account = accountRepository.findById(uuid);
         if(account.isEmpty()) {
@@ -109,39 +102,53 @@ public class AccountService {
         accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account.get(), token);
-        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password);
+//        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password); //TODO MAILE SIE ZMIENILY POPRAWIC!
         return password;
     }
 
     private String generateRandomPassword() {
-        int length = 12;
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        final int length = 12;
         SecureRandom random = new SecureRandom();
-        return random.ints(length, 0, chars.length())
-                .mapToObj(i -> String.valueOf(chars.charAt(i)))
+
+        return random.ints(length,33, 127)
+                .mapToObj(i -> String.valueOf((char) i))
                 .collect(Collectors.joining());
     }
 
-    public TokenPairDTO login(String username, String password, String ipAddress) { //todo 90% sure its not correct
-        Account account = accountRepository.findByLogin(username);
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class,
+            AccountNotFoundException.class, // teoretycznie w przypadku konta admina, ale bardzo watpliwe
+            AccountHasNoRolesException.class, // te trzy w przypadku gdy nastapi zmiana wspolbieznie - admin nada/aktywuje role, odblokuje konto lub uzytkownik je zweryfikuje
+            AccountNotActiveException.class,
+            AccountNotVerifiedException.class
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    public TokenPairDTO login(String username, String password, String ipAddress) {
+        Account account = accountRepository.findByLogin(username).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
         List<String> userRoles = new ArrayList<>();
+        if(roles.isEmpty()) {
+            throw new AccountHasNoRolesException();
+        }
         roles.forEach(role -> {
-            if (role.isActive()) { //todo this needs to be fixed later to support dynamic role granting
+            if (role.isActive()) {
                 userRoles.add(role.getRoleName());
             }
         });
-        if (account == null) {
-            throw new AccountNotFoundException();
+        if(userRoles.isEmpty()) {
+            throw new AccountHasNoRolesException();
         }
-//        if (!account.isActive()) {
-//            throw new AccountNotActiveException();
-//        } //todo uncomment later
-//        if (!account.isVerified()) {
+        if (!account.isActive()) {
+            throw new AccountNotActiveException();
+        }
+//        if (!account.isVerified()) { //uncomment later
 //            throw new AccountNotVerifiedException();
 //        }
         Date currentTime = new Date(System.currentTimeMillis());
-        if (jwtUtil.checkPassword(password, account.getPassword())) {
+        if (tokenUtil.checkPassword(password, account.getPassword())) {
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
@@ -153,9 +160,14 @@ public class AccountService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void logout() {
-        Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
-        jwtRepository.deleteAllByAccount(account);
+        Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(AccountNotFoundException::new);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
         SecurityContextHolder.clearContext();
     }
 
@@ -172,6 +184,7 @@ public class AccountService {
         account.setActive(false);
         accountRepository.saveAndFlush(account);
 
+//        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage()); //TODO MAILE SIE ZMIENILY POPRAWIC!
         //TODO logowanie
 
     }
@@ -193,6 +206,8 @@ public class AccountService {
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    //TODO tu raczej bez powtarzania ale do ustalenia
     public void sendResetPasswordEmail(String email) {
         Account account = accountRepository.findByEmail(email);
         if(account == null) {
@@ -200,23 +215,18 @@ public class AccountService {
         }
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account, token);
-        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
+//        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token); //TODO MAILE SIE ZMIENILY POPRAWIC!
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
-        if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Valid token")) {
-            Account account = accountRepository.findByEmail(resetPasswordDTO.email());
-            if(account == null) {
-                throw new AccountNotFoundException();
-            }
-            accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.password(), BCrypt.gensalt()));
+        passwordResetTokenService.validatePasswordResetToken(token);
+        Account account = accountRepository.findByEmail(resetPasswordDTO.email());
+        if(account == null) {
+            throw new AccountNotFoundException();
         }
-        else if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Invalid verification token")) {
-            throw new InvalidCredentialsException();
-        }
-        else if(Objects.equals(passwordResetTokenService.validatePasswordResetToken(token), "Token expired")) {
-            throw new TokenExpiredException();
-        }
+        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.password(), BCrypt.gensalt()));
     }
 
     public List<AccountDTO> getAllAccounts(Boolean active, Boolean verified) {
@@ -230,7 +240,7 @@ public class AccountService {
     public void changeOwnEmail(String newEmail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
-        Account account = accountRepository.findByLogin(login);
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         handleEmailChange(account, newEmail);
     }
 
@@ -250,16 +260,16 @@ public class AccountService {
         String emailChangeToken = jwtTokenProvider.generateEmailChangeToken(account, newEmail);
         String confirmationURL = confirmURL + emailChangeToken;
 
-        JwtEntity jwt = new JwtEntity(emailChangeToken, jwtTokenProvider.getExpiration(emailChangeToken), account);
-        jwtRepository.save(jwt);
+        TokenEntity jwt = new TokenEntity(emailChangeToken, jwtTokenProvider.getExpiration(emailChangeToken), account, TokenType.EMAIL_CHANGE);
+        tokenRepository.save(jwt);
 
         emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
     public void confirmEmail(String token) {
-        JwtEntity jwt = jwtRepository.findByTokenValue(token);
+        TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
-            jwtRepository.delete(jwt);
+            tokenRepository.delete(jwt);
             throw new TokenExpiredException();
         }
 
@@ -272,21 +282,21 @@ public class AccountService {
 
         account.setEmail(newEmail);
         accountRepository.saveAndFlush(account);
-        jwtRepository.delete(jwt);
+        tokenRepository.delete(jwt);
 
         String revertToken = jwtTokenProvider.generateEmailRevertToken(account, oldEmail);
         String revertChangeURL = revertURL + revertToken;
 
-        JwtEntity jwtEntity = new JwtEntity(revertToken, jwtTokenProvider.getExpiration(revertToken), account);
-        jwtRepository.save(jwtEntity);
+        TokenEntity tokenEntity = new TokenEntity(revertToken, jwtTokenProvider.getExpiration(revertToken), account, TokenType.EMAIL_REVERT);
+        tokenRepository.save(tokenEntity);
 
         emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, revertChangeURL, account.getLanguage());
     }
 
     public void revertEmailChange(String token) {
-        JwtEntity jwt = jwtRepository.findByTokenValue(token);
+        TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
-            jwtRepository.delete(jwt);
+            tokenRepository.delete(jwt);
             throw new TokenExpiredException();
         }
 
@@ -297,14 +307,14 @@ public class AccountService {
 
         account.setEmail(oldEmail);
         accountRepository.saveAndFlush(account);
-        jwtRepository.delete(jwt);
+        tokenRepository.delete(jwt);
     }
 
     public void resendEmailChangeLink() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
-        Account account = accountRepository.findByLogin(login);
-        JwtEntity jwtEntity = jwtRepository.findByAccount(account).stream()
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        TokenEntity tokenEntity = tokenRepository.findByAccount(account).stream()
                 .filter(jwt -> {
                     try {
                         String type = jwtTokenProvider.getType(jwt.getToken());
@@ -315,7 +325,7 @@ public class AccountService {
                 })
                 .findFirst().orElseThrow(EmailChangeTokenNotFoundException::new);
 
-        String emailChangeToken = jwtEntity.getToken();
+        String emailChangeToken = tokenEntity.getToken();
         String newEmail = jwtTokenProvider.getNewEmailFromToken(emailChangeToken);
         String confirmationURL = confirmURL + emailChangeToken;
 
@@ -323,11 +333,7 @@ public class AccountService {
     }
 
     public AccountWithTokenDTO getAccountByLogin(String login) {
-        Account account = accountRepository.findByLogin(login);
-
-        if(account == null) {
-            throw new AccountNotFoundException();
-        }
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(login);
 
         AccountReadDTO dto = accountMapper.toReadDTO(account);
@@ -378,10 +384,7 @@ public class AccountService {
     public void updateMyAccount(String login, UpdateAccountDTO updateAccountDTO) {
         LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(updateAccountDTO.lockToken());
 
-        Account account = accountRepository.findByLogin(login);
-        if (account == null) {
-            throw new AccountNotFoundException();
-        }
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
 
         if (!account.isActive()) {
             throw new AccountNotActiveException();
@@ -401,8 +404,12 @@ public class AccountService {
         accountRepository.saveAndFlush(account);
     }
 
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void verifyAccount(String token){
-        VerificationToken verificationToken = verificationTokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+        TokenEntity verificationToken = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         if(verificationToken.getExpiration().before(new Date())) {
             throw new TokenExpiredException();
         }
@@ -413,7 +420,7 @@ public class AccountService {
         if(account.isVerified()){
             throw new AccountAlreadyVerifiedException(); //remember to set verified = false when changing email
         }
-        verificationTokenRepository.delete(verificationToken);
+        tokenRepository.delete(verificationToken);
         account.setVerified(true);
     }
 

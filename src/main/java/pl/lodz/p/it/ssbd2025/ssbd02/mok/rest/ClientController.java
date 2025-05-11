@@ -15,13 +15,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.UserRoleMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.ClientService;
 
 import java.util.List;
 
 @AllArgsConstructor
 @RestController
-//@MethodCallLogged //todo!!
+@MethodCallLogged
 @RequestMapping(value = "/api/client", produces = MediaType.APPLICATION_JSON_VALUE)
 @EnableMethodSecurity(prePostEnabled = true)
 public class ClientController {
@@ -32,6 +33,7 @@ public class ClientController {
     private final UserRoleMapper userRoleMapper;
 
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("permitAll()")
     public ClientDTO registerClient(@RequestBody @Validated(OnCreate.class) ClientDTO clientDTO) {
         Client newClientData = userRoleMapper.toNewClientData(clientDTO.client());
         Account newAccount = accountMapper.toNewAccount(clientDTO.account());

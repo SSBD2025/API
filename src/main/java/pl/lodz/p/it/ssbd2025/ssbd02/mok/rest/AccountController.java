@@ -16,6 +16,8 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
@@ -36,9 +39,12 @@ import java.util.List;
 
 import java.util.UUID;
 
+import static pl.lodz.p.it.ssbd2025.ssbd02.utils.MiscellaneousUtil.getClientIp;
+
 @RequiredArgsConstructor
 @RestController
 //@AllArgsConstructor
+@MethodCallLogged
 //@RequestMapping(value = "/api/account", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequestMapping(value = "/api/account")
 @EnableMethodSecurity(prePostEnabled = true)
@@ -49,14 +55,14 @@ public class AccountController {
     private final JwtService jwtService;
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("permitAll()")
     public TokenPairDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
-        String ipAddress = getClientIp(request);
+        String ipAddress = getClientIp(request); //czy to nie wymaga transactional?
         return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress);
     }
 
-//    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')||hasRole('ADMIN')")
-
     @PostMapping(value = "/refresh")
+    @PreAuthorize("permitAll()")
     public TokenPairDTO refresh(@RequestBody RefreshRequestDTO refreshRequestDTO){
         return jwtService.refresh(refreshRequestDTO.refreshToken());
     }
@@ -75,7 +81,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(password); //TODO zastanowić się, czy zwracać tu tę wartość
     }
 
-    @PostMapping("/logout") //this is the normal logout for our own security implementation
+    @PostMapping("/logout")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<?> logout() {
         accountService.logout();
@@ -132,13 +138,7 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private String getClientIp(HttpServletRequest request) {
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null || xfHeader.isEmpty()) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0]; // In case of multiple IPs
-    }
+
 
     @PostMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
@@ -184,6 +184,7 @@ public class AccountController {
     }
 
     @GetMapping("/verify")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Void> verifyAccount(@RequestParam String token) {
         accountService.verifyAccount(token);
 //        try {

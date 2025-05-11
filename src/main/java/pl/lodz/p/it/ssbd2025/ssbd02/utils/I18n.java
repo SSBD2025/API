@@ -1,10 +1,12 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+@MethodCallLogged
 public class I18n {
 
     public static final String EMAIL_WELCOME = "email.welcome";

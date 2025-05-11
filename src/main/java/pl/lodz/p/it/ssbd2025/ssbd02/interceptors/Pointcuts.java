@@ -19,4 +19,9 @@ public class Pointcuts {
                     "|| within(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged *)"
     )
     public void transactionLoggedAnnotatedMethods() {}
+
+    @Pointcut(
+            "execution(* pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService.login(..))"
+    )
+    public void loginMethod() {}
 }

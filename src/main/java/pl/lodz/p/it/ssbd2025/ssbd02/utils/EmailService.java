@@ -11,19 +11,23 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.util.FileCopyUtils;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailTemplateLoadingException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+@MethodCallLogged
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled=true)
 @Component
 public class EmailService {
 
@@ -80,43 +84,29 @@ public class EmailService {
         }
     }
 
-    @Async
-    public void sendResetPasswordEmail(String to, String username, Language language, String token) {
-        String mailContent = "<p> Hi, "+ username + ", </p>"+
-            "<p><b>You recently requested to reset your password,</b>"+"" +
-            "Please, follow the link below to complete the action.</p>"+
-            "<a href=\"http://localhost:8080/api/account/reset/password/" +token+ "\">Reset password</a>"+
-            "<p> Users Registration Portal Service"; //TODO zmienić link
-
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-            helper.setFrom(senderEmail);
-            helper.setTo(to);
+//    @Async //poprawic bo nowe maile weszly !!
+//    public void sendResetPasswordEmail(String to, String username, Language language, String token) {
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//        try {
+//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+//            helper.setFrom(senderEmail);
+//            helper.setTo(to);
 //            helper.setSubject(I18n.getMessage("email.reset.subject", language));
-            helper.setSubject("Reset password");
-            helper.setText(mailContent, true);
-
 //            Context context = new Context();
 //            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
 //            context.setVariable("name", username);
-//            context.setVariable("body", I18n.getMessage("email.block.body", language));
-//            //TODO co się  dzieje z językiem?
-//
-//
-//            String htmlContent = templateEngine.process("emailTemplate", context);
-//
+//            context.setVariable("body", I18n.getMessage("email.own.reset.body", language));
+//            context.setVariable("url", "http://localhost:8080/api/account/reset/password/"+token );
+//            context.setVariable("linkText", I18n.getMessage("email.own.reset.link", language));
+//            String htmlContent = templateEngine.process("changeEmailTemplate", context);
 //            helper.setText(htmlContent, true);
-
-
-            mailSender.send(mimeMessage);
-
-        } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
-        }
-    }
+//            mailSender.send(mimeMessage);
+//
+//        } catch (MessagingException e) {
+//            //TODO
+//            e.printStackTrace();
+//        }
+//    }
 
     private String loadTemplate(String templateName) {
         try {
@@ -130,46 +120,33 @@ public class EmailService {
         }
     }
 
-    @Async
-    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
-        String mailContent = "<p> Hi, "+ username + ", </p>"+
-                "<p><b>Admin changed your password recently,</b>"+"" +
-                "You can chamge it by following this link.</p>"+
-                "<a href=\"http://localhost:8080/api/account/reset/password/" +token+ "\">Reset password</a>"+
-                "<p> You can also change it manually. Your new, temporary password: <b>" + password + "</b></p>"+
-                "<p> Users Registration Portal Service"; //TODO zmienić link
-
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-            helper.setFrom(senderEmail);
-            helper.setTo(to);
+//    @Async //poprawic bo nowe maile weszly!!
+//    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//        try {
+//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+//            helper.setFrom(senderEmail);
+//            helper.setTo(to);
 //            helper.setSubject(I18n.getMessage("email.reset.subject", language));
-            helper.setSubject("Admin changed your password");
-            helper.setText(mailContent, true);
-
 //            Context context = new Context();
 //            context.setVariable("welcome", I18n.getMessage("email.welcome", language));
 //            context.setVariable("name", username);
-//            context.setVariable("body", I18n.getMessage("email.block.body", language));
-//            //TODO co się  dzieje z językiem?
-//
-//
-//            String htmlContent = templateEngine.process("emailTemplate", context);
-//
+//            context.setVariable("body", I18n.getMessage("email.reset.password.body", language));
+//            context.setVariable("url", "http://localhost:8080/api/account/reset/password/"+token );
+//            context.setVariable("linkText", I18n.getMessage("email.reset.link", language));
+//            context.setVariable("manually", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
+//            String htmlContent = templateEngine.process("adminChangedPassword", context);
 //            helper.setText(htmlContent, true);
-
-
-            mailSender.send(mimeMessage);
-
-        } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
-        }
-    }
+//            mailSender.send(mimeMessage);
+//
+//        } catch (MessagingException e) {
+//            //TODO
+//            e.printStackTrace();
+//        }
+//    }
 
     @Async
+    @PreAuthorize("permitAll()")
     public void sendActivationMail(String to, String username, String verificationURL, Language language, String token, boolean reminder) { //todo reminder email
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {

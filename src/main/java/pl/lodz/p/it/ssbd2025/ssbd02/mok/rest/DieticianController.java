@@ -15,13 +15,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.UserRoleMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.DieticianService;
 
 import java.util.List;
 
 @AllArgsConstructor
 @RestController
-//@MethodCallLogged //todo!!
+@MethodCallLogged
 @RequestMapping(value = "/api/dietician", produces = MediaType.APPLICATION_JSON_VALUE)
 @EnableMethodSecurity(prePostEnabled = true)
 public class DieticianController {
@@ -32,6 +33,7 @@ public class DieticianController {
     private final UserRoleMapper userRoleMapper;
 
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("permitAll()")
     public DieticianDTO registerDietician(@RequestBody @Validated(OnCreate.class) DieticianDTO dieticianDTO) {
         Dietician newDieticianData = userRoleMapper.toNewDietician(dieticianDTO.dietician());
         Account newAccount = accountMapper.toNewAccount(dieticianDTO.account());
