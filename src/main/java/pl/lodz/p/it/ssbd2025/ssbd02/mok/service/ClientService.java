@@ -69,6 +69,8 @@ public class ClientService {
         return clientRepository.saveAndFlush(newClient);
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<ClientDTO> getClientAccounts() {
         Iterable<Client> clients = clientRepository.findAll();
 
@@ -77,6 +79,8 @@ public class ClientService {
                 .collect(Collectors.toList());
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<AccountDTO> getUnverifiedClientAccounts() {
         return accountRepository.findByActiveAndVerified(null, false).stream()
                 .filter(acc -> acc.getUserRoles().stream()

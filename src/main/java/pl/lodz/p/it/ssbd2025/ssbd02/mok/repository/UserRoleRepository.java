@@ -19,4 +19,5 @@ public interface UserRoleRepository extends JpaRepository<UserRole, UUID> {
     List<Admin> findAdminsByAccount(Account account);
     List<Client> findClientsByAccount(Account account);
     List<Dietician> findDieticiansByAccount(Account account);
+    UserRole saveAndFlush(UserRole userRole);
 }

@@ -28,6 +28,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
@@ -166,9 +167,9 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AccountDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) Boolean verified

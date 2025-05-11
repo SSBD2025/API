@@ -71,6 +71,8 @@ public class DieticianService {
         return dieticianRepository.saveAndFlush(newDietician); //todo check if this is correct
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<DieticianDTO> getDieticianAccounts() {
         Iterable<Dietician> dieticians = dieticianRepository.findAll();
 
@@ -79,6 +81,8 @@ public class DieticianService {
                 .collect(Collectors.toList());
     }
 
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public List<AccountDTO> getUnverifiedDieticianAccounts() {
         return accountRepository.findByActiveAndVerified(null, false).stream()
                 .filter(acc -> acc.getUserRoles().stream().anyMatch(r -> r instanceof Dietician))
