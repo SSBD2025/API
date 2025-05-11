@@ -2,7 +2,9 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,6 +13,8 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Service
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
 @PropertySource("classpath:secrets.properties")
 public class LockTokenService {
 

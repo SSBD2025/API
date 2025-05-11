@@ -1,4 +1,3 @@
-// https://reflectoring.io/bean-validation-with-spring-boot/
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
 import lombok.Data;

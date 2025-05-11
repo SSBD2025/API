@@ -3,6 +3,11 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.Token;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -10,10 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.JwtEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.JwtRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,10 +32,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Service
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
 public class JwtService {
     @NotNull
-    private final JwtRepository jwtRepository;
+    private final TokenRepository tokenRepository;
 
     @NotNull
     private final JwtTokenProvider jwtTokenProvider;
@@ -33,48 +45,64 @@ public class JwtService {
     @NotNull
     private final AccountRepository accountRepository;
 
+    private final TokenUtil tokenUtil;
+
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class,}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public TokenPairDTO generatePair(@NotNull Account account, @NotNull List<String> roles) {// no clue if this method is correct
         String accessToken = jwtTokenProvider.generateAccessToken(account, roles);
         String refreshToken = jwtTokenProvider.generateRefreshToken(account);
         Date accessExpiration = jwtTokenProvider.getExpiration(accessToken);
         Date refreshExpiration = jwtTokenProvider.getExpiration(refreshToken);
-        jwtRepository.saveAndFlush(new JwtEntity(accessToken, accessExpiration, account));
-        jwtRepository.saveAndFlush(new JwtEntity(refreshToken, refreshExpiration, account));
+        tokenRepository.saveAndFlush(new TokenEntity(accessToken, accessExpiration, account, TokenType.ACCESS));
+        tokenRepository.saveAndFlush(new TokenEntity(refreshToken, refreshExpiration, account, TokenType.REFRESH));
         return new TokenPairDTO(accessToken, refreshToken);
     }
 
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class,
+            TokenNotFoundException.class, //chyba teoretycznie moze zostac wygenerowany wspolbieznie przy logowaniu i refreshu jednoczesnie
+            AccountHasNoRolesException.class //admin moze je dodac/aktywowac wspolbieznie
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public TokenPairDTO refresh(String token) { //takes refresh token, produces access token and saves it into the database
         if(!jwtTokenProvider.validateToken(token)) {
-            throw new RuntimeException("todo");
-        } else if(!check(token)) {
-            throw new RuntimeException("todo2");
+            throw new TokenSignatureInvalidException();
+        } else if(!tokenRepository.existsByToken(token)) {
+            throw new TokenNotFoundException();
         } else if(!jwtTokenProvider.getType(token).equals("refresh")) {
-            throw new RuntimeException("todo3");
+            throw new TokenTypeInvalidException();
         }
-        Account account = accountRepository.findByLogin(jwtTokenProvider.getSubject(token));
+        Account account = accountRepository.findByLogin(jwtTokenProvider.getSubject(token)).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
         List<String> userRoles = new ArrayList<>();
+        if(roles.isEmpty()) {
+            throw new AccountHasNoRolesException();
+        }
         roles.forEach(role -> {
-            if (role.isActive()) { //todo this needs to be fixed later to support dynamic role granting
+            if (role.isActive()) {
                 userRoles.add(role.getRoleName());
             }
         });
+        if(userRoles.isEmpty()) {
+            throw new AccountHasNoRolesException();
+        }
         String newAccessToken = jwtTokenProvider.generateAccessToken(account, userRoles);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(account);
         Date expiration = jwtTokenProvider.getExpiration(token);
-        jwtRepository.deleteAllByAccount(account);
-        jwtRepository.saveAndFlush(new JwtEntity(newAccessToken, expiration, account));
-        jwtRepository.saveAndFlush(new JwtEntity(newRefreshToken, expiration, account));
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
+        tokenRepository.saveAndFlush(new TokenEntity(newAccessToken, expiration, account, TokenType.ACCESS));
+        tokenRepository.saveAndFlush(new TokenEntity(newRefreshToken, expiration, account, TokenType.REFRESH));
         return new TokenPairDTO(newAccessToken, newRefreshToken);
     }
 
-    public List<JwtEntity> findByAccount(Account account) {
-        return jwtRepository.findByAccount(account);
-    }
-
     public boolean check(String token) { //checks if token is actually in database
-        return jwtRepository.existsByToken(token);
+        return tokenRepository.existsByToken(token);
     }
 }

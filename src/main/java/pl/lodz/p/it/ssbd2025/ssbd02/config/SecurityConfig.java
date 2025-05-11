@@ -30,7 +30,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter, BearerTokenAuthenticationFilter.class)
                 //to run locally: comment following 2 lines (.oauth2 ... .jwt...), comment line 5 uncomment line 6 in application.properties
-//                .oauth2ResourceServer((oauth2) -> oauth2
+//                .oauth2ResourceServer((oauth2) -> oauth2 //those 2 lines cause all the trouble
 //                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter)))
                 .authorizeHttpRequests((authorize) ->
                         authorize

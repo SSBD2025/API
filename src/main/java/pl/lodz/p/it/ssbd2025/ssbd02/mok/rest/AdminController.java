@@ -14,13 +14,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.UserRoleMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Admin;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AdminService;
 
 import java.util.List;
 
 @AllArgsConstructor
 @RestController
-//@MethodCallLogged //todo!!
+@MethodCallLogged
 @RequestMapping(value = "/api/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 @EnableMethodSecurity(prePostEnabled = true)
 public class AdminController {

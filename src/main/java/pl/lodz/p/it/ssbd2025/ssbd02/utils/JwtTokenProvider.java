@@ -6,9 +6,13 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +23,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
+@MethodCallLogged
 @Component
 @PropertySource("classpath:secrets.properties")
 public class JwtTokenProvider {
@@ -35,6 +40,8 @@ public class JwtTokenProvider {
     @Value("${email.change_expiration}")
     private int emailChangeExpiration;
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateAccessToken(Account account, List<String> roles) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -49,6 +56,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateRefreshToken(Account account) {
         return Jwts.builder()
                 .id(account.getId().toString())
@@ -97,6 +106,8 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public Date getExpiration(String token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -106,6 +117,7 @@ public class JwtTokenProvider {
                 .getExpiration();
     }
 
+    @PreAuthorize("permitAll()")
     public String getType(String token) {
         return (String) Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -144,7 +156,6 @@ public class JwtTokenProvider {
             throw new RuntimeException("Unable to load public key", e);
         }
     }
-
 
     public boolean validateToken(String token) {
         try {

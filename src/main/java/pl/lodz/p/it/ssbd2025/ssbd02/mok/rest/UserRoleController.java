@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/account/{accountId}/roles")
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
 @RequiredArgsConstructor
 public class UserRoleController {
 

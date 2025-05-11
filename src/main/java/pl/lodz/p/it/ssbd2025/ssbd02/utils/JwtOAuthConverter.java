@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.util.Collection;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@MethodCallLogged
 @Component
 public class JwtOAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 

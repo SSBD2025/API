@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
 
@@ -33,7 +35,6 @@ import java.util.stream.Collectors;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final AccountService accountService;
     private final JwtService jwtService;
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer; //make it prettier with @value or something

@@ -3,10 +3,12 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.util.Collection;
 import java.util.List;
 
+@MethodCallLogged
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
