@@ -219,11 +219,6 @@ public class AccountService {
 
     }
 
-    public String me() {
-        return "Hello " + SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     //TODO tu raczej bez powtarzania ale do ustalenia
     public void sendResetPasswordEmail(String email) {
@@ -378,6 +373,7 @@ public class AccountService {
         emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(login);
@@ -388,6 +384,7 @@ public class AccountService {
         return new AccountWithTokenDTO(dto, token, roles);
     }
 
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public AccountWithTokenDTO getAccountById(String id) {
         Account account = accountRepository.findById(UUID.fromString(id))
                 .orElseThrow(AccountNotFoundException::new);
@@ -399,12 +396,19 @@ public class AccountService {
         return new AccountWithTokenDTO(dto, token, roles);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateAccountById(String id, UpdateAccountDTO dto) {
         updateAccount(() -> accountRepository.findById(UUID.fromString(id))
                 .orElseThrow(AccountNotFoundException::new), dto);
     }
 
-    private void updateAccount(Supplier<Account> accountSupplier, UpdateAccountDTO dto) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class, OptimisticLockException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}"
+    )
+    public void updateAccount(Supplier<Account> accountSupplier, UpdateAccountDTO dto) {
         LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.lockToken());
 
         Account account = accountSupplier.get();
@@ -427,27 +431,9 @@ public class AccountService {
         accountRepository.saveAndFlush(account);
     }
 
-    public void updateMyAccount(String login, UpdateAccountDTO updateAccountDTO) {
-        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(updateAccountDTO.lockToken());
-
-        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-
-        if (!account.isActive()) {
-            throw new AccountNotActiveException();
-        }
-
-        if (!account.getId().equals(record.id())) {
-            throw new InvalidLockTokenException();
-        }
-
-        account.setFirstName(updateAccountDTO.firstName());
-        account.setLastName(updateAccountDTO.lastName());
-
-        if (!Objects.equals(account.getVersion(), record.version())) {
-            throw new OptimisticLockException("Version mismatch"); // TODO: need to catch this error because its runtime
-        }
-
-        accountRepository.saveAndFlush(account);
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    public void updateMyAccount(String login, UpdateAccountDTO dto) {
+        updateAccount(() -> accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new), dto);
     }
 
     @PreAuthorize("permitAll()")
