@@ -60,7 +60,7 @@ public class Account extends AbstractEntity {
     @Column(name = "last_failed_login_ip", length = 45, nullable = true)
     private String lastFailedLoginIp;
 
-    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}) //TODO sprawdzic remove
     @ToString.Exclude
     private Collection<UserRole> userRoles = new ArrayList<>();
 

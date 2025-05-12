@@ -192,4 +192,28 @@ public class EmailService {
             e.printStackTrace(); //todo
         }
     }
+
+    @Async
+    @PreAuthorize("permitAll()")
+    public void sendAccountDeletedEmail(String to, String username, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_DELETE_ACCOUNT_BODY, language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.delete.account.subject", language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
 }

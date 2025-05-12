@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class DietaryRestrictions extends AbstractEntity {
 
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "client_id", nullable = false, unique = true, updatable = false)
     private Client client;
 
