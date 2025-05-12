@@ -257,6 +257,13 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void changeOwnEmail(String newEmail) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
@@ -264,6 +271,13 @@ public class AccountService {
         handleEmailChange(account, newEmail);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void changeUserEmail(UUID accountId, String newEmail) {
         Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
         handleEmailChange(account, newEmail);
@@ -286,6 +300,13 @@ public class AccountService {
         emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void confirmEmail(String token) {
         TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
@@ -313,6 +334,13 @@ public class AccountService {
         emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, revertChangeURL, account.getLanguage());
     }
 
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class
+    }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void revertEmailChange(String token) {
         TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
@@ -330,20 +358,18 @@ public class AccountService {
         tokenRepository.delete(jwt);
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @TransactionLogged
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public void resendEmailChangeLink() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-        TokenEntity tokenEntity = tokenRepository.findByAccount(account).stream()
-                .filter(jwt -> {
-                    try {
-                        String type = jwtTokenProvider.getType(jwt.getToken());
-                        return "EMAIL_CHANGE".equals(type) && jwt.getExpiration().after(new Date());
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .findFirst().orElseThrow(EmailChangeTokenNotFoundException::new);
+        TokenEntity tokenEntity = tokenRepository.findByType(TokenType.EMAIL_CHANGE);
+
+        if (tokenEntity == null) {
+            throw new EmailChangeTokenNotFoundException();
+        }
 
         String emailChangeToken = tokenEntity.getToken();
         String newEmail = jwtTokenProvider.getNewEmailFromToken(emailChangeToken);
