@@ -5,6 +5,10 @@ stages:
 build_backend:
   stage: build
   script:
+    - mkdir src/main/resources/keys
+    - cp /ssbd/secrets/secrets.properties src/main/resources/secrets.properties
+    - cp /ssbd/secrets/public_key.pem src/main/resources/keys/public_key.pem
+    - cp /ssbd/secrets/private_key.pem src/main/resources/keys/private_key.pem
     - mvn clean package -DskipTests
     - cp ./target/ssbd02*.jar /ssbd/api/target/ssbd02.jar
   tags:
