@@ -179,32 +179,40 @@ public class AccountService {
         SecurityContextHolder.clearContext();
     }
 
-    //@Retryable
+    @PreAuthorize("hasRole('ADMIN')") //TODO co z system?
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void blockAccount(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException());
 
-        if (!account.isActive())
-            throw new AccountNotActiveException(); //TODO zmienic
+        if (account.getLogin().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+            throw new SelfBlockAccountException();
+        }
 
-        //TODO obsluga wyjatku
+        if (!account.isActive())
+            throw new AccountAlreadyBlockedException();
+
+
 
         account.setActive(false);
         accountRepository.saveAndFlush(account);
 
 //        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage()); //TODO MAILE SIE ZMIENILY POPRAWIC!
-        //TODO logowanie
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')") //TODO co z system?
+    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
-    //TODO tu raczej bez powtarzania ale do ustalenia
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void unblockAccount(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException());
 
         if (account.isActive())
-            throw new AccountNotActiveException(); //TODO zmienic
+            throw new AccountAlreadyUnblockedException();
 
         account.setActive(true);
         accountRepository.saveAndFlush(account);
