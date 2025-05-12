@@ -91,16 +91,15 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //    @PreAuthorize("hasRole('CLIENT')||hasRole('client_admin')||hasRole('admin')")
-//    @PreAuthorize("permitAll()")
-//    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public AccountWithTokenDTO getMe() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         return accountService.getAccountByLogin(login);
     }
 
     @PutMapping("/me")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void updateMe(@RequestBody @Valid UpdateAccountDTO updateAccountDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.updateMyAccount(login, updateAccountDTO);
