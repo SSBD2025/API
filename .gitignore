@@ -36,10 +36,8 @@ src/main/resources/secrets.properties
 app-realm.json
 docker-compose.yml
 Dockerfile
-src/main/resources/init.sql
 pg_hba.conf
 src/main/resources/keys/*
 Dockerfile.dev
 test.sql
 .mailmap
-init.sql
