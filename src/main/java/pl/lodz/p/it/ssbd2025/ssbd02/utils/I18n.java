@@ -10,6 +10,8 @@ import java.util.ResourceBundle;
 public class I18n {
 
     public static final String EMAIL_WELCOME = "email.welcome";
+    public static final String EMAIL_DELETE_ACCOUNT_SUBJECT = "email.delete.account.subject";
+    public static final String EMAIL_DELETE_ACCOUNT_BODY = "email.delete.account.body";
 
     public static String getMessage(String key, Language language) {
         String[] parts = language.name().split("_");

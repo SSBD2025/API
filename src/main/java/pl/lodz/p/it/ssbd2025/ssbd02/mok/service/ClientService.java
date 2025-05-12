@@ -53,6 +53,9 @@ public class ClientService {
     @Value("${mail.verify.url}")
     private String verificationURL;
 
+    @Value("${account.verification.threshold}")
+    private long accountVerificationThreshold;
+
     @PreAuthorize("permitAll()")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
@@ -65,7 +68,7 @@ public class ClientService {
         Account createdAccount = accountRepository.saveAndFlush(newAccount);
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
-        tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateDayExpiration(1), createdAccount, TokenType.VERIFICATION));
+        tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         return clientRepository.saveAndFlush(newClient);
     }
 

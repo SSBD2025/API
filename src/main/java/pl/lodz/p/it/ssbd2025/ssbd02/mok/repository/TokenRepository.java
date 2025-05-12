@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,4 +58,6 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     TokenEntity saveAndFlush(TokenEntity entity);
 
     TokenEntity findByType(TokenType type);
+
+    List<TokenEntity> findByExpirationBefore(Date date);
 }
