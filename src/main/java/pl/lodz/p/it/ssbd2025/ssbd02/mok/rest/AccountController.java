@@ -108,18 +108,23 @@ public class AccountController {
     
     @PostMapping("/change-email")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    public ResponseEntity<?> changeEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+    @MethodCallLogged
+    public ResponseEntity<?> changeOwnEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeOwnEmail(changeEmailDTO.email());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/confirm-email")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
     public ResponseEntity<?> confirmEmail(@RequestParam("token") String token ) {
         accountService.confirmEmail(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/revert-email-change")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
     public ResponseEntity<?> revertEmailChange(@RequestParam("token") String token) {
         accountService.revertEmailChange(token);
         return ResponseEntity.ok().build();
@@ -127,6 +132,7 @@ public class AccountController {
 
     @PostMapping("/resend-change-email")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @MethodCallLogged
     public ResponseEntity<Void> resendEmailChangeLink() {
         accountService.resendEmailChangeLink();
         return ResponseEntity.ok().build();
@@ -134,14 +140,13 @@ public class AccountController {
 
     @PostMapping("/{id}/change-user-email")
     @PreAuthorize("hasRole('ADMIN')")
+    @MethodCallLogged
     public ResponseEntity<?> changeUserEmail(
             @PathVariable String id,
             @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeUserEmail(UUID.fromString(id), changeEmailDTO.email());
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
 
     @PostMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
