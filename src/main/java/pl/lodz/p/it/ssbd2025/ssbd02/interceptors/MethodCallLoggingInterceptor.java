@@ -11,6 +11,7 @@ import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LogSanitizer;
 
 @Aspect @Order(Ordered.LOWEST_PRECEDENCE)
 @Component
@@ -35,7 +36,8 @@ public class MethodCallLoggingInterceptor {
                 message.append("| user: ").append(username);
                 message.append("| args: ");
                 for (Object arg : joinPoint.getArgs()) {
-                    message.append(String.valueOf(arg)).append(" ");
+                    Object sanitizedArg = LogSanitizer.sanitize(arg);
+                    message.append(String.valueOf(sanitizedArg)).append(" ");
                 }
             } catch (Exception e) {
                 log.error("| Unexpected exception within interceptor: ", e);
@@ -50,7 +52,8 @@ public class MethodCallLoggingInterceptor {
             throw t;
         }
 
-        message.append("| returned: ").append(String.valueOf(result)).append(" ");
+        Object sanitizedResult = LogSanitizer.sanitize(result);
+        message.append("| returned: ").append(String.valueOf(sanitizedResult)).append(" ");
 
         log.info(message.toString());
 
