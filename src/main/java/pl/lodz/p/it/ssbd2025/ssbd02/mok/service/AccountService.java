@@ -462,24 +462,33 @@ public class AccountService {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public void assignRole(UUID accountId, UserRole userRole, String login) {
-        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+    public void assignRole(UUID accountId, AccessRole accessRole, String login) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
 
         if (Objects.equals(login, account.getLogin())) {
             throw new SelfRoleAssignmentException();
         }
 
-        boolean hasActiveRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
-                .anyMatch(role -> role.getRoleName().equals(userRole.getRoleName()) && role.isActive());
+        String roleName = accessRole.name();
 
-        if (hasActiveRole) {
-            throw new RoleAlreadyAssgined();
+        boolean exists = userRoleRepository.existsByLoginAndRoleName(account.getLogin(), roleName);
+
+        if (exists) {
+            Optional<Boolean> activeOpt = userRoleRepository.findActiveByLoginAndRoleName(account.getLogin(), roleName);
+            if (activeOpt.isPresent() && !activeOpt.get()) {
+                userRoleRepository.updateRoleActiveStatus(account.getLogin(), roleName, true);
+            }
+        } else {
+            UserRole newRole = switch (accessRole) {
+                case ADMIN -> new Admin();
+                case DIETICIAN -> new Dietician();
+                case CLIENT -> new Client();
+            };
+            newRole.setAccount(account);
+            newRole.setActive(true);
+            userRoleRepository.saveAndFlush(newRole);
         }
-
-        userRole.setAccount(account);
-        userRole.setActive(true);
-
-        userRoleRepository.saveAndFlush(userRole);
     }
 
     @TransactionLogged
@@ -491,50 +500,19 @@ public class AccountService {
     public void unassignRole(UUID accountId, AccessRole accessRole, String login) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(AccountNotFoundException::new);
-
-        if (Objects.equals(login, account.getLogin())) {
+        if (Objects.equals(account.getLogin(), login)) {
             throw new SelfRoleAssignmentException();
         }
+        String roleName = accessRole.name();
 
-        boolean hasActiveRole = accountRepository.findAccountRolesByLogin(account.getLogin()).stream()
-                .anyMatch(role -> role.getRoleName().equals(accessRole.name()) && role.isActive());
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
 
-        if (!hasActiveRole) {
+        boolean hasActive = roles.stream()
+                .anyMatch(r -> r.getRoleName().equals(roleName) && r.isActive());
+        if (!hasActive) {
             throw new RoleNotFoundException();
         }
 
-        switch (accessRole) {
-            case ADMIN -> {
-                List<Admin> admins = userRoleRepository.findAdminsByAccount(account);
-                Admin activeAdmin = admins.stream()
-                        .filter(Admin::isActive)
-                        .findFirst()
-                        .orElseThrow(RoleNotFoundException::new);
-
-                activeAdmin.setActive(false);
-                userRoleRepository.saveAndFlush(activeAdmin);
-            }
-            case DIETICIAN -> {
-                List<Dietician> dieticians = userRoleRepository.findDieticiansByAccount(account);
-                Dietician activeDietician = dieticians.stream()
-                        .filter(Dietician::isActive)
-                        .findFirst()
-                        .orElseThrow(RoleNotFoundException::new);
-
-                activeDietician.setActive(false);
-                userRoleRepository.saveAndFlush(activeDietician);
-            }
-            case CLIENT -> {
-                List<Client> clients = userRoleRepository.findClientsByAccount(account);
-                Client activeClient = clients.stream()
-                        .filter(Client::isActive)
-                        .findFirst()
-                        .orElseThrow(RoleNotFoundException::new);
-
-                activeClient.setActive(false);
-                userRoleRepository.saveAndFlush(activeClient);
-            }
-            default -> throw new RoleNotFoundException();
-        }
+        userRoleRepository.updateRoleActiveStatus(account.getLogin(), roleName, false);
     }
 }
