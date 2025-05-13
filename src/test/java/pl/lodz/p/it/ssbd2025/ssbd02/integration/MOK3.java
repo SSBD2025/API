@@ -1,17 +1,16 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 
@@ -25,9 +24,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -40,10 +37,10 @@ public class MOK3 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
 
-    @MockBean
+    @MockitoBean
     private PasswordResetTokenService passwordResetTokenService;
 
     @Captor
@@ -85,35 +82,13 @@ public class MOK3 extends BaseIntegrationTest {
     }
 
 //    @Test
-//    public void resetPasswordRequest_TokenNotFound() throws Exception {
-//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
-//                "admin@example.com",
-//                null
-//        );
+//    public void resetPassword_TokenNotFound() throws Exception {
+//        String wrongToken = "21370000-0000-0000-0000-000000000000";
 //
-//        doNothing().when(emailService).sendResetPasswordEmail(
-//                anyString(), anyString(), any(), tokenCaptor.capture());
-//
+//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO("jcheddar@example.com", "P@ssw0rd!");
 //        String json = objectMapper.writeValueAsString(resetPasswordDTO);
 //
-//        mockMvc.perform(post("/api/account/reset/password/request")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(json))
-//                .andExpect(status().isOk());
-//
-//        verify(emailService, times(1)).sendResetPasswordEmail(
-//                eq("admin@example.com"),
-//                anyString(),
-//                any(),
-//                anyString()
-//        );
-//
-//        String capturedToken = (tokenCaptor.getValue()).replace("1", "0");
-//
-//        resetPasswordDTO = new ResetPasswordDTO("admin@example.com", "P@ssw0rd!");
-//        json = objectMapper.writeValueAsString(resetPasswordDTO);
-//
-//        mockMvc.perform(post("/api/account/reset/password/" + capturedToken )
+//        mockMvc.perform(post("/api/account/reset/password/" + wrongToken )
 //                        .contentType(MediaType.APPLICATION_JSON)
 //                        .content(json))
 //                .andExpect(status().isNotFound());
@@ -121,7 +96,7 @@ public class MOK3 extends BaseIntegrationTest {
 
     @Test
     public void resetPasswordRequest_TokenExpired() throws Exception {
-        String email = "admin@example.com";
+        String email = "jcheddar@example.com";
         String newPassword = "P@ssw0rd!";
 
         ResetPasswordDTO resetPasswordRequestDTO = new ResetPasswordDTO(email, null);
@@ -157,5 +132,105 @@ public class MOK3 extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized());
 
     }
+
+    @Test
+    public void resetPasswordRequest_AccountNotFound() throws Exception {
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                "example.wrong.mail@example.com",
+                null
+        );
+
+
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        mockMvc.perform(post("/api/account/reset/password/request")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void resetPassword_AccountNotFound() throws Exception {
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                "jcheddar@example.com",
+                null
+        );
+
+        doNothing().when(emailService).sendResetPasswordEmail(
+                anyString(), anyString(), any(), tokenCaptor.capture());
+
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        mockMvc.perform(post("/api/account/reset/password/request")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
+
+        verify(emailService, times(1)).sendResetPasswordEmail(
+                eq("jcheddar@example.com"),
+                anyString(),
+                any(),
+                anyString()
+        );
+
+        String capturedToken = tokenCaptor.getValue();
+
+        resetPasswordDTO = new ResetPasswordDTO("example.wrong.mail@example.com", "P@ssw0rd!");
+        json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void password_NotNull() throws Exception {
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                "jcheddar@example.com",
+                "P@ssw0rd!"
+        );
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        MvcResult result = mockMvc.perform(post("/api/account/reset/password/request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest()).andReturn();
+        String responseBody = result.getResponse().getContentAsString();
+        Assertions.assertTrue(responseBody.contains("{\"violations\":[{\"fieldName\":\"password\",\"message\":\"must be null\"}]}"));
+    }
+
+    @Test
+    public void email_NotEmailFormat() throws Exception {
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                "ssbd.p.lodz.pl",
+                null
+        );
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        MvcResult result = mockMvc.perform(post("/api/account/reset/password/request")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest()).andReturn();
+        String responseBody = result.getResponse().getContentAsString();
+        Assertions.assertTrue(responseBody.contains("{\"violations\":[{\"fieldName\":\"email\",\"message\":\"must be a well-formed email address\"}]}"));
+    }
+
+    @Test
+    public void email_Null() throws Exception {
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                null,
+                null
+        );
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+
+        MvcResult result = mockMvc.perform(post("/api/account/reset/password/request")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest()).andReturn();
+        String responseBody = result.getResponse().getContentAsString();
+        Assertions.assertTrue(responseBody.contains("{\"violations\":[{\"fieldName\":\"email\",\"message\":\"must not be null\"}]}"));
+    }
+
 }
 

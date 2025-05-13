@@ -14,6 +14,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.MANDATORY)
 public interface AdminRepository extends AbstractRepository<Admin> {
-//    @PreAuthorize("hasRole('ADMIN')")//ostatecznie odkomentowac
+    @PreAuthorize("hasRole('ADMIN')")//ostatecznie odkomentowac
     Admin saveAndFlush(Admin admin);
 }

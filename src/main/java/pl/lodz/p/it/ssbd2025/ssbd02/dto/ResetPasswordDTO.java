@@ -7,7 +7,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
 
 public record ResetPasswordDTO(
-        @Email
+        @Email(groups = {OnRequest.class, OnReset.class})
         @NotNull(groups = {OnRequest.class, OnReset.class})
         String email,
         @Null(groups = OnRequest.class)

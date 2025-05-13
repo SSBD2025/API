@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class AdminService {
     @Value("${account.verification.threshold}")
     private long accountVerificationThreshold;
 
-//    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
+    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -60,7 +61,6 @@ public class AdminService {
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));
         newAdmin.setAccount(newAccount);
         newAccount.getUserRoles().add(newAdmin);
-        //the only difference between this and client is the fact that admin must manually activate the account
         Account createdAccount = accountRepository.saveAndFlush(newAccount);
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
