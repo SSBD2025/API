@@ -25,7 +25,7 @@ public class AdminDBConfig {
     }
 
     @Primary
-    @Bean
+    @Bean("adminDataSource")
     public DataSource adminDataSource() {
         return adminDataSourceProperties()
                 .initializeDataSourceBuilder()
@@ -33,6 +33,7 @@ public class AdminDBConfig {
     }
 
     @Bean(name="adminEntityManagerFactory")
+    // USUŃ jakąkolwiek adnotację @DependsOn jeśli taka istnieje w tej metodzie
     public LocalContainerEntityManagerFactoryBean adminEntityManagerFactory(
             @Qualifier("adminDataSource") DataSource dataSource,
             EntityManagerFactoryBuilder builder,
@@ -47,8 +48,5 @@ public class AdminDBConfig {
                 .packages("pl.lodz.p.it.ssbd2025.ssbd02.entities")
                 .properties(vendorProperties)
                 .build();
-
     }
-
-
 }
