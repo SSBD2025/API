@@ -152,9 +152,9 @@ public class AccountService {
         if (!account.isActive()) {
             throw new AccountNotActiveException();
         }
-//        if (!account.isVerified()) { //uncomment later
-//            throw new AccountNotVerifiedException();
-//        }
+        if (!account.isVerified()) { //uncomment later
+            throw new AccountNotVerifiedException();
+        }
         Date currentTime = new Date(System.currentTimeMillis());
         if (tokenUtil.checkPassword(password, account.getPassword())) {
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
@@ -228,7 +228,7 @@ public class AccountService {
         }
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account, token);
-        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token); //TODO MAILE SIE ZMIENILY POPRAWIC!
+        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")

@@ -47,8 +47,8 @@ public class MethodCallLoggingInterceptor {
             result = joinPoint.proceed();
 
         } catch (Throwable t) {
-            message.append("| thrown exception: ").append(t.toString());
-            log.warn(message.toString(), t);
+            message.append("| thrown exception: ").append(t.getMessage());
+            log.warn(message.toString(), t.getMessage());
             throw t;
         }
 

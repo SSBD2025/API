@@ -1,0 +1,213 @@
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.UserRoleDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+@Testcontainers
+public class MOK14 extends BaseIntegrationTest { //LOGOUT
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private AccountTestHelper accountTestHelper;
+
+    @MockitoBean
+    private JavaMailSender mailSender;
+
+    String adminToken;
+
+    @BeforeEach
+    void setup() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "adminlogin",
+          "password": "password"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        adminToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+
+        MimeMessage realMimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+    }
+
+    @AfterEach
+    void teardown() throws Exception {
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + adminToken)).andReturn();
+    }
+
+    // POSITIVE TESTS //
+    // POSITIVE TESTS //
+    // POSITIVE TESTS //
+
+    @Test
+    public void clientLogoutTest() throws Exception {
+        UserRoleDTO.ClientDTO clientDTO = new UserRoleDTO.ClientDTO();
+
+        AccountDTO accountDTO = new AccountDTO(
+                null,
+                null,
+                "clientLogoutTest",
+                "clientLogoutTest",
+                null,
+                null,
+                "clientLogoutTest",
+                "clientLogoutTest",
+                "clientLogoutTest@example.com",
+                null,
+                null,
+                Language.pl_PL,
+                null,
+                null
+        );
+
+        String loginRequestJson = """
+        {
+          "login": "clientLogoutTest",
+          "password": "clientLogoutTest"
+        }
+        """;
+
+        ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
+
+        String requestJson = objectMapper.writeValueAsString(clientDTO2);
+
+        mockMvc.perform(post("/api/client/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk());
+
+        accountTestHelper.verifyByLogin("clientLogoutTest"); //only for tests
+
+        MvcResult result = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk()).andReturn();
+        String body = result.getResponse().getContentAsString();
+        Assertions.assertTrue(body.contains("accessToken"));
+        Assertions.assertTrue(body.contains("refreshToken"));
+        JSONObject json = new JSONObject(body);
+
+        String accessToken = json.getString("accessToken");
+
+        mockMvc.perform(get("/api/account/me")
+                .header("Authorization", "Bearer "+accessToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + accessToken)).andReturn();
+
+        mockMvc.perform(get("/api/account/me")
+                .header("Authorization", "Bearer "+accessToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    // NEGATIVE TESTS //
+    // NEGATIVE TESTS //
+    // NEGATIVE TESTS //
+
+    @Test
+    public void clientLogoutInvalidTokenTest() throws Exception {
+        UserRoleDTO.ClientDTO clientDTO = new UserRoleDTO.ClientDTO();
+
+        AccountDTO accountDTO = new AccountDTO(
+                null,
+                null,
+                "clientLogoutInvalidTokenTest",
+                "clientLogoutInvalidTokenTest",
+                null,
+                null,
+                "clientLogoutInvalidTokenTest",
+                "clientLogoutInvalidTokenTest",
+                "clientLogoutInvalidTokenTest@example.com",
+                null,
+                null,
+                Language.pl_PL,
+                null,
+                null
+        );
+
+        String loginRequestJson = """
+        {
+          "login": "clientLogoutInvalidTokenTest",
+          "password": "clientLogoutInvalidTokenTest"
+        }
+        """;
+
+        ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
+
+        String requestJson = objectMapper.writeValueAsString(clientDTO2);
+
+        mockMvc.perform(post("/api/client/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk());
+
+        accountTestHelper.verifyByLogin("clientLogoutInvalidTokenTest"); //only for tests
+
+        MvcResult result = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk()).andReturn();
+        String body = result.getResponse().getContentAsString();
+        Assertions.assertTrue(body.contains("accessToken"));
+        Assertions.assertTrue(body.contains("refreshToken"));
+        JSONObject json = new JSONObject(body);
+
+        String accessToken = json.getString("accessToken");
+
+        mockMvc.perform(get("/api/account/me")
+                .header("Authorization", "Bearer "+accessToken))
+                .andExpect(status().isOk());
+
+        accessToken = accessToken + "a";
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isForbidden());
+    }
+}

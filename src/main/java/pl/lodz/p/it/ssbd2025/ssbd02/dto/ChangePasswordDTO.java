@@ -12,7 +12,7 @@ public record ChangePasswordDTO(
         @NotBlank
         @Pattern(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()]).+$",
-                message = "Hasło musi zawierać małą literę, wielką literę, cyfrę i znak specjalny"
+                message = "Password must contain a lowercase letter, an uppercase letter, a digit, and a special character."
         )
         String newPassword
 ) {}

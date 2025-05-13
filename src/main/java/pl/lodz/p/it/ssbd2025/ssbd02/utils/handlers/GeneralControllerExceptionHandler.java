@@ -1,12 +1,11 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
 import jakarta.validation.ConstraintViolationException;
-import org.hibernate.exception.JDBCConnectionException;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,7 +42,7 @@ public class GeneralControllerExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ValidationErrorResponse onConstraintValidationException(
+    public ResponseEntity<ValidationErrorResponse> onConstraintValidationException(
             ConstraintViolationException e) {
         ValidationErrorResponse error = new ValidationErrorResponse();
         e.getConstraintViolations().forEach(
@@ -52,7 +51,7 @@ public class GeneralControllerExceptionHandler {
                 }
         );
 
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     // For better validation error responses (i.e. multiple error descriptions)
@@ -70,7 +69,8 @@ public class GeneralControllerExceptionHandler {
                             new ValidationErrorResponse.Violation(fieldError.getField(), fieldError.getDefaultMessage()));
                 }
         );
-        return ResponseEntity.ofNullable(error);
+//        return ResponseEntity.ofNullable(error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -100,13 +100,44 @@ public class GeneralControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Authorization exception: "+exception.getMessage());
     }
 
-   // For general unknown exceptions handling
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Object> handleAllUncaughtException(
-            RuntimeException exception,
-            WebRequest request
-    ){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception thrown by controller: "+exception);
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<Object> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex,
+            WebRequest request) {
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof org.hibernate.exception.ConstraintViolationException constraintViolationException) {
+            String violation = constraintViolationException.getMessage();
+            if(violation.contains("account_login_key")){
+                violation = "this login is already in use";
+            }
+            if(violation.contains("account_email_key")){
+                violation = "this email is already in use";
+            }
+            return new ResponseEntity<>("Constraint error: " + violation, HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("A database error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); //TODO SPRAWDZIC !!
     }
+
+//    // For general unknown exceptions handling
+//    @ExceptionHandler(RuntimeException.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ResponseEntity<Object> handleAllUncaughtException(
+//            RuntimeException exception,
+//            WebRequest request
+//    ){
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception thrown by controller: "+exception);
+//    }
+
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
+//    @ResponseBody
+//    public ResponseEntity<Object> catchEverything(
+//            Exception ex,
+//            WebRequest request) {
+//        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(ex.getMessage());
+//    }
 }
