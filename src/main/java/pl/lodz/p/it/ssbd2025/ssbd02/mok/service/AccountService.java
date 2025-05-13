@@ -110,7 +110,7 @@ public class AccountService {
         accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account.get(), token);
-//        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password); //TODO MAILE SIE ZMIENILY POPRAWIC!
+        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password);
         return password;
     }
 
@@ -228,7 +228,7 @@ public class AccountService {
         }
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account, token);
-//        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token); //TODO MAILE SIE ZMIENILY POPRAWIC!
+        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token); //TODO MAILE SIE ZMIENILY POPRAWIC!
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
