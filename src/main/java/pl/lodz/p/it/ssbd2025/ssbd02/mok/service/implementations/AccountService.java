@@ -231,8 +231,9 @@ public class AccountService implements IAccountService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
+        TokenEntity tokenEntity = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         passwordResetTokenService.validatePasswordResetToken(token);
-        Account account = accountRepository.findByEmail(resetPasswordDTO.email());
+        Account account = tokenEntity.getAccount();
         if(account == null) {
             throw new AccountNotFoundException();
         }
