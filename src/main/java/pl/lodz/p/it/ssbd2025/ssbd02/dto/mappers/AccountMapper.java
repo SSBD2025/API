@@ -33,7 +33,7 @@ public interface AccountMapper {
 
     @Mappings({
             @Mapping(target = "accountDTO", source = "account"),
-            @Mapping(target = "userRoleDTOS", source = "account.userRoles"),
+            @Mapping(target = "userRoleDTOS", source = "account.userRoles")
     })
     AccountWithRolesDTO toAccountWithUserRolesDTO(Account account);
 
