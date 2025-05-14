@@ -56,8 +56,8 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
     void setup() throws Exception {
         String loginRequestJson = """
         {
-          "login": "adminlogin",
-          "password": "password"
+          "login": "jcheddar",
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -92,7 +92,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 null,
                 "clientLogoutTest",
-                "clientLogoutTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "clientLogoutTest",
@@ -108,7 +108,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
         String loginRequestJson = """
         {
           "login": "clientLogoutTest",
-          "password": "clientLogoutTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -158,7 +158,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 null,
                 "clientLogoutInvalidTokenTest",
-                "clientLogoutInvalidTokenTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "clientLogoutInvalidTokenTest",
@@ -174,7 +174,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
         String loginRequestJson = """
         {
           "login": "clientLogoutInvalidTokenTest",
-          "password": "clientLogoutInvalidTokenTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
