@@ -60,4 +60,6 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     TokenEntity findByType(TokenType type);
 
     List<TokenEntity> findByExpirationBefore(Date date);
+
+    List<TokenEntity> findAllByType(TokenType type);
 }
