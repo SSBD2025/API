@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
+package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 
 import lombok.RequiredArgsConstructor;
@@ -7,19 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IPasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
-import java.util.Calendar;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -27,7 +23,7 @@ import java.util.Date;
 @EnableMethodSecurity(prePostEnabled=true)
 @MethodCallLogged
 @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager")
-public class PasswordResetTokenService {
+public class PasswordResetTokenService implements IPasswordResetTokenService {
 
 //    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final TokenRepository tokenRepository;

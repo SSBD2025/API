@@ -14,9 +14,9 @@ import java.util.List;
 @DiscriminatorValue("CLIENT")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
 public class Client extends UserRole {
 
     @ManyToOne

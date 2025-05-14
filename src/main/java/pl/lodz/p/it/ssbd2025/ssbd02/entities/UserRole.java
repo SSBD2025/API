@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Entity
@@ -17,6 +18,7 @@ import lombok.Setter;
 )
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "role")
+@ToString(callSuper = true)
 public abstract class UserRole extends AbstractEntity {
 
     @Column(name = "role", updatable = false, insertable=false, nullable = true)

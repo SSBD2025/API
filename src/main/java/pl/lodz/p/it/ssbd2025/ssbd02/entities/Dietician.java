@@ -11,9 +11,9 @@ import java.util.List;
 @DiscriminatorValue("DIETICIAN")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
 public class Dietician extends UserRole {
 
     @OneToMany(mappedBy = "dietician", cascade = CascadeType.REFRESH)

@@ -16,7 +16,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Admin;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AdminService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAdminService;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class AdminController {
 
-    private final AdminService adminService;
+    private final IAdminService adminService;
     private final AdminMapper adminMapper;
     private final AccountMapper accountMapper;
     private final UserRoleMapper userRoleMapper;

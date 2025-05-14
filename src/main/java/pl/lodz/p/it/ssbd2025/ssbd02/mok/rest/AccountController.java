@@ -2,22 +2,14 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
@@ -28,14 +20,10 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.JwtService;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
 
-import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 import java.util.UUID;
@@ -52,8 +40,8 @@ import static pl.lodz.p.it.ssbd2025.ssbd02.utils.MiscellaneousUtil.getClientIp;
 public class AccountController {
 
     @NonNull
-    private final AccountService accountService;
-    private final JwtService jwtService;
+    private final IAccountService accountService;
+    private final IJwtService jwtService;
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")

@@ -21,7 +21,7 @@ public class Pointcuts {
     public void transactionLoggedAnnotatedMethods() {}
 
     @Pointcut(
-            "execution(* pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService.login(..))"
+            "execution(* pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.AccountService.login(..))"
     )
     public void loginMethod() {}
 }

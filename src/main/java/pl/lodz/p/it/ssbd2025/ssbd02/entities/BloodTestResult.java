@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(callSuper = true)
 public class BloodTestResult extends AbstractEntity {
     @Column(name = "result", nullable = false)
     private String result;

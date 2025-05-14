@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
+package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +24,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AdminRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAdminService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
@@ -38,7 +39,7 @@ import java.util.stream.StreamSupport;
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
-public class AdminService {
+public class AdminService implements IAdminService {
 
     private final AdminRepository adminRepository;
     private final AccountRepository accountRepository;

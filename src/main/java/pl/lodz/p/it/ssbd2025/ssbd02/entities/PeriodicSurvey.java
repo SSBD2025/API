@@ -17,6 +17,7 @@ import java.sql.Timestamp;
     indexes = {
         @Index(name = "ps_client_id_index", columnList = "client_id")
     })
+@ToString(callSuper = true)
 public class PeriodicSurvey extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false, updatable = false)
