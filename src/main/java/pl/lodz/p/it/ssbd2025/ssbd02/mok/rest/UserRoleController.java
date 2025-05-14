@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.AccountService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserRoleController {
     @NotNull
-    private final AccountService accountService;
+    private final IAccountService accountService;
 
     @PutMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")

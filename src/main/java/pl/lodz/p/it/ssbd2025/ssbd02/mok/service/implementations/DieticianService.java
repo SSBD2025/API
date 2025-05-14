@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
+package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,19 +13,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.DieticianRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ClientRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IDieticianService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
@@ -39,12 +40,12 @@ import java.util.stream.StreamSupport;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
-public class ClientService {
+@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+public class DieticianService implements IDieticianService {
 
-    private final ClientRepository clientRepository;
+    private final DieticianRepository dieticianRepository;
     private final AccountRepository accountRepository;
-    private final ClientMapper clientMapper;
+    private final DieticianMapper dieticianMapper;
     private final AccountMapper accountMapper;
     private final EmailService emailService;
     private final TokenRepository tokenRepository;
@@ -60,34 +61,34 @@ public class ClientService {
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public Client createClient(Client newClient, Account newAccount) {
+    public Dietician createDietician(Dietician newDietician, Account newAccount) {
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));
-        newClient.setAccount(newAccount);
-        newAccount.getUserRoles().add(newClient);
-        newAccount.setActive(true); //verification is required anyway
-        Account createdAccount = accountRepository.saveAndFlush(newAccount);
+        newDietician.setAccount(newAccount);
+        newAccount.getUserRoles().add(newDietician);
+        //the only difference between this and client is the fact that admin must manually activate the account
+        Account createdAccount = accountRepository.saveAndFlush(newAccount);//todo check if this is correct
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token);
+//        verificationTokenRepository.saveAndFlush(new VerificationToken(token, createdAccount));
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
-        return clientRepository.saveAndFlush(newClient);
+        return dieticianRepository.saveAndFlush(newDietician); //todo check if this is correct
     }
 
     @TransactionLogged
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<ClientDTO> getClientAccounts() {
-        Iterable<Client> clients = clientRepository.findAll();
+    public List<DieticianDTO> getDieticianAccounts() {
+        Iterable<Dietician> dieticians = dieticianRepository.findAll();
 
-        return StreamSupport.stream(clients.spliterator(), false)
-                .map(clientMapper::toClientDTO)
+        return StreamSupport.stream(dieticians.spliterator(), false)
+                .map(dieticianMapper::toDieticianDTO)
                 .collect(Collectors.toList());
     }
 
     @TransactionLogged
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<AccountDTO> getUnverifiedClientAccounts() {
+    public List<AccountDTO> getUnverifiedDieticianAccounts() {
         return accountRepository.findByActiveAndVerified(null, false).stream()
-                .filter(acc -> acc.getUserRoles().stream()
-                        .anyMatch(role -> role instanceof Client))
+                .filter(acc -> acc.getUserRoles().stream().anyMatch(r -> r instanceof Dietician))
                 .map(accountMapper::toAccountDTO)
                 .collect(Collectors.toList());
     }

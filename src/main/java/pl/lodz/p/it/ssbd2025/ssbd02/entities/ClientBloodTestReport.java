@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(callSuper = true)
 public class ClientBloodTestReport extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false, updatable = false)

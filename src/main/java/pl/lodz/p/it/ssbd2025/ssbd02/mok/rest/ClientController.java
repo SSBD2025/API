@@ -17,7 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.ClientService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IClientService;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class ClientController {
 
-    private final ClientService clientService;
+    private final IClientService clientService;
     private final ClientMapper clientMapper;
     private final AccountMapper accountMapper;
     private final UserRoleMapper userRoleMapper;

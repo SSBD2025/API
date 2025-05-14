@@ -17,7 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.DieticianService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IDieticianService;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class DieticianController {
 
-    private final DieticianService dieticianService;
+    private final IDieticianService dieticianService;
     private final DieticianMapper dieticianMapper;
     private final AccountMapper accountMapper;
     private final UserRoleMapper userRoleMapper;

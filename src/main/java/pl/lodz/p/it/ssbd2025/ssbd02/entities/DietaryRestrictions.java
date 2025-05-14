@@ -7,9 +7,9 @@ import lombok.*;
 @Table(name = "dietary_restrictions")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
 public class DietaryRestrictions extends AbstractEntity {
 
     @OneToOne(optional = false)

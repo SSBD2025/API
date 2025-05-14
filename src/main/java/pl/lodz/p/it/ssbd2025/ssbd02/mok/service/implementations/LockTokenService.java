@@ -1,10 +1,11 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.mok.service;
+package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ILockTokenService;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
 @PropertySource("classpath:secrets.properties")
-public class LockTokenService {
+public class LockTokenService implements ILockTokenService {
 
     @Value("${app.optimistic-lock-secret}")
     private String secret;

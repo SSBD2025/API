@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 @Table(indexes = {
@@ -20,6 +17,7 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class Feedback extends AbstractEntity {
     @Size(min = 1, max = 5)
     private int rating;

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
@@ -15,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString(callSuper = true)
 public class TokenEntity extends AbstractEntity {
 
     @Column(name = "token", unique = true, nullable = false, updatable = false, columnDefinition = "TEXT")

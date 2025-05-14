@@ -17,7 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.PasswordResetTokenService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.PasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import static org.mockito.ArgumentMatchers.any;

@@ -10,7 +10,7 @@ import lombok.*;
 @DiscriminatorValue("ADMIN")
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 public class Admin extends UserRole {
     public Admin() {
 

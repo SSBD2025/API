@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "survey")
+@ToString(callSuper = true)
 public class Survey extends AbstractEntity {
     @OneToOne(optional = false)
     @JoinColumn(name = "client_id", nullable = false, unique = true, updatable = false)

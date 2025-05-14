@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"client", "foodPyramid"})
+@ToString(callSuper = true)
 public class ClientFoodPyramid {
 
     @EmbeddedId
