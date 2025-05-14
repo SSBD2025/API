@@ -18,11 +18,14 @@ public record AccountDTO(
         Long version,
 
         @Null(groups = OnUpdate.class)
-        @Size(min = 4, max = 64, groups = OnCreate.class)
+        @Size(min = 4, max = 50, groups = OnCreate.class)
         String login,
 
         @Null(groups = OnUpdate.class)
-        @Size(min = 8, groups = OnCreate.class)
+        @Size(min = 8, max = 60, groups = OnCreate.class)
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,60}$",
+                message = "Password must include at least: 1 lower case letter, 1 upper case letter, 1 number and 1 special character",
+                groups = {OnCreate.class})
         String password,
 
         @Null(groups = {OnCreate.class, OnUpdate.class})
@@ -31,16 +34,16 @@ public record AccountDTO(
         Boolean active,
 
         @NotBlank(groups = OnCreate.class)
-        @Size(min = 1, max = 50)
+        @Size(min = 1, max = 50, groups = {OnCreate.class, OnUpdate.class})
         String firstName,
 
         @NotBlank(groups = OnCreate.class)
-        @Size(min = 1, max = 50)
+        @Size(min = 1, max = 50, groups = {OnCreate.class, OnUpdate.class})
         String lastName,
 
         @NotBlank(groups = OnCreate.class)
-        @Email
-        @Size(max = 128)
+        @Email(groups = OnCreate.class)
+        @Size(max = 128, groups = {OnCreate.class, OnUpdate.class})
         String email,
 
         @Null(groups = {OnCreate.class, OnUpdate.class})

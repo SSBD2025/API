@@ -64,7 +64,7 @@ public class AccountController {
 
     @PostMapping(value = "/refresh")
     @PreAuthorize("permitAll()")
-    public TokenPairDTO refresh(@RequestBody RefreshRequestDTO refreshRequestDTO){
+    public TokenPairDTO refresh(@RequestBody @Validated(OnCreate.class) RefreshRequestDTO refreshRequestDTO){
         return jwtService.refresh(refreshRequestDTO.refreshToken());
     }
 

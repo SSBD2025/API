@@ -61,12 +61,14 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
 
     String adminToken;
 
+    //todo counter tests
+
     @BeforeEach
     void setup() throws Exception {
         String loginRequestJson = """
         {
-          "login": "adminlogin",
-          "password": "password"
+          "login": "jcheddar",
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -101,7 +103,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 "clientLoginTest",
-                "clientLoginTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "clientLoginTest",
@@ -117,7 +119,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
         String loginRequestJson = """
         {
           "login": "clientLoginTest",
-          "password": "clientLoginTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -152,7 +154,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 "dieticianLoginTest",
-                "dieticianLoginTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "dieticianLoginTest",
@@ -168,7 +170,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
         String loginRequestJson = """
         {
           "login": "dieticianLoginTest",
-          "password": "dieticianLoginTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -203,7 +205,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 "adminLoginTest",
-                "adminLoginTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "adminLoginTest",
@@ -219,7 +221,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
         String loginRequestJson = """
         {
           "login": "adminLoginTest",
-          "password": "adminLoginTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -267,7 +269,6 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
 
     }
 
-
     // NEGATIVE TESTS //
     // NEGATIVE TESTS //
     // NEGATIVE TESTS //
@@ -280,7 +281,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 "dieticianLoginNotActiveTest",
-                "dieticianLoginNotActiveTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "dieticianLoginNotActiveTest",
@@ -296,7 +297,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
         String loginRequestJson = """
         {
           "login": "dieticianLoginNotActiveTest",
-          "password": "dieticianLoginNotActiveTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -326,7 +327,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 "adminLoginNotActiveTest",
-                "adminLoginNotActiveTest",
+                "P@ssw0rd!",
                 null,
                 null,
                 "adminLoginNotActiveTest",
@@ -342,7 +343,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
         String loginRequestJson = """
         {
           "login": "adminLoginNotActiveTest",
-          "password": "adminLoginNotActiveTest"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -363,5 +364,159 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                         .content(loginRequestJson))
                 .andExpect(status().isForbidden())
                 .andExpect(result -> Assertions.assertTrue(Objects.requireNonNull(result.getResponse().getErrorMessage()).contains("Account not verified")));
+    }
+
+    @Test
+    public void clientLoginPasswordIncorrectTest() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@ssw0rd!!!!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void clientLoginLoginIncorrectTest() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzolaaaaa",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isNotFound());
+    }
+
+
+
+    // MALFORMATION TESTS //
+    // MALFORMATION TESTS //
+    // MALFORMATION TESTS //
+
+    @Test
+    public void clientLoginMalformationTest_Login_TooShort() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "ago",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Login_TooLong() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgagorgagorgagorgagorgagorgagorgagorgagorgagorgagorg",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Login_Blank() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "      ",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Login_Missing() throws Exception {
+        String loginRequestJson = """
+        {
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Password_TooShort() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@s"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Password_TooLong() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@sswP@ssw"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Password_Blank() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "     "
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void clientLoginMalformationTest_Password_Missing() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola"
+        }
+        """;
+
+        mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isBadRequest());
     }
 }

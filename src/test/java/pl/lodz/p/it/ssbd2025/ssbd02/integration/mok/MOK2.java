@@ -81,8 +81,8 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
     void setup() throws Exception {
         String loginRequestJson = """
         {
-          "login": "adminlogin",
-          "password": "password"
+          "login": "jcheddar",
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -365,7 +365,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
         String loginRequestJson = """
         {
           "login": "adminlogin",
-          "password": "password"
+          "password": "P@ssw0rd!"
         }
         """;
 
@@ -554,7 +554,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
         String loginRequestJson = """
         {
           "login": "adminlogin",
-          "password": "password"
+          "password": "P@ssw0rd!"
         }
         """;
 
