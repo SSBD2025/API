@@ -4,16 +4,20 @@ import jakarta.mail.BodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
 @TestComponent
 public class AccountTestHelper {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private TokenUtil tokenUtil;
 
     //TODO THIS ABSOLUTELY CANNOT LEAK TO PROD
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
@@ -39,6 +43,20 @@ public class AccountTestHelper {
         account.setActive(true);
         account.setVerified(true);
         accountRepository.saveAndFlush(account);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    public void checkPassword(String login, String password) {
+        Account account = accountRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalStateException("Account not found"));
+        if(!tokenUtil.checkPassword(password, account.getPassword())) {
+            throw new IllegalStateException("Wrong password");
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    public void setPassword(String login, String password) {
+        accountRepository.updatePassword(login, BCrypt.hashpw(password, BCrypt.gensalt()));
     }
 
     public static String extractTextFromMimeMessage(MimeMessage message) throws Exception {

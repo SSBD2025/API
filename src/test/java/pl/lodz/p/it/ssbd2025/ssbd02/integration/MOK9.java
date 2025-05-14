@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.PasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
@@ -37,6 +38,9 @@ public class MOK9 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private AccountTestHelper accountTestHelper;
+
     @MockitoBean
     private EmailService emailService;
 
@@ -55,6 +59,7 @@ public class MOK9 extends BaseIntegrationTest {
 
 
     public String loginAsAdmin() throws Exception {
+        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
         LoginDTO loginDTO = new LoginDTO(
                 "jcheddar",
                 "P@ssw0rd!"
@@ -85,6 +90,8 @@ public class MOK9 extends BaseIntegrationTest {
     @Test
     public void resetPasswordByAdmin_Success() throws Exception {
         String adminAccessToken = loginAsAdmin();
+        accountTestHelper.setPassword("agorgonzola", "P@ssw0rd!");
+        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!");
         doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), tokenCaptor.capture(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + adminAccessToken)
@@ -100,6 +107,7 @@ public class MOK9 extends BaseIntegrationTest {
                 .content(json)
         ).andExpect(status().isOk());
         logout(adminAccessToken);
+        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!!");
     }
 
     @Order(2)
@@ -109,7 +117,6 @@ public class MOK9 extends BaseIntegrationTest {
                 "tcheese",
                 "P@ssw0rd!"
         );
-
         String json = objectMapper.writeValueAsString(loginDTO);
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
