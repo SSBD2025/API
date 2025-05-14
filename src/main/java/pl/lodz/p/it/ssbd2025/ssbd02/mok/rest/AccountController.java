@@ -178,7 +178,7 @@ public class AccountController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AccountDTO> getAllAccounts(
+    public List<AccountWithRolesDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) Boolean verified
     ) {

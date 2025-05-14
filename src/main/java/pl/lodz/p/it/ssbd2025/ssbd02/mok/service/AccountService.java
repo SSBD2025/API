@@ -244,11 +244,11 @@ public class AccountService {
 
     @TransactionLogged
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<AccountDTO> getAllAccounts(Boolean active, Boolean verified) {
+    public List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified) {
         List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
 
         return accounts.stream()
-                .map(accountMapper::toAccountDTO)
+                .map(accountMapper::toAccountWithUserRolesDTO) 
                 .collect(Collectors.toList());
     }
 
