@@ -34,44 +34,44 @@ GRANT SELECT, INSERT, UPDATE ON TABLE survey_medications TO ssbd02mod;
 GRANT SELECT ON TABLE user_data TO ssbd02mod;
 GRANT SELECT ON TABLE user_role TO ssbd02mod;
 
--- 1. Insert into account
-INSERT INTO account (
-    id, login, email, password,
-    active, verified, language, version
-) VALUES (
-             '11111111-1111-1111-1111-111111111111',
-             'adminlogin',
-             'admin@example.com',
-             '$2a$10$iALHwDyAc05S3/4xrlobOObjPveBXZtbjs6HnNeWyB10UCre3nbUm',
-             TRUE,
-             TRUE,
-             0,
-             0
-         );
-
--- 2. Insert into user_role
-INSERT INTO user_role (
-    id, user_id, role, active, version
-) VALUES (
-             '22222222-2222-2222-2222-222222222222',
-             '11111111-1111-1111-1111-111111111111',
-             'ADMIN',
-             TRUE,
-             0
-         );
-
--- 3. Insert into user_data
-INSERT INTO user_data (
-    id, first_name, last_name
-) VALUES (
-             '11111111-1111-1111-1111-111111111111',
-             'Test',
-             'Admin'
-         );
-
--- 4. Insert into admin
-INSERT INTO admin (
-    id
-) VALUES (
-             '22222222-2222-2222-2222-222222222222'
-         );
+-- -- 1. Insert into account
+-- INSERT INTO account (
+--     id, login, email, password,
+--     active, verified, language, version
+-- ) VALUES (
+--              '11111111-1111-1111-1111-111111111111',
+--              'adminlogin',
+--              'admin@example.com',
+--              '$2a$10$iALHwDyAc05S3/4xrlobOObjPveBXZtbjs6HnNeWyB10UCre3nbUm',
+--              TRUE,
+--              TRUE,
+--              0,
+--              0
+--          );
+--
+-- -- 2. Insert into user_role
+-- INSERT INTO user_role (
+--     id, user_id, role, active, version
+-- ) VALUES (
+--              '22222222-2222-2222-2222-222222222222',
+--              '11111111-1111-1111-1111-111111111111',
+--              'ADMIN',
+--              TRUE,
+--              0
+--          );
+--
+-- -- 3. Insert into user_data
+-- INSERT INTO user_data (
+--     id, first_name, last_name
+-- ) VALUES (
+--              '11111111-1111-1111-1111-111111111111',
+--              'Test',
+--              'Admin'
+--          );
+--
+-- -- 4. Insert into admin
+-- INSERT INTO admin (
+--     id
+-- ) VALUES (
+--              '22222222-2222-2222-2222-222222222222'
+--          );
