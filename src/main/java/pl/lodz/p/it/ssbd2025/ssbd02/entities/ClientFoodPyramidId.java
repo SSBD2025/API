@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 @Getter
@@ -16,8 +17,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ClientFoodPyramidId implements Serializable {
 
-    private Long clientId;
-    private Long foodPyramidId;
+    private UUID clientId;
+    private UUID foodPyramidId;
 
     @Override
     public boolean equals(Object o) {
