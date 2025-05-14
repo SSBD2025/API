@@ -69,4 +69,7 @@ public class Account extends AbstractEntity {
 
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
+
+    @Column(name = "reminded", nullable = false)
+    private boolean reminded = false;
 }

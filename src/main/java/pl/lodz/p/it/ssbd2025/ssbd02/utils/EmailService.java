@@ -146,7 +146,7 @@ public class EmailService {
 
     @Async
     @PreAuthorize("permitAll()")
-    public void sendActivationMail(String to, String username, String verificationURL, Language language, String token, boolean reminder) { //todo reminder email
+    public void sendActivationMail(String to, String username, String verificationURL, Language language, String token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate("changeEmailTemplate.html")
@@ -216,4 +216,29 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    @Async
+    @PreAuthorize("permitAll()")
+    public void sendVerificationReminderEmail(String to, String username, String verificationURL, Language language, String token) {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            try {
+                String emailBody = loadTemplate("changeEmailTemplate.html")
+                        .replace("${welcome}", I18n.getMessage("email.welcome", language))
+                        .replace("${name}", username)
+                        .replace("${body}", I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_BODY, language))
+                        .replace("${url}", verificationURL+token)
+                        .replace("${linkText}", I18n.getMessage("email.verification.link", language));
+
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                helper.setFrom(senderEmail);
+                helper.setTo(to);
+                helper.setSubject(I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_SUBJECT, language));
+                helper.setText(emailBody, true);
+
+                mailSender.send(mimeMessage);
+
+            } catch (MessagingException e) {
+                e.printStackTrace(); //todo
+            }
+        }
 }

@@ -63,7 +63,7 @@ public class AdminService {
         //the only difference between this and client is the fact that admin must manually activate the account
         Account createdAccount = accountRepository.saveAndFlush(newAccount);
         String token = UUID.randomUUID().toString();
-        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token, false);
+        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token);
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         return adminRepository.saveAndFlush(newAdmin);
     }
