@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.PasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
@@ -37,6 +38,9 @@ public class MOK3 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private AccountTestHelper accountTestHelper;
+
     @MockitoBean
     private EmailService emailService;
 
@@ -48,6 +52,7 @@ public class MOK3 extends BaseIntegrationTest {
 
     @Test
     public void resetPasswordRequest_Success() throws Exception {
+        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
                 "jcheddar@example.com",
                 null
@@ -72,13 +77,15 @@ public class MOK3 extends BaseIntegrationTest {
 
         String capturedToken = tokenCaptor.getValue();
 
-        resetPasswordDTO = new ResetPasswordDTO("jcheddar@example.com", "P@ssw0rd!");
+        resetPasswordDTO = new ResetPasswordDTO("jcheddar@example.com", "P@ssw0rd?");
         json = objectMapper.writeValueAsString(resetPasswordDTO);
 
         mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk());
+
+        accountTestHelper.checkPassword("jcheddar", "P@ssw0rd?");
     }
 
 //    @Test
@@ -96,8 +103,9 @@ public class MOK3 extends BaseIntegrationTest {
 
     @Test
     public void resetPasswordRequest_TokenExpired() throws Exception {
+        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
         String email = "jcheddar@example.com";
-        String newPassword = "P@ssw0rd!";
+        String newPassword = "P@ssw0rd?";
 
         ResetPasswordDTO resetPasswordRequestDTO = new ResetPasswordDTO(email, null);
 
@@ -131,6 +139,7 @@ public class MOK3 extends BaseIntegrationTest {
                         .content(resetJson))
                 .andExpect(status().isUnauthorized());
 
+        accountTestHelper.checkPassword("jcheddar", "P@ssw0rd!");
     }
 
     @Test

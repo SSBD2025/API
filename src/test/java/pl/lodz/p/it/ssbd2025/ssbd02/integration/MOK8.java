@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,7 +31,11 @@ public class MOK8 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private AccountTestHelper accountTestHelper;
+
     private String loginAsUser() throws Exception {
+        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
         LoginDTO loginDTO = new LoginDTO(
                 "jcheddar",
                 "P@ssw0rd!"
@@ -55,7 +60,7 @@ public class MOK8 extends BaseIntegrationTest {
 
     @Test
     public void changePassword_Success() throws Exception {
-
+        accountTestHelper.setPassword("drice", "P@ssw0rd!");
         LoginDTO loginDTO = new LoginDTO(
                 "drice",
                 "P@ssw0rd!"
@@ -87,15 +92,18 @@ public class MOK8 extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonChangePassword))
                 .andExpect(status().isOk());
+
+        accountTestHelper.checkPassword("drice", "P@ssw0rd?");
     }
 
 
     @Test
     public void changePassword_Unauthorized() throws Exception {
 
+
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
-                "password",
-                "P@ssw0rd!"
+                "P@ssw0rd!",
+                "P@ssw0rd?"
         );
 
         String jsonChangePassword = objectMapper.writeValueAsString(changePasswordDTO);
@@ -104,6 +112,7 @@ public class MOK8 extends BaseIntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonChangePassword))
                 .andExpect(status().isForbidden());
+
     }
 
 
@@ -131,7 +140,7 @@ public class MOK8 extends BaseIntegrationTest {
 
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
                 "wrongCredentials",
-                "P@ssw0rd!"
+                "P@ssw0rd?"
         );
 
         String jsonChangePassword = objectMapper.writeValueAsString(changePasswordDTO);
@@ -141,6 +150,8 @@ public class MOK8 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonChangePassword))
                 .andExpect(status().isUnauthorized());
+
+        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!");
     }
 
 
