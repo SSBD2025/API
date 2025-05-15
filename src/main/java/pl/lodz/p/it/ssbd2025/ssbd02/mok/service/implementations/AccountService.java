@@ -424,18 +424,19 @@ public class AccountService implements IAccountService {
                 .map(p -> new AccountRoleDTO(p.getRoleName(), p.isActive()))
                 .toList();
 
-        AccountReadDTO dto = accountMapper.toReadDTO(account);
+        AccountDTO dto = accountMapper.toAccountDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
 
         return new AccountWithTokenDTO(dto, token, roles);
     }
+
 
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public AccountWithTokenDTO getAccountById(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
-        AccountReadDTO dto = accountMapper.toReadDTO(account);
+        AccountDTO dto = accountMapper.toAccountDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
         List<AccountRolesProjection> projections = accountRepository.findAccountRolesByLogin(account.getLogin());
 
