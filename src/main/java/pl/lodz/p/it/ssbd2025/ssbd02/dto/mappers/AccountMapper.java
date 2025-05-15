@@ -3,7 +3,6 @@ package pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountReadDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountWithRolesDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 
@@ -50,7 +49,7 @@ public interface AccountMapper {
     })
     void updateExistingAccount(Account accountUpdate, @MappingTarget Account account);
 
-    AccountReadDTO toReadDTO(Account account);
+//    AccountDTO toReadDTO(Account account);
 
 }
 

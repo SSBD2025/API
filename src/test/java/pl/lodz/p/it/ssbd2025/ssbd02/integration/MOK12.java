@@ -66,7 +66,7 @@ public class MOK12 extends BaseIntegrationTest {
     @Test
     void shouldUpdateAccountSuccessfully() throws Exception {
         UpdateAccountDTO dto = new UpdateAccountDTO("John", "Doe", "sometoken");
-        
+
         String body = objectMapper.writeValueAsString(dto);
 
         String accountId = "00000000-0000-0000-0000-000000000005";
