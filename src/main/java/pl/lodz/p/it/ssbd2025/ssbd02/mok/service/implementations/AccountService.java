@@ -347,7 +347,7 @@ public class AccountService implements IAccountService {
         if (account.getEmail().equals(newEmail)) {
             throw new AccountSameEmailException();
         }
-        if (accountRepository.findByEmail(newEmail) != null) {
+        if (accountRepository.findByEmail(newEmail).isPresent()) {
             throw new AccountEmailAlreadyInUseException();
         }
 
