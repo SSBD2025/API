@@ -43,11 +43,4 @@ public class AdminController {
     //activate dietician
     //create admin
     //activate admin
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<AdminDTO> getAdminAccounts() throws AppBaseException {
-        return adminService.getAdminAccounts();
-    }
 }
