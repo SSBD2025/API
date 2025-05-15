@@ -74,13 +74,16 @@ public record AccountDTO(
         @Max(45)
         String lastFailedLoginIp,
 
-        @NotNull(groups = {OnCreate.class}) // todo czy to git?
+        @NotNull(groups = {OnRead.class, OnCreate.class, OnUpdate.class})
+        boolean twoFactorAuth,
+
+        @NotNull(groups = {OnCreate.class})
         boolean reminded,
 
-        @NotNull(groups = {OnCreate.class})// todo czy to git?
+        @NotNull(groups = {OnCreate.class})
         int loginAttempts,
 
-        @Null(groups = {OnCreate.class})// todo czy to git?
+        @Null(groups = {OnCreate.class})
         Timestamp lockedUntil
 ) {
 }

@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -94,6 +96,8 @@ public class AccountService implements IAccountService {
     private int maxLoginAttempts;
     @Value("${app.login.lockedFor}")
     private int lockedFor;
+    @Value("${app.jwt_refresh_expiration}")
+    private int jwtRefreshExpiration;
     @NotNull
     private final UserRoleRepository userRoleRepository;
 
@@ -143,7 +147,7 @@ public class AccountService implements IAccountService {
             AccountNotActiveException.class,
             AccountNotVerifiedException.class
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public TokenPairDTO login(String username, String password, String ipAddress) {
+    public SensitiveDTO login(String username, String password, String ipAddress, HttpServletResponse response) {
         Account account = accountRepository.findByLogin(username).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
         List<String> userRoles = new ArrayList<>();
@@ -169,12 +173,29 @@ public class AccountService implements IAccountService {
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress, 0);
             if(account.isTwoFactorAuth()){
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
-                return new TokenPairDTO(null, null, true);
+
+
+//                return new TokenPairDTO(null, null, true);
+                return null;//newtokentypetodo; //TODO
+                //TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO
+                //TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO
+                //TODO//TODO//TODO//TODO
             }
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
             }
-            return jwtService.generatePair(account, userRoles);
+            TokenPairDTO pair = jwtService.generatePair(account, userRoles);
+            String access = pair.accessToken();
+            String refresh = pair.refreshToken();
+
+            Cookie cookie = new Cookie("refreshToken", refresh);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setPath("/api/account/refresh");
+            cookie.setMaxAge(jwtRefreshExpiration/1000);
+            response.addCookie(cookie);
+
+            return new SensitiveDTO(access);
         } else {
             if(account.getLoginAttempts() + 1 >= maxLoginAttempts) {
                 lockTemporarily(username, Timestamp.from(tokenUtil.generateMinuteExpiration(lockedFor).toInstant()));

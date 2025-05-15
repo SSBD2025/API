@@ -49,7 +49,7 @@ public class JwtTokenProvider {
                 .claim("typ", "access")
                 .id(account.getId().toString())
                 .subject(account.getLogin())
-                .issuer(issuer) //is this needed? <- yes it is
+                .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getPrivateKey())
@@ -63,7 +63,7 @@ public class JwtTokenProvider {
                 .id(account.getId().toString())
                 .subject(account.getLogin())
                 .claim("typ", "refresh")
-                .issuer(issuer) //is this needed? <- yes it is
+                .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getPrivateKey())
@@ -72,7 +72,7 @@ public class JwtTokenProvider {
 
     public String getLogin(String token) {
         return Jwts.parser()
-                .verifyWith(getPublicKey()) // use RSA public key
+                .verifyWith(getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

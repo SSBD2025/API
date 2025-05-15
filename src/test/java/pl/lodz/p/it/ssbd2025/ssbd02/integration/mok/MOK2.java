@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper.extractTextFromMimeMessage;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -80,7 +82,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        token = objectMapper.readTree(responseJson).get("accessToken").asText();
+        token = objectMapper.readTree(responseJson).get("value").asText();
 
         MimeMessage realMimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
@@ -91,7 +93,6 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();
     }
-
     // POSITIVE TESTS //
     // POSITIVE TESTS //
     // POSITIVE TESTS //
@@ -115,6 +116,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -154,6 +156,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -191,6 +194,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -234,6 +238,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -264,6 +269,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -300,6 +306,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -330,6 +337,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -365,6 +373,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -404,6 +413,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -441,6 +451,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -471,6 +482,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -507,6 +519,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -537,6 +550,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -572,6 +586,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -611,6 +626,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -639,6 +655,7 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null, null,
                 Language.pl_PL,
                 null, null,
+                false,
                 false,
                 0,
                 null
