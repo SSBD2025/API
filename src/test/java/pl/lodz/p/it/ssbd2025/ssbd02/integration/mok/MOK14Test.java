@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-public class MOK14 extends BaseIntegrationTest { //LOGOUT
+public class MOK14Test extends BaseIntegrationTest { //LOGOUT
     @Autowired
     private MockMvc mockMvc;
 

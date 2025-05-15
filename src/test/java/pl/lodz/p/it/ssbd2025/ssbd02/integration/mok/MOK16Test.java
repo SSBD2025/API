@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-public class MOK16 extends BaseIntegrationTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class MOK16Test extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
