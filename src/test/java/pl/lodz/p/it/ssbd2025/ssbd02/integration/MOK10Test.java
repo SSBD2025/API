@@ -70,9 +70,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO changeEmailDTO = new ChangeEmailDTO("newemail@example.com");
 
@@ -117,9 +115,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO dto = new ChangeEmailDTO("verylongemailaddress1234567890verylongemailaddress1234567890verylongemailaddress1234567890@example.com");
         String changeEmail = objectMapper.writeValueAsString(dto);
@@ -148,9 +144,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO dto = new ChangeEmailDTO("not_an_email");
 
@@ -190,9 +184,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO dto = new ChangeEmailDTO("");
 
@@ -208,14 +200,14 @@ public class MOK10Test extends BaseIntegrationTest {
         LoginDTO loginDTO = new LoginDTO("tcheese", "P@ssw0rd!");
         String loginJson = objectMapper.writeValueAsString(loginDTO);
 
-        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+        MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginJson))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(loginResult.getResponse().getContentAsString(), TokenPairDTO.class);
-        accessToken = tokenPair.accessToken();
+        String responseBody = result.getResponse().getContentAsString();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO sameEmail = new ChangeEmailDTO("tcheese@example.com");
         String json = objectMapper.writeValueAsString(sameEmail);
@@ -235,14 +227,14 @@ public class MOK10Test extends BaseIntegrationTest {
         );
         String json = objectMapper.writeValueAsString(loginDTO);
 
-        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+        MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(loginResult.getResponse().getContentAsString(), TokenPairDTO.class);
-        accessToken = tokenPair.accessToken();
+        String responseBody = result.getResponse().getContentAsString();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO takenEmail = new ChangeEmailDTO("jcheddar@example.com");
         String takenEmailJson = objectMapper.writeValueAsString(takenEmail);
@@ -271,9 +263,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO changeEmailDTO = new ChangeEmailDTO("changeEmail@example.com");
 
@@ -339,9 +329,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         ChangeEmailDTO changeEmailDTO = new ChangeEmailDTO("adminnewemail@example.com");
 
@@ -383,9 +371,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
 
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        accessToken = tokenPair.accessToken();
+        accessToken = objectMapper.readTree(responseBody).get("value").asText();
 
         mockMvc.perform(post("/api/account/resend-change-email")
                         .header("Authorization", "Bearer " + accessToken)
