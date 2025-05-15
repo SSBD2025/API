@@ -43,7 +43,7 @@ import static pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper.extractText
 @AutoConfigureMockMvc
 @Testcontainers
 @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
-public class MOK2 extends BaseIntegrationTest { //REGISTER
+public class MOK2Test extends BaseIntegrationTest { //REGISTER
     @Autowired
     private AccountRepository accountRepository;
 

@@ -61,7 +61,7 @@ public class MOK12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+        accessToken = objectMapper.readTree(responseJson).get("value").asText();
     }
 
     @AfterEach
@@ -85,7 +85,7 @@ public class MOK12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        return objectMapper.readTree(responseJson).get("accessToken").asText();
+        return objectMapper.readTree(responseJson).get("value").asText();
     }
 
     @Test

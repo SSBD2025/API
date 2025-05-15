@@ -60,7 +60,7 @@ public class MOK15Test extends BaseIntegrationTest {
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+        accessToken = objectMapper.readTree(responseJson).get("value").asText();
     }
 
     @Test
