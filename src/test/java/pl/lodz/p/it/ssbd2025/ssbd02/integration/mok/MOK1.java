@@ -113,6 +113,9 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -164,6 +167,9 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -215,6 +221,9 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -291,6 +300,9 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -337,6 +349,9 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 

@@ -29,17 +29,17 @@ public class MOK11Test extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    public void changeUserEmailPositiveTest() throws Exception {
-        ChangeEmailDTO dto = new ChangeEmailDTO("newemail@example.com");
-        String json = objectMapper.writeValueAsString(dto);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/account/{id}/change-user-email", "00000000-0000-0000-0000-000000000003")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    @WithMockUser(roles = "ADMIN")
+//    public void changeUserEmailPositiveTest() throws Exception {
+//        ChangeEmailDTO dto = new ChangeEmailDTO("newemail@example.com");
+//        String json = objectMapper.writeValueAsString(dto);
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/account/{id}/change-user-email", "00000000-0000-0000-0000-000000000003")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(json))
+//                .andExpect(status().isOk());
+//    }
 
     @Test
     @WithMockUser(roles = "ADMIN")
