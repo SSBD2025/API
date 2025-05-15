@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRoleDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
@@ -373,7 +374,10 @@ public class AccountService implements IAccountService {
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(login);
+        List<AccountRolesProjection> projections = accountRepository.findAccountRolesByLogin(login);
+        List<AccountRoleDTO> roles = projections.stream()
+                .map(p -> new AccountRoleDTO(p.getRoleName(), p.isActive()))
+                .toList();
 
         AccountReadDTO dto = accountMapper.toReadDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
@@ -382,20 +386,24 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public AccountWithTokenDTO getAccountById(String id) {
-        Account account = accountRepository.findById(UUID.fromString(id))
+    public AccountWithTokenDTO getAccountById(UUID id) {
+        Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
         AccountReadDTO dto = accountMapper.toReadDTO(account);
         String token = lockTokenService.generateToken(account.getId(), account.getVersion());
-        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
+        List<AccountRolesProjection> projections = accountRepository.findAccountRolesByLogin(account.getLogin());
+
+        List<AccountRoleDTO> roles = projections.stream()
+                .map(p -> new AccountRoleDTO(p.getRoleName(), p.isActive()))
+                .toList();
 
         return new AccountWithTokenDTO(dto, token, roles);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void updateAccountById(String id, UpdateAccountDTO dto) {
-        updateAccount(() -> accountRepository.findById(UUID.fromString(id))
+    public void updateAccountById(UUID id, UpdateAccountDTO dto) {
+        updateAccount(() -> accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new), dto);
     }
 
