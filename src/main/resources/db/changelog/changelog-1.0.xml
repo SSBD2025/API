@@ -15,6 +15,7 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -46,6 +47,7 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -77,6 +79,7 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -108,6 +111,7 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">

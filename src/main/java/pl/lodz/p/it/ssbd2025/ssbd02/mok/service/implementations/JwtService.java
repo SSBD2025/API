@@ -58,7 +58,7 @@ public class JwtService implements IJwtService {
         Date refreshExpiration = jwtTokenProvider.getExpiration(refreshToken);
         tokenRepository.saveAndFlush(new TokenEntity(accessToken, accessExpiration, account, TokenType.ACCESS));
         tokenRepository.saveAndFlush(new TokenEntity(refreshToken, refreshExpiration, account, TokenType.REFRESH));
-        return new TokenPairDTO(accessToken, refreshToken);
+        return new TokenPairDTO(accessToken, refreshToken, account.isTwoFactorAuth());
     }
 
     @PreAuthorize("permitAll()")
@@ -99,7 +99,12 @@ public class JwtService implements IJwtService {
         tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
         tokenRepository.saveAndFlush(new TokenEntity(newAccessToken, expiration, account, TokenType.ACCESS));
         tokenRepository.saveAndFlush(new TokenEntity(newRefreshToken, expiration, account, TokenType.REFRESH));
-        return new TokenPairDTO(newAccessToken, newRefreshToken);
+        return new TokenPairDTO(newAccessToken, newRefreshToken, account.isTwoFactorAuth());
+    }
+
+    //TODO sprawdzic
+    public List<TokenEntity> findByAccount(Account account) {
+        return tokenRepository.findByAccount(account);
     }
 
     public boolean check(String token) { //checks if token is actually in database

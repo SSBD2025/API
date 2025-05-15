@@ -32,5 +32,7 @@ public interface IAccountService {
     void verifyAccount(String token);
     void assignRole(UUID accountId, AccessRole accessRole, String login);
     void unassignRole(UUID accountId, AccessRole accessRole, String login);
-
+    TokenPairDTO verifyTwoFactorCode(String username, String code, String ipAddress);
+    void enableTwoFactor();
+    void disableTwoFactor();
 }
