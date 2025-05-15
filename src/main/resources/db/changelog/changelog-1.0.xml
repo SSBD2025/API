@@ -15,6 +15,8 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
@@ -47,6 +49,8 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
@@ -79,6 +83,8 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 
@@ -111,6 +117,8 @@
             <column name="verified" valueBoolean="true"/>
             <column name="language" valueNumeric="1"/>
             <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
         </insert>
 

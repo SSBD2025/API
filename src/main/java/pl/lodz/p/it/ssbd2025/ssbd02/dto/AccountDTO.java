@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
@@ -71,6 +72,15 @@ public record AccountDTO(
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
         @Max(45)
-        String lastFailedLoginIp
+        String lastFailedLoginIp,
+
+        @NotNull(groups = {OnCreate.class}) // todo czy to git?
+        boolean reminded,
+
+        @NotNull(groups = {OnCreate.class})// todo czy to git?
+        int loginAttempts,
+
+        @Null(groups = {OnCreate.class})// todo czy to git?
+        Timestamp lockedUntil
 ) {
 }

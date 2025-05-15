@@ -27,6 +27,9 @@ public interface AccountMapper {
             @Mapping(target = "lastSuccessfulLoginIp", ignore = true),
             @Mapping(target = "lastFailedLoginIp", ignore = true),
             @Mapping(target = "userRoles", ignore = true),
+            @Mapping(target = "reminded", ignore = true),
+            @Mapping(target = "loginAttempts", ignore = true),
+            @Mapping(target = "lockedUntil", ignore = true)
     })
     Account toNewAccount(AccountDTO accountDTO);
 

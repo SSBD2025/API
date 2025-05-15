@@ -75,4 +75,10 @@ public class Account extends AbstractEntity {
 
     @Column(name = "reminded", nullable = false)
     private boolean reminded = false;
+
+    @Column(name = "login_attempts", nullable = false)
+    private int loginAttempts = 0;
+
+    @Column(name = "locked_until", nullable = true)
+    private Timestamp lockedUntil;
 }
