@@ -546,6 +546,20 @@ public class AccountService implements IAccountService {
 
         String roleName = accessRole.name();
 
+        if (accessRole == AccessRole.DIETICIAN) {
+            Optional<Boolean> clientRoleActiveOpt = userRoleRepository.findActiveByLoginAndRoleName(account.getLogin(),
+                    AccessRole.CLIENT.name());
+            if (clientRoleActiveOpt.orElse(false)) {
+                throw new RoleConflictException();
+            }
+        } else if (accessRole == AccessRole.CLIENT) {
+            Optional<Boolean> dieticianRoleActiveOpt = userRoleRepository.findActiveByLoginAndRoleName(account.getLogin(),
+                    AccessRole.DIETICIAN.name());
+            if (dieticianRoleActiveOpt.orElse(false)) {
+                throw new RoleConflictException();
+            }
+        }
+
         boolean exists = userRoleRepository.existsByLoginAndRoleName(account.getLogin(), roleName);
 
         if (exists) {

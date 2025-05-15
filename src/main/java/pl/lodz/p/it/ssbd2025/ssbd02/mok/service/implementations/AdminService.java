@@ -68,14 +68,4 @@ public class AdminService implements IAdminService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         return adminRepository.saveAndFlush(newAdmin);
     }
-
-    @TransactionLogged
-    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<AdminDTO> getAdminAccounts() {
-        Iterable<Admin> admins = adminRepository.findAll();
-
-        return StreamSupport.stream(admins.spliterator(), false)
-                .map(adminMapper::toAdminDTO)
-                .collect(Collectors.toList());
-    }
 }

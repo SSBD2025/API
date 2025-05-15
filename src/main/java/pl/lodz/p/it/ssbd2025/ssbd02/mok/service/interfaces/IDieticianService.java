@@ -10,6 +10,4 @@ import java.util.List;
 public interface IDieticianService {
 
     Dietician createDietician(Dietician newDietician, Account newAccount);
-    List<DieticianDTO> getDieticianAccounts();
-    List<AccountDTO> getUnverifiedDieticianAccounts();
 }

@@ -9,5 +9,4 @@ import java.util.List;
 public interface IAdminService {
 
     Admin createAdmin(Admin newAdmin, Account newAccount);
-    List<AdminDTO> getAdminAccounts();
 }

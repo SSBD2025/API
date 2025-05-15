@@ -40,18 +40,4 @@ public class ClientController {
         Account newAccount = accountMapper.toNewAccount(clientDTO.account());
         return clientMapper.toClientDTO(clientService.createClient(newClientData, newAccount));
     }
-
-    @PreAuthorize("hasRole('ADMIN')||hasRole('DIETICIAN')")
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<ClientDTO> getClientAccounts() throws AppBaseException {
-        return clientService.getClientAccounts();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/unverified")
-    @ResponseStatus(HttpStatus.OK)
-    public List<AccountDTO> getUnverifiedClientAccounts() throws AppBaseException {
-        return clientService.getUnverifiedClientAccounts();
-    }
 }

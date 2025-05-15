@@ -72,24 +72,4 @@ public class ClientService implements IClientService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         return clientRepository.saveAndFlush(newClient);
     }
-
-    @TransactionLogged
-    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<ClientDTO> getClientAccounts() {
-        Iterable<Client> clients = clientRepository.findAll();
-
-        return StreamSupport.stream(clients.spliterator(), false)
-                .map(clientMapper::toClientDTO)
-                .collect(Collectors.toList());
-    }
-
-    @TransactionLogged
-    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<AccountDTO> getUnverifiedClientAccounts() {
-        return accountRepository.findByActiveAndVerified(null, false).stream()
-                .filter(acc -> acc.getUserRoles().stream()
-                        .anyMatch(role -> role instanceof Client))
-                .map(accountMapper::toAccountDTO)
-                .collect(Collectors.toList());
-    }
 }

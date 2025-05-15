@@ -73,23 +73,4 @@ public class DieticianService implements IDieticianService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         return dieticianRepository.saveAndFlush(newDietician); //todo check if this is correct
     }
-
-    @TransactionLogged
-    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<DieticianDTO> getDieticianAccounts() {
-        Iterable<Dietician> dieticians = dieticianRepository.findAll();
-
-        return StreamSupport.stream(dieticians.spliterator(), false)
-                .map(dieticianMapper::toDieticianDTO)
-                .collect(Collectors.toList());
-    }
-
-    @TransactionLogged
-    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
-    public List<AccountDTO> getUnverifiedDieticianAccounts() {
-        return accountRepository.findByActiveAndVerified(null, false).stream()
-                .filter(acc -> acc.getUserRoles().stream().anyMatch(r -> r instanceof Dietician))
-                .map(accountMapper::toAccountDTO)
-                .collect(Collectors.toList());
-    }
 }

@@ -10,6 +10,4 @@ import java.util.List;
 public interface IClientService {
 
     Client createClient(Client newClient, Account newAccount);
-    List<ClientDTO> getClientAccounts();
-    List<AccountDTO> getUnverifiedClientAccounts();
 }

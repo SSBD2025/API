@@ -40,18 +40,4 @@ public class DieticianController {
         Account newAccount = accountMapper.toNewAccount(dieticianDTO.account());
         return dieticianMapper.toDieticianDTO(dieticianService.createDietician(newDieticianData, newAccount));
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<DieticianDTO> getDieticianAccounts() throws AppBaseException {
-        return dieticianService.getDieticianAccounts();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/unverified")
-    @ResponseStatus(HttpStatus.OK)
-    public List<AccountDTO> getUnverifiedDieticianAccounts() throws AppBaseException {
-        return dieticianService.getUnverifiedDieticianAccounts();
-    }
 }

@@ -45,6 +45,12 @@ public class AccountTestHelper {
         accountRepository.saveAndFlush(account);
     }
 
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    public Account getClientByLogin(String login) {
+        return accountRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalStateException("Account not found"));
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     public void checkPassword(String login, String password) {
         Account account = accountRepository.findByLogin(login)
