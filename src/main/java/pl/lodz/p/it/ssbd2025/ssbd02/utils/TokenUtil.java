@@ -20,8 +20,8 @@ import java.util.Date;
 public class TokenUtil {
     private final TokenRepository tokenRepository;
 
-    public boolean checkPassword(String plaintext, String hash) {
-        return BCrypt.checkpw(plaintext, hash);
+    public boolean checkPassword(String passwordPlaintext, String passwordHash) {
+        return BCrypt.checkpw(passwordPlaintext, passwordHash);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")

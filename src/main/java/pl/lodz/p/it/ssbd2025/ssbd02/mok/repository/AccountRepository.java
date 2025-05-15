@@ -36,7 +36,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @PreAuthorize("permitAll()")
     Optional<Account> findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
 
-    Account findByEmail(@Email String email);
+    Optional<Account> findByEmail(@Email String email);
 
     @PreAuthorize("permitAll()")
     @Query("""

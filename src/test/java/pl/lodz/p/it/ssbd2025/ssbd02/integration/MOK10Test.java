@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.AccountService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,7 +43,7 @@ public class MOK10Test extends BaseIntegrationTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private AccountService accountService;
+    private IAccountService accountService;
 
     @AfterEach
     void tearDown() {
