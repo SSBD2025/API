@@ -22,6 +22,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
@@ -65,6 +66,8 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
     private TokenUtil tokenUtil;
 
     private String token;
+    @Autowired
+    private AccountTestHelper accountTestHelper;
 
     @BeforeEach
     void setup() throws Exception {
@@ -134,6 +137,8 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 .andExpect(jsonPath("$.account.firstName").value("Joe"))
                 .andExpect(jsonPath("$.account.verified").value(false))
                 .andExpect(jsonPath("$.account.active").value(true));
+
+        Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
 
     @Test
@@ -173,6 +178,8 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 .andExpect(jsonPath("$.account.firstName").value("Doe"))
                 .andExpect(jsonPath("$.account.verified").value(false))
                 .andExpect(jsonPath("$.account.active").value(false));
+
+        Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
 
     @Test
@@ -212,6 +219,8 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 .andExpect(jsonPath("$.account.firstName").value("doejoe"))
                 .andExpect(jsonPath("$.account.verified").value(false))
                 .andExpect(jsonPath("$.account.active").value(false));
+
+        Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
 
     // NEGATIVE TESTS //

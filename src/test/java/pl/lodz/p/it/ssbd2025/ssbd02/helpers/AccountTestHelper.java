@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
 import java.util.UUID;
@@ -20,6 +21,8 @@ public class AccountTestHelper {
     private AccountRepository accountRepository;
     @Autowired
     private TokenUtil tokenUtil;
+    @Autowired
+    private TokenRepository tokenRepository;
 
     //TODO THIS ABSOLUTELY CANNOT LEAK TO PROD
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
@@ -71,6 +74,11 @@ public class AccountTestHelper {
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     public void setPassword(String login, String password) {
         accountRepository.updatePassword(login, BCrypt.hashpw(password, BCrypt.gensalt()));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    public String getToken(String token) {
+        return tokenRepository.findByToken(token).orElseThrow().getToken();
     }
 
     public static String extractTextFromMimeMessage(MimeMessage message) throws Exception {
