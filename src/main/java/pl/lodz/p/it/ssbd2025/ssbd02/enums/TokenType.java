@@ -7,4 +7,5 @@ public enum TokenType {
     VERIFICATION,
     EMAIL_CHANGE,
     EMAIL_REVERT,
+    TWO_FACTOR,
 }

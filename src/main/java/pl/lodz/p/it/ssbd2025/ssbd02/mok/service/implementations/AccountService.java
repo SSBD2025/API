@@ -155,6 +155,11 @@ public class AccountService implements IAccountService {
         }
         Date currentTime = new Date(System.currentTimeMillis());
         if (tokenUtil.checkPassword(password, account.getPassword())) {
+            if(account.isTwoFactorAuth()){
+                emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
+                return new TokenPairDTO(null, null, true);
+            }
+
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
@@ -164,6 +169,45 @@ public class AccountService implements IAccountService {
             accountRepository.updateFailedLogin(username, currentTime, ipAddress);
             throw new InvalidCredentialsException();
         }
+    }
+
+
+    @PreAuthorize("permitAll()")
+    public TokenPairDTO verifyTwoFactorCode(String username, String code, String ipAddress) {
+        Account account = accountRepository.findByLogin(username).orElseThrow(AccountNotFoundException::new);
+
+        List<TokenEntity> tokens = tokenRepository.findAllByAccountWithType(account, TokenType.TWO_FACTOR);
+        if (tokens.isEmpty()) {
+            throw new TokenNotFoundException();
+        }
+
+        TokenEntity token = tokens.getFirst();
+
+        if (token.getExpiration().before(new Date())) {
+            tokenRepository.delete(token);
+            throw new TokenExpiredException();
+        }
+
+        boolean isValid = BCrypt.checkpw(code, token.getToken());
+        if (!isValid) {
+            throw new TwoFactorTokenInvalidException();
+        }
+
+        tokenRepository.delete(token);
+
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
+        List<String> userRoles = roles.stream()
+                .filter(AccountRolesProjection::isActive)
+                .map(AccountRolesProjection::getRoleName)
+                .collect(Collectors.toList());
+
+        accountRepository.updateSuccessfulLogin(username, new Date(), ipAddress);
+
+        if (userRoles.contains("ADMIN")) {
+            emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
+        }
+
+        return jwtService.generatePair(account, userRoles);
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
@@ -428,7 +472,7 @@ public class AccountService implements IAccountService {
         }
 
         if (!Objects.equals(account.getVersion(), record.version())) {
-            throw new OptimisticLockException("Version mismatch");
+            throw new OptimisticLockException("Version123 mismatch");
         }
 
         account.setFirstName(dto.firstName());
@@ -437,6 +481,7 @@ public class AccountService implements IAccountService {
         accountRepository.saveAndFlush(account);
     }
 
+    //TODO co to?
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void updateMyAccount(String login, UpdateAccountDTO dto) {
         updateAccount(() -> accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new), dto);
@@ -520,5 +565,31 @@ public class AccountService implements IAccountService {
         }
 
         userRoleRepository.updateRoleActiveStatus(account.getLogin(), roleName, false);
+    }
+
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("permitAll()")
+    public void enableTwoFactor() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        if (account.isTwoFactorAuth())
+            throw new AccountTwoFactorAlreadyEnabled();
+        account.setTwoFactorAuth(true);
+        accountRepository.saveAndFlush(account);
+    }
+
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("permitAll()")
+    public void disableTwoFactor() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        if (!account.isTwoFactorAuth())
+            throw new AccountTwoFactorAlreadyDisabled();
+        account.setTwoFactorAuth(false);
+        accountRepository.saveAndFlush(account);
     }
 }

@@ -60,7 +60,7 @@ public class Account extends AbstractEntity {
     @Column(name = "last_failed_login_ip", length = 45, nullable = true)
     private String lastFailedLoginIp;
 
-    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}) //TODO sprawdzic remove
+    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Collection<UserRole> userRoles = new ArrayList<>();
 
@@ -69,6 +69,9 @@ public class Account extends AbstractEntity {
 
     @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
     private String lastName;
+
+    @Column(name = "two_factor_auth", nullable = false)
+    private boolean twoFactorAuth = false;
 
     @Column(name = "reminded", nullable = false)
     private boolean reminded = false;

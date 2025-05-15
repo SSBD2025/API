@@ -194,6 +194,29 @@ public class EmailService {
     }
 
     @Async
+    public void sendTwoFactorCode(String to, String username, String code, Language language){
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("twoFactorTemplate.html")
+                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage("email.2fa.body", language))
+                    .replace("${code}", code);
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage("email.2fa.subject", language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            e.printStackTrace(); //todo
+        }
+    }
+
+    @Async
     @PreAuthorize("permitAll()")
     public void sendAccountDeletedEmail(String to, String username, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();

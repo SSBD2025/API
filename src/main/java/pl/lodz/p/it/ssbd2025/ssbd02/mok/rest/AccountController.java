@@ -50,6 +50,13 @@ public class AccountController {
         return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress);
     }
 
+    @PostMapping(value = "/login/2fa", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("permitAll()")
+    public TokenPairDTO verifyTwoFactor(@RequestBody TwoFactorDTO twoFactorDTO, HttpServletRequest request) {
+        String ipAddress = getClientIp(request);
+        return accountService.verifyTwoFactorCode(twoFactorDTO.login(), twoFactorDTO.code(), ipAddress);
+    }
+
     @PostMapping(value = "/refresh")
     @PreAuthorize("permitAll()")
     public TokenPairDTO refresh(@RequestBody @Validated(OnCreate.class) RefreshRequestDTO refreshRequestDTO){
@@ -199,6 +206,20 @@ public class AccountController {
     public ResponseEntity<Void> updateAccountById(@RequestBody @Valid UpdateAccountDTO updateAccountDTO,
                                                   @PathVariable UUID id) {
         accountService.updateAccountById(id, updateAccountDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/me/enable2f")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Void> enableTwoFactor() {
+        accountService.enableTwoFactor();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/me/disable2f")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Void> disableTwoFactor() {
+        accountService.disableTwoFactor();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
