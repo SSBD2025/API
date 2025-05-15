@@ -13,6 +13,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ISchedulerService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,7 +73,21 @@ public class SchedulerService implements ISchedulerService {
                 emailService.sendVerificationReminderEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), verificationURL, token.getAccount().getLanguage(), token.getToken());
             }
         }
-
     }
 
+    @Scheduled(fixedRateString = "${scheduler.unlock.accounts}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    public void unlockAccounts() {
+        Date currentDate = new Date();
+        List<Account> accounts = accountRepository.findByHasLockedUntil();
+        if(!accounts.isEmpty()) {
+            for (Account account : accounts) {
+                if(account.getLockedUntil().before(currentDate)) {
+                    account.setLockedUntil(null);
+                    account.setActive(true);
+                    accountRepository.saveAndFlush(account);
+                }
+            }
+        }
+    }
 }

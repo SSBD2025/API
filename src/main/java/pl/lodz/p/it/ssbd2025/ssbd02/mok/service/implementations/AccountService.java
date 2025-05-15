@@ -47,6 +47,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 import java.security.SecureRandom;
 
 import java.sql.SQLTransientConnectionException;
+import java.sql.Timestamp;
 import java.util.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
@@ -89,6 +90,10 @@ public class AccountService implements IAccountService {
     private String confirmURL;
     @Value("${mail.revert.url}")
     private String revertURL;
+    @Value("${app.login.maxAttempts}")
+    private int maxLoginAttempts;
+    @Value("${app.login.lockedFor}")
+    private int lockedFor;
     @NotNull
     private final UserRoleRepository userRoleRepository;
 
@@ -129,7 +134,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", noRollbackFor = {InvalidCredentialsException.class, ExcessiveLoginAttemptsException.class})
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
@@ -161,6 +166,7 @@ public class AccountService implements IAccountService {
         }
         Date currentTime = new Date(System.currentTimeMillis());
         if (tokenUtil.checkPassword(password, account.getPassword())) {
+            accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress, 0);
             if(account.isTwoFactorAuth()){
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
                 return new TokenPairDTO(null, null, true);
@@ -172,9 +178,24 @@ public class AccountService implements IAccountService {
             }
             return jwtService.generatePair(account, userRoles);
         } else {
-            accountRepository.updateFailedLogin(username, currentTime, ipAddress);
+            if(account.getLoginAttempts() + 1 > maxLoginAttempts) {
+
+                lockTemporarily(username, Timestamp.from(tokenUtil.generateMinuteExpiration(lockedFor).toInstant()));
+
+                accountRepository.updateFailedLogin(username, currentTime, ipAddress, 0);
+                throw new ExcessiveLoginAttemptsException();
+            }
+            accountRepository.updateFailedLogin(username, currentTime, ipAddress, account.getLoginAttempts() + 1);
             throw new InvalidCredentialsException();
         }
+    }
+
+//    @PreAuthorize("hasRole('SYSTEM')")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    protected void lockTemporarily(String username, Timestamp until){
+        accountRepository.lockTemporarily(username, until);
     }
 
 

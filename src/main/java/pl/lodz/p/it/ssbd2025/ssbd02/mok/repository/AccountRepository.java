@@ -20,7 +20,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -62,15 +62,27 @@ public interface AccountRepository extends AbstractRepository<Account> {
 
 
     @Modifying
-    @Query("UPDATE Account a SET a.lastSuccessfulLogin = :lastSuccessfulLogin, a.lastSuccessfulLoginIp = :lastSuccessfulLoginIp WHERE a.login = :login")
+    @Query("UPDATE Account a SET a.lastSuccessfulLogin = :lastSuccessfulLogin, a.lastSuccessfulLoginIp = :lastSuccessfulLoginIp, a.loginAttempts = :loginAttempts  WHERE a.login = :login")
     void updateSuccessfulLogin(@Param("login") String login,
                                @Param("lastSuccessfulLogin") Date lastSuccessfulLogin,
-                               @Param("lastSuccessfulLoginIp") String lastSuccessfulLoginIp);
+                               @Param("lastSuccessfulLoginIp") String lastSuccessfulLoginIp,
+                               @Param("loginAttempts") int loginAttempts);
 
     @Modifying
-    @Query("UPDATE Account a SET a.lastFailedLogin = :lastFailedLogin, a.lastFailedLoginIp = :lastFailedLoginIp WHERE a.login = :login")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Query("UPDATE Account a SET a.lastFailedLogin = :lastFailedLogin, a.lastFailedLoginIp = :lastFailedLoginIp, a.loginAttempts = :loginAttempts WHERE a.login = :login")
     void updateFailedLogin(@Param("login") String login,
                            @Param("lastFailedLogin") Date lastFailedLogin,
-                           @Param("lastFailedLoginIp") String lastFailedLoginIp);
+                           @Param("lastFailedLoginIp") String lastFailedLoginIp,
+                           @Param("loginAttempts") int loginAttempts);
+
+    @Modifying
+    @Query("""
+        update Account a set a.lockedUntil = :lockedUntil, a.active = false where a.login = :login
+    """)
+    void lockTemporarily(@Param("login") String login, @Param("lockedUntil") Timestamp lockedUntil);
+
+    @Query("""
+        select a from Account a where a.lockedUntil is not null
+    """)
+    List<Account> findByHasLockedUntil();
 }
