@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper.extractTextFromMimeMessage;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -79,7 +81,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        adminToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+        adminToken = objectMapper.readTree(responseJson).get("value").asText();
 
         MimeMessage realMimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
@@ -115,6 +117,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -141,11 +144,15 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("refreshToken")))
                 .andExpect(result -> {
-                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("accessToken"));
+                    String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
+                    System.out.println("BALLS" + refreshToken);
+                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                })
+                .andExpect(result -> {
+                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("accessToken")).contains("CLIENT"));
+                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("CLIENT"));
                 });
     }
 
@@ -168,6 +175,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -195,11 +203,15 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("refreshToken")))
                 .andExpect(result -> {
-                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("accessToken"));
+                    String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
+                    System.out.println("BALLS" + refreshToken);
+                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                })
+                .andExpect(result -> {
+                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("accessToken")).contains("DIETICIAN"));
+                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("DIETICIAN"));
                 });
     }
 
@@ -222,6 +234,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -250,11 +263,15 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("refreshToken")))
                 .andExpect(result -> {
-                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("accessToken"));
+                    String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
+                    System.out.println("BALLS" + refreshToken);
+                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                })
+                .andExpect(result -> {
+                    Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("accessToken")).contains("ADMIN"));
+                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("ADMIN"));
                 });
 
         ArgumentCaptor<MimeMessage> messageCaptor = ArgumentCaptor.forClass(MimeMessage.class);
@@ -301,6 +318,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null
@@ -350,6 +368,7 @@ public class MOK1 extends BaseIntegrationTest { //LOGIN
                 Language.pl_PL,
                 null,
                 null,
+                false,
                 false,
                 0,
                 null

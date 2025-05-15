@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -68,7 +70,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        adminToken = objectMapper.readTree(responseJson).get("accessToken").asText();
+        adminToken = objectMapper.readTree(responseJson).get("value").asText();
 
         MimeMessage realMimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
@@ -104,6 +106,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -131,11 +134,10 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                         .content(loginRequestJson))
                 .andExpect(status().isOk()).andReturn();
         String body = result.getResponse().getContentAsString();
-        Assertions.assertTrue(body.contains("accessToken"));
-        Assertions.assertTrue(body.contains("refreshToken"));
+        Assertions.assertTrue(body.contains("value"));
         JSONObject json = new JSONObject(body);
 
-        String accessToken = json.getString("accessToken");
+        String accessToken = json.getString("value");
 
         mockMvc.perform(get("/api/account/me")
                 .header("Authorization", "Bearer "+accessToken))
@@ -173,6 +175,7 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 null,
                 false,
+                false,
                 0,
                 null
         );
@@ -200,11 +203,10 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                         .content(loginRequestJson))
                 .andExpect(status().isOk()).andReturn();
         String body = result.getResponse().getContentAsString();
-        Assertions.assertTrue(body.contains("accessToken"));
-        Assertions.assertTrue(body.contains("refreshToken"));
+        Assertions.assertTrue(body.contains("value"));
         JSONObject json = new JSONObject(body);
 
-        String accessToken = json.getString("accessToken");
+        String accessToken = json.getString("value");
 
         mockMvc.perform(get("/api/account/me")
                 .header("Authorization", "Bearer "+accessToken))

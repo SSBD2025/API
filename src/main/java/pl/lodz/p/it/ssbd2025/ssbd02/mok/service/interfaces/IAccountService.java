@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces;
 
+import jakarta.servlet.http.HttpServletResponse;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
@@ -12,7 +13,7 @@ public interface IAccountService {
 
     void changePassword(ChangePasswordDTO changePasswordDTO);
     String setGeneratedPassword(UUID uuid);
-    TokenPairDTO login(String username, String password, String ipAddress);
+    SensitiveDTO login(String username, String password, String ipAddress, HttpServletResponse response);
     void logout();
     void blockAccount(UUID id);
     void unblockAccount(UUID id);

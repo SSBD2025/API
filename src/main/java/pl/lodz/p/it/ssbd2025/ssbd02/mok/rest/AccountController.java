@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +46,9 @@ public class AccountController {
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
-    public TokenPairDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request) {
-        String ipAddress = getClientIp(request); //czy to nie wymaga transactional?
-        return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress);
+    public SensitiveDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
+        String ipAddress = getClientIp(request);
+        return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress, response);
     }
 
     @PostMapping(value = "/login/2fa", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,8 +60,8 @@ public class AccountController {
 
     @PostMapping(value = "/refresh")
     @PreAuthorize("permitAll()")
-    public TokenPairDTO refresh(@RequestBody @Validated(OnCreate.class) RefreshRequestDTO refreshRequestDTO){
-        return jwtService.refresh(refreshRequestDTO.refreshToken());
+    public SensitiveDTO refresh(HttpServletRequest request, HttpServletResponse response) {
+        return jwtService.refresh(request, response);
     }
 
     @MethodCallLogged
