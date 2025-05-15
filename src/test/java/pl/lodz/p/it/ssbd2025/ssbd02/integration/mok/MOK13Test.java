@@ -1,36 +1,34 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.trilead.ssh2.Session;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateAccountDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-public class MOK13 extends BaseIntegrationTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class MOK13Test extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,11 +36,11 @@ public class MOK13 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @MockBean
+    @MockitoBean
     private LockTokenService lockTokenService;
+
+    @Autowired
+    private AccountTestHelper accountTestHelper;
 
     private final String accountId ="00000000-0000-0000-0000-000000000001";
     private final Long version = 0L;
@@ -50,14 +48,20 @@ public class MOK13 extends BaseIntegrationTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void shouldUpdateAccountSuccessfully() throws Exception {
+        String accountId2 = "00000000-0000-0000-0000-000000000007";
+
         given(lockTokenService.verifyToken("test-token"))
-                .willReturn(new LockTokenService.Record<UUID, Long>(UUID.fromString(accountId), version));
+                .willReturn(new LockTokenService.Record<UUID, Long>(UUID.fromString(accountId2), version));
         UpdateAccountDTO updateDto = new UpdateAccountDTO("Joe", "Doe", "test-token");
 
-        mockMvc.perform(put("/api/account/" + accountId)
+        mockMvc.perform(put("/api/account/" + accountId2)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId2));
+        Assertions.assertEquals("Joe", account.getFirstName());
+        Assertions.assertEquals("Doe", account.getLastName());
     }
 
     @Test
@@ -69,6 +73,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -81,6 +89,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isForbidden());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -93,6 +105,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -100,6 +116,10 @@ public class MOK13 extends BaseIntegrationTest {
     void shouldReturn400ForInvalidUuidFormat() throws Exception {
         mockMvc.perform(put("/api/account/" + "bajo-jajo"))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -112,6 +132,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -124,6 +148,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -136,6 +164,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -148,6 +180,10 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 
     @Test
@@ -160,5 +196,9 @@ public class MOK13 extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Justin", account.getFirstName());
+        Assertions.assertEquals("Cheddar", account.getLastName());
     }
 }
