@@ -2,6 +2,9 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,17 +17,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRoleDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
@@ -34,6 +38,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IPasswordResetTokenService;
@@ -41,6 +46,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
 
+import java.sql.SQLTransientConnectionException;
 import java.util.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
@@ -264,13 +270,12 @@ public class AccountService implements IAccountService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     //TODO tu raczej bez powtarzania ale do ustalenia
     public void sendResetPasswordEmail(String email) {
-        Account account = accountRepository.findByEmail(email);
-        if(account == null) {
-            throw new AccountNotFoundException();
+        if(accountRepository.findByEmail(email).isPresent()) {
+            Account account = accountRepository.findByEmail(email).get();
+            String token = UUID.randomUUID().toString();
+            passwordResetTokenService.createPasswordResetToken(account, token);
+            emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
         }
-        String token = UUID.randomUUID().toString();
-        passwordResetTokenService.createPasswordResetToken(account, token);
-        emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
@@ -291,7 +296,7 @@ public class AccountService implements IAccountService {
         List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
 
         return accounts.stream()
-                .map(accountMapper::toAccountWithUserRolesDTO) 
+                .map(accountMapper::toAccountWithUserRolesDTO)
                 .collect(Collectors.toList());
     }
 
