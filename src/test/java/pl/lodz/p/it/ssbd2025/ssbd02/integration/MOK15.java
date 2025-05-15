@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.LockTokenService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 
 import java.util.UUID;
 
