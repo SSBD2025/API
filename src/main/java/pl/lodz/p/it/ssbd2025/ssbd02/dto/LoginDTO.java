@@ -21,6 +21,7 @@ public class LoginDTO {
 
     @ToString.Exclude
     @Size(min = 8, max = 60, groups = OnCreate.class)
+    // regex not needed here
     @NotBlank(groups = {OnCreate.class})
     private String password;
 }
