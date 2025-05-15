@@ -25,8 +25,8 @@ public interface IAccountService {
     void revertEmailChange(String token);
     void resendEmailChangeLink();
     AccountWithTokenDTO getAccountByLogin(String login);
-    AccountWithTokenDTO getAccountById(String id);
-    void updateAccountById(String id, UpdateAccountDTO dto);
+    AccountWithTokenDTO getAccountById(UUID id);
+    void updateAccountById(UUID id, UpdateAccountDTO dto);
     void updateAccount(Supplier< Account > accountSupplier, UpdateAccountDTO dto);
     void updateMyAccount(String login, UpdateAccountDTO dto);
     void verifyAccount(String token);

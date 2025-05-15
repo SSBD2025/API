@@ -17,7 +17,7 @@ import org.testcontainers.shaded.com.trilead.ssh2.Session;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateAccountDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.LockTokenService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 
 import java.util.UUID;
 
