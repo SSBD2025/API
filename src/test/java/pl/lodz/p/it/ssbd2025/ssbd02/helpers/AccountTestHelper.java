@@ -11,6 +11,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
+import java.util.UUID;
+
 @TestComponent
 public class AccountTestHelper {
 
@@ -48,6 +50,12 @@ public class AccountTestHelper {
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public Account getClientByLogin(String login) {
         return accountRepository.findByLogin(login)
+                .orElseThrow(() -> new IllegalStateException("Account not found"));
+    }
+
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    public Account getClientById(UUID id) {
+        return accountRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Account not found"));
     }
 

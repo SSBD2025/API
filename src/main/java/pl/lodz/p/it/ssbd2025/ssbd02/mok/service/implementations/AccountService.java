@@ -495,7 +495,7 @@ public class AccountService implements IAccountService {
         }
 
         if (!Objects.equals(account.getVersion(), record.version())) {
-            throw new OptimisticLockException("Version123 mismatch");
+            throw new ConcurrentUpdateException();
         }
 
         account.setFirstName(dto.firstName());

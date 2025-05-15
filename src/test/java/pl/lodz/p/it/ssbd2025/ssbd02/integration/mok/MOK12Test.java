@@ -1,21 +1,21 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateAccountDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 
 import java.util.UUID;
@@ -28,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-public class MOK12 extends BaseIntegrationTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class MOK12Test extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,11 +37,11 @@ public class MOK12 extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @MockBean
+    @MockitoBean
     private LockTokenService lockTokenService;
+
+    @Autowired
+    private AccountTestHelper accountTestHelper;
 
     private String accessToken;
 
@@ -63,13 +64,38 @@ public class MOK12 extends BaseIntegrationTest {
         accessToken = objectMapper.readTree(responseJson).get("accessToken").asText();
     }
 
+    @AfterEach
+    void teardown() throws Exception {
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + accessToken)).andReturn();
+    }
+
+    String setupUpdateUser() throws Exception {
+        String loginRequestJson = """
+        {
+          "login": "drice",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        return objectMapper.readTree(responseJson).get("accessToken").asText();
+    }
+
     @Test
     void shouldUpdateAccountSuccessfully() throws Exception {
+        String tok = setupUpdateUser();
         UpdateAccountDTO dto = new UpdateAccountDTO("John", "Doe", "sometoken");
 
         String body = objectMapper.writeValueAsString(dto);
 
-        String accountId = "00000000-0000-0000-0000-000000000005";
+        String accountId = "00000000-0000-0000-0000-000000000007";
 
         given(lockTokenService.verifyToken("sometoken"))
                 .willReturn(new LockTokenService.Record<UUID, Long>(UUID.fromString(accountId), 0L));
@@ -77,8 +103,15 @@ public class MOK12 extends BaseIntegrationTest {
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tok))
                 .andExpect(status().isOk());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("John", account.getFirstName());
+        Assertions.assertEquals("Doe", account.getLastName());
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + tok)).andReturn();
     }
 
     @Test
@@ -97,6 +130,10 @@ public class MOK12 extends BaseIntegrationTest {
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + "bajo-jajo"))
                 .andExpect(status().isForbidden());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 
     @Test
@@ -105,11 +142,17 @@ public class MOK12 extends BaseIntegrationTest {
 
         String body = objectMapper.writeValueAsString(dto);
 
+        String accountId = "00000000-0000-0000-0000-000000000005";
+
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 
     @Test
@@ -118,11 +161,17 @@ public class MOK12 extends BaseIntegrationTest {
 
         String body = objectMapper.writeValueAsString(dto);
 
+        String accountId = "00000000-0000-0000-0000-000000000005";
+
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 
     @Test
@@ -131,11 +180,17 @@ public class MOK12 extends BaseIntegrationTest {
 
         String body = objectMapper.writeValueAsString(dto);
 
+        String accountId = "00000000-0000-0000-0000-000000000005";
+
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 
     @Test
@@ -144,11 +199,17 @@ public class MOK12 extends BaseIntegrationTest {
 
         String body = objectMapper.writeValueAsString(dto);
 
+        String accountId = "00000000-0000-0000-0000-000000000005";
+
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 
     @Test
@@ -157,10 +218,16 @@ public class MOK12 extends BaseIntegrationTest {
 
         String body = objectMapper.writeValueAsString(dto);
 
+        String accountId = "00000000-0000-0000-0000-000000000005";
+
         mockMvc.perform(put("/api/account/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
                 .andExpect(status().isBadRequest());
+
+        Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
+        Assertions.assertEquals("Anthony", account.getFirstName());
+        Assertions.assertEquals("Gorgonzola", account.getLastName());
     }
 }
