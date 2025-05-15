@@ -114,6 +114,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -149,6 +152,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -184,6 +190,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -223,6 +232,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -251,6 +263,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -283,6 +298,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -311,6 +329,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -343,6 +364,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -378,6 +402,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -412,6 +439,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -440,6 +470,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -472,6 +505,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -500,6 +536,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -532,6 +571,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -567,6 +609,9 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -593,7 +638,10 @@ public class MOK2 extends BaseIntegrationTest { //REGISTER
                 "doe.joe2@example.com",
                 null, null,
                 Language.pl_PL,
-                null, null
+                null, null,
+                false,
+                0,
+                null
         );
 
         ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);

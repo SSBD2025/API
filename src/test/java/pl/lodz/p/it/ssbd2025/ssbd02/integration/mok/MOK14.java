@@ -102,6 +102,9 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 
@@ -168,6 +171,9 @@ public class MOK14 extends BaseIntegrationTest { //LOGOUT
                 null,
                 Language.pl_PL,
                 null,
+                null,
+                false,
+                0,
                 null
         );
 

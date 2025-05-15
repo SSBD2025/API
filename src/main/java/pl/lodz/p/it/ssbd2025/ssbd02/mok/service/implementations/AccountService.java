@@ -171,17 +171,13 @@ public class AccountService implements IAccountService {
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
                 return new TokenPairDTO(null, null, true);
             }
-
-            accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress);
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
             }
             return jwtService.generatePair(account, userRoles);
         } else {
-            if(account.getLoginAttempts() + 1 > maxLoginAttempts) {
-
+            if(account.getLoginAttempts() + 1 >= maxLoginAttempts) {
                 lockTemporarily(username, Timestamp.from(tokenUtil.generateMinuteExpiration(lockedFor).toInstant()));
-
                 accountRepository.updateFailedLogin(username, currentTime, ipAddress, 0);
                 throw new ExcessiveLoginAttemptsException();
             }
@@ -228,7 +224,7 @@ public class AccountService implements IAccountService {
                 .map(AccountRolesProjection::getRoleName)
                 .collect(Collectors.toList());
 
-        accountRepository.updateSuccessfulLogin(username, new Date(), ipAddress);
+        accountRepository.updateSuccessfulLogin(username, new Date(), ipAddress, 0);
 
         if (userRoles.contains("ADMIN")) {
             emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
