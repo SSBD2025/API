@@ -82,7 +82,7 @@ public class MOK5Test extends BaseIntegrationTest {
 
         @Test
         public void unblockUserPositiveTest() throws Exception {
-//            doNothing().when(emailService).sendUnblockAccountEmail(anyString(), anyString(), any());
+            doNothing().when(emailService).sendUnblockAccountEmail(anyString(), anyString(), any());
 
             mockMvc.perform(post("/api/account/" + blockedClientId.toString() +"/unblock")
                             .header("Authorization", "Bearer " + adminToken))

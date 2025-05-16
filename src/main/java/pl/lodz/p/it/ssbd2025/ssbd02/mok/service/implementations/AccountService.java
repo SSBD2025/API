@@ -284,7 +284,7 @@ public class AccountService implements IAccountService {
         account.setActive(false);
         accountRepository.saveAndFlush(account);
 
-//        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage()); //TODO MAILE SIE ZMIENILY POPRAWIC!
+        emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
 
     }
 
@@ -302,6 +302,7 @@ public class AccountService implements IAccountService {
         account.setActive(true);
         accountRepository.saveAndFlush(account);
 
+        emailService.sendUnblockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
@@ -548,6 +549,7 @@ public class AccountService implements IAccountService {
         }
         tokenRepository.delete(verificationToken);
         account.setVerified(true);
+        emailService.sendActivateAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
     @TransactionLogged

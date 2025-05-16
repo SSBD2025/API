@@ -83,7 +83,7 @@ public class MOK4Test extends BaseIntegrationTest {
 
     @Test
     public void blockUserPositiveTest() throws Exception {
-        //doNothing().when(emailService).sendBlockAccountEmail(anyString(), anyString(), any());
+        doNothing().when(emailService).sendBlockAccountEmail(anyString(), anyString(), any());
 
         mockMvc.perform(post("/api/account/" + dieticianId.toString() +"/block")
                 .header("Authorization", "Bearer " + adminToken))
