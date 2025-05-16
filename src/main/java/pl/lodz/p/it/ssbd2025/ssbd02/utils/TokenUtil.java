@@ -21,7 +21,7 @@ import java.util.Date;
 public class TokenUtil {
     private final TokenRepository tokenRepository;
 
-    @Value("${app.jwt_2fa_access_expiration}")
+    @Value("${app.jwt_2fa_expiration}")
     private int twoFactorExpiration;
 
     public boolean checkPassword(String passwordPlaintext, String passwordHash) {
