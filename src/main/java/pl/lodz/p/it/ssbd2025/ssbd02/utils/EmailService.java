@@ -38,6 +38,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
+//    private static final String RESET_PASSWORD_URL = "http://localhost:5173/reset/password/"; //TODO locally
+    private static final String RESET_PASSWORD_URL = "team-2.proj-sum.it.p.lodz.pl/reset/password/"; //TODO on machine
+
     @Async
     public void sendChangeEmail(String username, String receiver, String confirmationURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -92,7 +95,7 @@ public class EmailService {
                     .replace("${welcome}", I18n.getMessage("email.welcome", language))
                     .replace("${name}", username)
                     .replace("${body}", I18n.getMessage("email.own.reset.body", language))
-                    .replace("${url}", "http://localhost:8080/api/account/reset/password/"+token)
+                    .replace("${url}", RESET_PASSWORD_URL+token)
                     .replace("${linkText}", I18n.getMessage("email.own.reset.link", language));
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -115,7 +118,7 @@ public class EmailService {
                     .replace("${welcome}", I18n.getMessage("email.welcome", language))
                     .replace("${name}", username)
                     .replace("${body}", I18n.getMessage("email.reset.password.body", language))
-                    .replace("${url}", "http://localhost:8080/api/account/reset/password/"+token)
+                    .replace("${url}", RESET_PASSWORD_URL+token)
                     .replace("${linkText}", I18n.getMessage("email.reset.link", language))
                     .replace("${manually}", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
             ;
