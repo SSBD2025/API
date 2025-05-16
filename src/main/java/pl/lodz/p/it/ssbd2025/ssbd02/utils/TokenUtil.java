@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +21,9 @@ import java.util.Date;
 public class TokenUtil {
     private final TokenRepository tokenRepository;
 
+    @Value("${app.jwt_2fa_access_expiration}")
+    private int twoFactorExpiration;
+
     public boolean checkPassword(String passwordPlaintext, String passwordHash) {
         return BCrypt.checkpw(passwordPlaintext, passwordHash);
     }
@@ -36,7 +40,7 @@ public class TokenUtil {
         String code = sb.toString();
         String hashedCode = BCrypt.hashpw(code, BCrypt.gensalt());
         tokenRepository.deleteAllByAccountWithType(account, TokenType.TWO_FACTOR);
-        tokenRepository.saveAndFlush(new TokenEntity(hashedCode, generateMinuteExpiration(5), account, TokenType.TWO_FACTOR));
+        tokenRepository.saveAndFlush(new TokenEntity(hashedCode, generateMinuteExpiration(twoFactorExpiration), account, TokenType.TWO_FACTOR));
         return code;
     }
 

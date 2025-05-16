@@ -116,12 +116,7 @@ public class JwtService implements IJwtService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(account, userRoles);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(account);
 
-        Cookie cookie = new Cookie("refreshToken", newRefreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/api/account/refresh");
-        cookie.setMaxAge(jwtRefreshExpiration/1000);
-        response.addCookie(cookie);
+        jwtTokenProvider.cookieSetter(newAccessToken, jwtRefreshExpiration, response);
 
         Date expiration = jwtTokenProvider.getExpiration(token);
         tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);

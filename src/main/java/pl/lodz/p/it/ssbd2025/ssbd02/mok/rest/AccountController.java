@@ -52,10 +52,10 @@ public class AccountController {
     }
 
     @PostMapping(value = "/login/2fa", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("permitAll()")
-    public TokenPairDTO verifyTwoFactor(@RequestBody TwoFactorDTO twoFactorDTO, HttpServletRequest request) {
+    @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
+    public SensitiveDTO verifyTwoFactor(@RequestBody @Validated(OnRequest.class)TwoFactorDTO twoFactorDTO, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
-        return accountService.verifyTwoFactorCode(twoFactorDTO.login(), twoFactorDTO.code(), ipAddress);
+        return accountService.verifyTwoFactorCode(twoFactorDTO.code(), ipAddress, response);
     }
 
     @PostMapping(value = "/refresh")
