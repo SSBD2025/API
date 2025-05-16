@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
 
 import java.util.UUID;
@@ -23,6 +24,8 @@ public class AccountTestHelper {
     private TokenUtil tokenUtil;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     //TODO THIS ABSOLUTELY CANNOT LEAK TO PROD
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
@@ -49,6 +52,19 @@ public class AccountTestHelper {
         account.setVerified(true);
         accountRepository.saveAndFlush(account);
     }
+
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    public Account getClientWithRolesById(UUID id) {
+        return accountRepository.findByIdWithRoles(id)
+                .orElseThrow(() -> new IllegalStateException("Account not found"));
+    }
+
+    @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    public Account getClientWithRolesByLogin(String login) {
+        return accountRepository.findByLoginWithRoles(login)
+                .orElseThrow(() -> new IllegalStateException("Account not found"));
+    }
+
 
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public Account getClientByLogin(String login) {

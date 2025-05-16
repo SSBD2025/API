@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
@@ -39,9 +37,6 @@ public class MOK7Test extends BaseIntegrationTest {
     @Autowired
     private AccountTestHelper accountTestHelper;
 
-    @MockitoBean
-    private JavaMailSender mailSender;
-
     private String adminToken;
 
     @BeforeEach
@@ -60,20 +55,24 @@ public class MOK7Test extends BaseIntegrationTest {
                 .andReturn();
 
         String response = result.getResponse().getContentAsString();
-        adminToken = objectMapper.readTree(response).get("accessToken").asText();
+        adminToken = objectMapper.readTree(response).get("value").asText();
     }
 
     @AfterEach
     void cleanup() throws Exception {
-        mockMvc.perform(post("/api/account/logout")
-                .header("Authorization", "Bearer " + adminToken)).andReturn();
+        if (adminToken != null) {
+            mockMvc.perform(post("/api/account/logout")
+                            .header("Authorization", "Bearer " + adminToken))
+                    .andExpect(status().isOk());
+            adminToken = null;
+        }
     }
 
     // ============ POSITIVE TESTS ============
 
     @Test
     public void unassignAdminRoleTest() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+        UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/admin")
                         .header("Authorization", "Bearer " + adminToken))
@@ -86,7 +85,7 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignDieticianRoleTest() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+        UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/dietician")
                         .header("Authorization", "Bearer " + adminToken))
@@ -99,7 +98,7 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignClientRoleTest() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+        UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/client")
                         .header("Authorization", "Bearer " + adminToken))
@@ -123,7 +122,7 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignNotAssignedRole_ShouldReturn404() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+        UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(delete("/api/account/" + id + "/roles/dietician")
                         .header("Authorization", "Bearer " + adminToken))
@@ -132,7 +131,7 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignInvalidRole_ShouldReturn404() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+        UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(delete("/api/account/" + id + "/roles/superuser")
                         .header("Authorization", "Bearer " + adminToken))

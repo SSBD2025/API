@@ -85,4 +85,10 @@ public interface AccountRepository extends AbstractRepository<Account> {
         select a from Account a where a.lockedUntil is not null
     """)
     List<Account> findByHasLockedUntil();
+
+    @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.id = :id")
+    Optional<Account> findByIdWithRoles(@Param("id") UUID id);
+
+    @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.login = :login")
+    Optional<Account> findByLoginWithRoles(@Param("login") String login);
 }
