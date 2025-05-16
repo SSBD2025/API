@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatusCode;
 
 public class AccountAlreadyUnblockedException extends AppBaseException {
     public AccountAlreadyUnblockedException() {
-        super(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "TODO"); //TODO
+        super(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "Account has already been unblocked");
     }
 }

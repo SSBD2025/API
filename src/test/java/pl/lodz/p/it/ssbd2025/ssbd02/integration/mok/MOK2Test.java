@@ -291,7 +291,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
         mockMvc.perform(post("/api/client/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this login is already in use")));
     }
 
@@ -359,7 +359,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
         mockMvc.perform(post("/api/dietician/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this login is already in use")));
     }
 
@@ -434,7 +434,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this login is already in use")));
     }
 
@@ -504,7 +504,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
         mockMvc.perform(post("/api/client/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this email is already in use")));
     }
 
@@ -572,7 +572,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
         mockMvc.perform(post("/api/dietician/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this email is already in use")));
     }
 
@@ -647,7 +647,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson2))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("this email is already in use")));
     }
 

@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatusCode;
 
 public class SelfBlockAccountException extends AppBaseException {
     public SelfBlockAccountException() {
-      super(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "TODO"); //TODO
+      super(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), "You cannot block your account");
     }
 }
