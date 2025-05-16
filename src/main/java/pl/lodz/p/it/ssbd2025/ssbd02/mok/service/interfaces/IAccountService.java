@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 public interface IAccountService {
 
     void changePassword(ChangePasswordDTO changePasswordDTO);
-    String setGeneratedPassword(UUID uuid);
+    void setGeneratedPassword(UUID uuid);
     SensitiveDTO login(String username, String password, String ipAddress, HttpServletResponse response);
     void logout();
     void blockAccount(UUID id);

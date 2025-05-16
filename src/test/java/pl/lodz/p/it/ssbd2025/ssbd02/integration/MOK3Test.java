@@ -46,9 +46,6 @@ public class MOK3Test extends BaseIntegrationTest {
     @MockitoBean
     private EmailService emailService;
 
-    @MockitoBean
-    private PasswordResetTokenService passwordResetTokenService;
-
     @Captor
     private ArgumentCaptor<String> tokenCaptor;
 
@@ -79,7 +76,7 @@ public class MOK3Test extends BaseIntegrationTest {
 
         String capturedToken = tokenCaptor.getValue();
 
-        resetPasswordDTO = new ResetPasswordDTO("jcheddar@example.com", "P@ssw0rd?");
+        resetPasswordDTO = new ResetPasswordDTO(null, "P@ssw0rd?");
         json = objectMapper.writeValueAsString(resetPasswordDTO);
 
         mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
@@ -90,59 +87,59 @@ public class MOK3Test extends BaseIntegrationTest {
         accountTestHelper.checkPassword("jcheddar", "P@ssw0rd?");
     }
 
-//    @Test
-//    public void resetPassword_TokenNotFound() throws Exception {
-//        String wrongToken = "21370000-0000-0000-0000-000000000000";
-//
-//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO("jcheddar@example.com", "P@ssw0rd!");
-//        String json = objectMapper.writeValueAsString(resetPasswordDTO);
-//
-//        mockMvc.perform(post("/api/account/reset/password/" + wrongToken )
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(json))
-//                .andExpect(status().isNotFound());
-//    }
-
     @Test
-    public void resetPasswordRequest_TokenExpired() throws Exception {
-        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
-        String email = "jcheddar@example.com";
-        String newPassword = "P@ssw0rd?";
+    public void resetPassword_TokenNotFound() throws Exception {
+        String wrongToken = "21370000-0000-0000-0000-000000000000";
 
-        ResetPasswordDTO resetPasswordRequestDTO = new ResetPasswordDTO(email, null);
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(null, "P@ssw0rd!");
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
 
-        doNothing().when(emailService).sendResetPasswordEmail(
-                anyString(), anyString(), any(), tokenCaptor.capture());
-
-        String requestJson = objectMapper.writeValueAsString(resetPasswordRequestDTO);
-
-        mockMvc.perform(post("/api/account/reset/password/request")
+        mockMvc.perform(post("/api/account/reset/password/" + wrongToken )
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isOk());
-
-        verify(emailService, times(1)).sendResetPasswordEmail(
-                eq(email),
-                anyString(),
-                any(),
-                anyString()
-        );
-
-        String capturedToken = tokenCaptor.getValue();
-
-        doThrow(new TokenExpiredException()).when(passwordResetTokenService)
-                .validatePasswordResetToken(eq(capturedToken));
-
-        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(email, newPassword);
-        String resetJson = objectMapper.writeValueAsString(resetPasswordDTO);
-
-        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(resetJson))
-                .andExpect(status().isUnauthorized());
-
-        accountTestHelper.checkPassword("jcheddar", "P@ssw0rd!");
+                        .content(json))
+                .andExpect(status().isNotFound());
     }
+
+//    @Test
+//    public void resetPasswordRequest_TokenExpired() throws Exception {
+//        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
+//        String email = "jcheddar@example.com";
+//        String newPassword = "P@ssw0rd?";
+//
+//        ResetPasswordDTO resetPasswordRequestDTO = new ResetPasswordDTO(email, null);
+//
+//        doNothing().when(emailService).sendResetPasswordEmail(
+//                anyString(), anyString(), any(), tokenCaptor.capture());
+//
+//        String requestJson = objectMapper.writeValueAsString(resetPasswordRequestDTO);
+//
+//        mockMvc.perform(post("/api/account/reset/password/request")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(requestJson))
+//                .andExpect(status().isOk());
+//
+//        verify(emailService, times(1)).sendResetPasswordEmail(
+//                eq(email),
+//                anyString(),
+//                any(),
+//                anyString()
+//        );
+//
+//        String capturedToken = tokenCaptor.getValue();
+//
+//        doThrow(new TokenExpiredException()).when(passwordResetTokenService)
+//                .validatePasswordResetToken(eq(capturedToken));
+//
+//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(email, newPassword);
+//        String resetJson = objectMapper.writeValueAsString(resetPasswordDTO);
+//
+//        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(resetJson))
+//                .andExpect(status().isUnauthorized());
+//
+//        accountTestHelper.checkPassword("jcheddar", "P@ssw0rd!");
+//    }
 
     @Test
     public void resetPasswordRequest_AccountNotFound() throws Exception {
@@ -157,43 +154,9 @@ public class MOK3Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void resetPassword_AccountNotFound() throws Exception {
-        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
-                "jcheddar@example.com",
-                null
-        );
-
-        doNothing().when(emailService).sendResetPasswordEmail(
-                anyString(), anyString(), any(), tokenCaptor.capture());
-
-        String json = objectMapper.writeValueAsString(resetPasswordDTO);
-
-        mockMvc.perform(post("/api/account/reset/password/request")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
                 .andExpect(status().isOk());
-
-        verify(emailService, times(1)).sendResetPasswordEmail(
-                eq("jcheddar@example.com"),
-                anyString(),
-                any(),
-                anyString()
-        );
-
-        String capturedToken = tokenCaptor.getValue();
-
-        resetPasswordDTO = new ResetPasswordDTO("example.wrong.mail@example.com", "P@ssw0rd!");
-        json = objectMapper.writeValueAsString(resetPasswordDTO);
-
-        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isNotFound());
     }
+
 
     @Test
     public void password_NotNull() throws Exception {

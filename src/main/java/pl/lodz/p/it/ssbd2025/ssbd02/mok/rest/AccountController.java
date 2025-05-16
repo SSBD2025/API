@@ -76,8 +76,8 @@ public class AccountController {
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> changeUserPassword(@PathVariable String id) {
-        String password = accountService.setGeneratedPassword(UUID.fromString(id));
-        return ResponseEntity.status(HttpStatus.OK).body(password); //TODO zastanowić się, czy zwracać tu tę wartość
+        accountService.setGeneratedPassword(UUID.fromString(id));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/logout")
@@ -158,6 +158,7 @@ public class AccountController {
     }
 
     @MethodCallLogged
+    @PreAuthorize("permitAll()")
     @PostMapping("reset/password/request")
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.email());
@@ -165,6 +166,7 @@ public class AccountController {
     }
 
     @MethodCallLogged
+    @PreAuthorize("permitAll()")
     @PostMapping("reset/password/{token}")
     public ResponseEntity<Void> resetPassword(@PathVariable String token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);

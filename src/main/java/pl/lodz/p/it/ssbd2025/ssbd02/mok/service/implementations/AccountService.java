@@ -113,8 +113,7 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
-    //TODO zastanowić się czy tutaj dać
-    public String setGeneratedPassword(UUID uuid) { //TODO zmienić na void
+    public void setGeneratedPassword(UUID uuid) {
         Optional<Account> account = accountRepository.findById(uuid);
         if(account.isEmpty()) {
             throw new AccountNotFoundException();
@@ -124,7 +123,6 @@ public class AccountService implements IAccountService {
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account.get(), token);
         emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password);
-        return password;
     }
 
     private String generateRandomPassword() {
