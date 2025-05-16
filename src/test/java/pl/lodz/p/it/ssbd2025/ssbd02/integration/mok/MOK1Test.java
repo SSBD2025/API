@@ -140,7 +140,6 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    System.out.println("BALLS" + refreshToken);
                     Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
@@ -200,7 +199,6 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    System.out.println("BALLS" + refreshToken);
                     Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
@@ -261,7 +259,6 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    System.out.println("BALLS" + refreshToken);
                     Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
