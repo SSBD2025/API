@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +62,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+
+        if(token != null && jwtTokenProvider.validateToken(token) && jwtTokenProvider.getType(token).equals("access2fa")) {
+            if (!jwtService.check(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has been invalidated");
+                return;
+            }
+            String login = jwtTokenProvider.getLogin(token);
+            Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("2FA_AUTHORITY"));
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(login, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         filterChain.doFilter(request, response);
     }
 

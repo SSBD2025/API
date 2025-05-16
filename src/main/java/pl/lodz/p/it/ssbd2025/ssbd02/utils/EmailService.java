@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.util.FileCopyUtils;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailSendingException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailTemplateLoadingException;
 
@@ -60,7 +61,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw new EmailSendingException(e);
         }
     }
 
@@ -83,7 +84,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw new EmailSendingException(e);
         }
     }
 
@@ -105,8 +106,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
+            throw new EmailSendingException(e);
         }
     }
 
@@ -130,8 +130,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
+            throw new EmailSendingException(e);
         }
     }
 
@@ -142,7 +141,6 @@ public class EmailService {
                 return FileCopyUtils.copyToString(reader);
             }
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace(); //TODO;
             throw new EmailTemplateLoadingException("TODO");
         }
     }
@@ -168,7 +166,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            e.printStackTrace(); //todo
+            throw new EmailSendingException(e);
         }
     }
 
@@ -192,7 +190,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            e.printStackTrace(); //todo
+            throw new EmailSendingException(e);
         }
     }
 
@@ -215,7 +213,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            e.printStackTrace(); //todo
+            throw new EmailSendingException(e);
         }
     }
 
@@ -238,8 +236,8 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
+
+            throw new EmailSendingException(e);
         }
     }
 
@@ -264,7 +262,7 @@ public class EmailService {
                 mailSender.send(mimeMessage);
 
             } catch (MessagingException e) {
-                e.printStackTrace(); //todo
+                throw new EmailSendingException(e);
             }
         }
 }

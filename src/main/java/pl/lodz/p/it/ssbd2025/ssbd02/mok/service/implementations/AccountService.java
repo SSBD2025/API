@@ -172,12 +172,11 @@ public class AccountService implements IAccountService {
             if(account.isTwoFactorAuth()){
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
 
+                String access2FAToken = jwtTokenProvider.generateAccess2FAToken(account);
 
-//                return new TokenPairDTO(null, null, true);
-                return null;//newtokentypetodo; //TODO
-                //TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO
-                //TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO
-                //TODO//TODO//TODO//TODO
+                tokenRepository.saveAndFlush(new TokenEntity(access2FAToken, jwtTokenProvider.getExpiration(access2FAToken), account, TokenType.ACCESS_2FA));
+
+                return new SensitiveDTO(jwtTokenProvider.generateAccess2FAToken(account));
             }
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
@@ -186,12 +185,7 @@ public class AccountService implements IAccountService {
             String access = pair.accessToken();
             String refresh = pair.refreshToken();
 
-            Cookie cookie = new Cookie("refreshToken", refresh);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/api/account/refresh");
-            cookie.setMaxAge(jwtRefreshExpiration/1000);
-            response.addCookie(cookie);
+            jwtTokenProvider.cookieSetter(refresh, jwtRefreshExpiration, response);
 
             return new SensitiveDTO(access);
         } else {
@@ -214,9 +208,11 @@ public class AccountService implements IAccountService {
     }
 
 
-    @PreAuthorize("permitAll()")
-    public TokenPairDTO verifyTwoFactorCode(String username, String code, String ipAddress) {
-        Account account = accountRepository.findByLogin(username).orElseThrow(AccountNotFoundException::new);
+//    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    public SensitiveDTO verifyTwoFactorCode(String code, String ipAddress, HttpServletResponse response) {
+        Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()).orElseThrow(AccountNotFoundException::new);
 
         List<TokenEntity> tokens = tokenRepository.findAllByAccountWithType(account, TokenType.TWO_FACTOR);
         if (tokens.isEmpty()) {
@@ -237,19 +233,24 @@ public class AccountService implements IAccountService {
 
         tokenRepository.delete(token);
 
-        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
         List<String> userRoles = roles.stream()
                 .filter(AccountRolesProjection::isActive)
                 .map(AccountRolesProjection::getRoleName)
                 .collect(Collectors.toList());
 
-        accountRepository.updateSuccessfulLogin(username, new Date(), ipAddress, 0);
+        accountRepository.updateSuccessfulLogin(account.getLogin(), new Date(), ipAddress, 0);
 
         if (userRoles.contains("ADMIN")) {
             emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
         }
 
-        return jwtService.generatePair(account, userRoles);
+        TokenPairDTO pair = jwtService.generatePair(account, userRoles);
+
+        jwtTokenProvider.cookieSetter(pair.refreshToken(), jwtRefreshExpiration, response);
+
+
+        return new SensitiveDTO(pair.accessToken());
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")

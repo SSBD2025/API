@@ -33,7 +33,7 @@ public interface IAccountService {
     void verifyAccount(String token);
     void assignRole(UUID accountId, AccessRole accessRole, String login);
     void unassignRole(UUID accountId, AccessRole accessRole, String login);
-    TokenPairDTO verifyTwoFactorCode(String username, String code, String ipAddress);
+    SensitiveDTO verifyTwoFactorCode(String code, String ipAddress, HttpServletResponse response);
     void enableTwoFactor();
     void disableTwoFactor();
 }

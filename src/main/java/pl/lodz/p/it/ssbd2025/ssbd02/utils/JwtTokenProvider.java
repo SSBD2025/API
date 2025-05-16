@@ -3,6 +3,8 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
@@ -33,6 +35,9 @@ public class JwtTokenProvider {
 
     @Value("${app.jwt_refresh_expiration}")
     private long refreshExpiration;
+
+    @Value("${app.jwt_2fa_access_expiration}")
+    private long access2faExpiration;
 
     @Value("${app.jwt_issuer}")
     private String issuer;
@@ -66,6 +71,18 @@ public class JwtTokenProvider {
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    public String generateAccess2FAToken(Account account) {
+        return Jwts.builder()
+                .id(account.getId().toString())
+                .subject(account.getLogin())
+                .claim("typ", "access2fa")
+                .issuer(issuer)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + access2faExpiration))
                 .signWith(getPrivateKey())
                 .compact();
     }
@@ -221,5 +238,14 @@ public class JwtTokenProvider {
                 .getId();
 
         return UUID.fromString(id);
+    }
+
+    public void cookieSetter(String refresh, int jwtRefreshExpiration, HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", refresh);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/api/account/refresh");
+        cookie.setMaxAge(jwtRefreshExpiration/1000);
+        response.addCookie(cookie);
     }
 }
