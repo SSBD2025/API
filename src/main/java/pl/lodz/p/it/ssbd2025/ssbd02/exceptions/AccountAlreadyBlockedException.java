@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatusCode;
 
 public class AccountAlreadyBlockedException extends AppBaseException {
     public AccountAlreadyBlockedException() {
-        super(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "TODO"); //TODO
+        super(HttpStatusCode.valueOf(HttpStatus.CONFLICT.value()), "Account has already been blocked");
     }
 }

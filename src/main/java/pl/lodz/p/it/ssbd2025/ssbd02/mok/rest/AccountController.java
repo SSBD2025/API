@@ -75,8 +75,8 @@ public class AccountController {
     @MethodCallLogged
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> changeUserPassword(@PathVariable String id) {
-        accountService.setGeneratedPassword(UUID.fromString(id));
+    public ResponseEntity<Object> changeUserPassword(@PathVariable UUID id) {
+        accountService.setGeneratedPassword(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -137,23 +137,23 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @MethodCallLogged
     public ResponseEntity<?> changeUserEmail(
-            @PathVariable String id,
+            @PathVariable UUID id,
             @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-        accountService.changeUserEmail(UUID.fromString(id), changeEmailDTO.email());
+        accountService.changeUserEmail(id, changeEmailDTO.email());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> blockAccount(@PathVariable String id) {
-        accountService.blockAccount(UUID.fromString(id));
+    public ResponseEntity<Void> blockAccount(@PathVariable UUID id) {
+        accountService.blockAccount(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/unblock")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> unblockAccount(@PathVariable String id) {
-        accountService.unblockAccount(UUID.fromString(id));
+    public ResponseEntity<Void> unblockAccount(@PathVariable UUID id) {
+        accountService.unblockAccount(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -152,6 +152,41 @@
             <column name="id" value="00000000-0000-0000-0000-000000000009"/>
         </insert>
 
+        <!--        Client-->
+        <insert tableName="account">
+            <column name="id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="login" value="userlogin"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="false"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="userlogin@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="first_name" value="Anthony"/>
+            <column name="last_name" value="Gorgonzola"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="00000000-0000-0000-0000-000000000011"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="00000000-0000-0000-0000-000000000011"/>
+        </insert>
+
+
         <!--        Pyramids-->
 <!--        <insert tableName="food_pyramid">-->
 <!--            <column name="id" value="00000000-0000-0000-0000-000000000010"/>-->
