@@ -14,6 +14,12 @@ public class I18n {
     public static final String EMAIL_DELETE_ACCOUNT_BODY = "email.delete.account.body";
     public static final String EMAIL_VERIFICATION_REMINDER_SUBJECT = "email.verification.reminder.subject";
     public static final String EMAIL_VERIFICATION_REMINDER_BODY = "email.verification.reminder.body";
+    public static final String EMAIL_BLOCK_SUBJECT = "email.block.subject";
+    public static final String EMAIL_BLOCK_BODY = "email.block.body";
+    public static final String EMAIL_UNBLOCK_SUBJECT = "email.unblock.subject";
+    public static final String EMAIL_UNBLOCK_BODY = "email.unblock.body";
+    public static final String EMAIL_ACTIVATE_ACCOUNT_BODY = "email.activate.body";
+    public static final String EMAIL_ACTIVATE_ACCOUNT_SUBJECT = "email.activate.account.subject";
 
     public static String getMessage(String key, Language language) {
         String[] parts = language.name().split("_");

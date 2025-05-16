@@ -2,6 +2,8 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,6 +109,30 @@ public class EmailService {
 
         } catch (MessagingException e) {
             throw new EmailSendingException(e);
+        }
+    }
+
+    @Async
+    public void sendBlockAccountEmail(String to, String username, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_BLOCK_BODY, language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_BLOCK_SUBJECT, language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException | EmailTemplateLoadingException e) {
+            //TODO
+            e.printStackTrace();
         }
     }
 
@@ -265,4 +291,53 @@ public class EmailService {
                 throw new EmailSendingException(e);
             }
         }
+
+    @Async
+    public void sendUnblockAccountEmail(String to, String username, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_UNBLOCK_BODY, language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_UNBLOCK_SUBJECT, language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            //TODO
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    @PreAuthorize("permitAll()")
+    public void sendActivateAccountEmail(String email, String login, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", login)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_ACTIVATE_ACCOUNT_BODY, language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(email);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_ACTIVATE_ACCOUNT_SUBJECT, language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            e.printStackTrace(); // TODO: proper logging
+        }
+    }
+
 }
