@@ -91,4 +91,11 @@ public class SchedulerService implements ISchedulerService {
             }
         }
     }
+
+    @Scheduled(fixedRateString = "${scheduler.deleteUnverifiedAccounts.fixedRate}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    public void deleteExpiredTokens() {
+        Date currentDate = new Date();
+        tokenRepository.deleteTokenEntitiesExceptVerification(currentDate);
+    }
 }
