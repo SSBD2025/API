@@ -48,9 +48,8 @@ public class MOK8Test extends BaseIntegrationTest {
                         .content(json))
                 .andExpect(status().isOk())
                 .andReturn();
-        String responseBody = result.getResponse().getContentAsString();
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-        return tokenPair.accessToken();
+        String responseJson = result.getResponse().getContentAsString();
+        return objectMapper.readTree(responseJson).get("value").asText();
     }
 
     public void logout(String token) throws Exception {
@@ -76,11 +75,8 @@ public class MOK8Test extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String responseBody = result.getResponse().getContentAsString();
-
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        String accessToken = tokenPair.accessToken();
+        String responseJson = result.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("value").asText();
 
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
                 "P@ssw0rd!",
@@ -134,11 +130,8 @@ public class MOK8Test extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String responseBody = result.getResponse().getContentAsString();
-
-        TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
-
-        String accessToken = tokenPair.accessToken();
+        String responseJson = result.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseJson).get("value").asText();
 
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
                 "wrongCredentials",

@@ -30,16 +30,10 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
     private final TokenUtil tokenUtil;
 
     public void createPasswordResetToken(Account account, String token) {
-//        if(passwordResetTokenRepository.findByAccount(account) != null) {
-//           passwordResetTokenRepository.deleteByAccount(account);
-//        }
         if(tokenRepository.existsByAccountWithType(account, TokenType.PASSWORD_RESET)) {
             tokenRepository.deleteAllByAccountWithType(account, TokenType.PASSWORD_RESET);
         }
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateMinuteExpiration(5), account, TokenType.PASSWORD_RESET));
-//        PasswordResetToken passwordResetToken = new PasswordResetToken(token, account);
-
-//        passwordResetTokenRepository.saveAndFlush(passwordResetToken);
     }
 
     public void validatePasswordResetToken(String passwordResetToken) {

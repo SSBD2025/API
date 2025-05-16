@@ -101,7 +101,7 @@ public class GeneralControllerExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public ResponseEntity<Object> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex,
@@ -116,7 +116,7 @@ public class GeneralControllerExceptionHandler {
             if(violation.contains("account_email_key")){
                 violation = "this email is already in use";
             }
-            return new ResponseEntity<>("Constraint error: " + violation, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Constraint error: " + violation, HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<>("A database error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); //TODO SPRAWDZIC !!

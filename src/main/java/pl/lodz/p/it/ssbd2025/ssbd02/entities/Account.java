@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ public class Account extends AbstractEntity {
 
     @Basic(optional = false)
     @NotBlank
-    @Column(updatable = false, nullable = false, unique = true, length = 50)
-    @Size(min = 4, max = 50)
+    @Column(updatable = false, nullable = false, unique = true, length = AccountConsts.LOGIN_MAX)
+    @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX)
     private String login;
 
     @Column(name = "password", nullable = false, length = 60)
