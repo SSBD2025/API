@@ -105,7 +105,7 @@ public class MOK5Test extends BaseIntegrationTest {
                     .andExpect(status().isConflict())
                     .andReturn();
 
-            Assertions.assertEquals("Account has already been unblocked", result.getResponse().getErrorMessage());
+            Assertions.assertEquals("account_already_unblocked", result.getResponse().getErrorMessage());
             Assertions.assertTrue(accountTestHelper.getClientByLogin("agorgonzola").isActive());
         }
 
@@ -125,7 +125,7 @@ public class MOK5Test extends BaseIntegrationTest {
                     .andExpect(status().isNotFound())
                     .andReturn();
 
-            Assertions.assertEquals("Account not found", result.getResponse().getErrorMessage());
+            Assertions.assertEquals("account_not_found", result.getResponse().getErrorMessage());
 
         }
 

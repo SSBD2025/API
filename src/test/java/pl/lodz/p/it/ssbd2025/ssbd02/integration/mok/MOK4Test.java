@@ -99,7 +99,7 @@ public class MOK4Test extends BaseIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andReturn();
 
-        Assertions.assertEquals("You cannot block your account", result.getResponse().getErrorMessage());
+        Assertions.assertEquals("self_block", result.getResponse().getErrorMessage());
         Assertions.assertTrue(accountTestHelper.getClientByLogin("jcheddar").isActive());
     }
 
@@ -116,7 +116,7 @@ public class MOK4Test extends BaseIntegrationTest {
                 .andExpect(status().isConflict())
                 .andReturn();
 
-        Assertions.assertEquals("Account has already been blocked", result.getResponse().getErrorMessage());
+        Assertions.assertEquals("account_already_blocked", result.getResponse().getErrorMessage());
         Assertions.assertFalse(accountTestHelper.getClientByLogin("drice").isActive());
     }
 
@@ -135,7 +135,7 @@ public class MOK4Test extends BaseIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        Assertions.assertEquals("Account not found", result.getResponse().getErrorMessage());
+        Assertions.assertEquals("account_not_found", result.getResponse().getErrorMessage());
 
     }
 
