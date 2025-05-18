@@ -309,7 +309,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/account/revert-email-change")
                         .param("token", notFoundToken))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

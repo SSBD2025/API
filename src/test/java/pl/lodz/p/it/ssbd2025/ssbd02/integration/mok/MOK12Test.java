@@ -115,7 +115,7 @@ public class MOK12Test extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnForbiddenForAnonymous() throws Exception {
+    void shouldReturnUnauthorizedForAnonymous() throws Exception {
         UpdateAccountDTO dto = new UpdateAccountDTO("John", "Doe", "sometoken");
 
         String body = objectMapper.writeValueAsString(dto);
@@ -129,7 +129,7 @@ public class MOK12Test extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + "bajo-jajo"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         Account account = accountTestHelper.getClientById(UUID.fromString(accountId));
         Assertions.assertEquals("Anthony", account.getFirstName());

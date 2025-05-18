@@ -132,7 +132,7 @@ public class MOK9Test extends BaseIntegrationTest {
         doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), anyString(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + accessToken)
-        ).andExpect(status().isForbidden());
+        ).andExpect(status().isUnauthorized());
     }
 
     @Order(3)
