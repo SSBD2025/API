@@ -89,6 +89,7 @@ public class MOK2Test extends BaseIntegrationTest { //REGISTER
 
         MimeMessage realMimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
     }
 
     @AfterEach

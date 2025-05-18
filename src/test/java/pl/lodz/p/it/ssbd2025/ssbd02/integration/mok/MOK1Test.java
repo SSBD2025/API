@@ -79,6 +79,7 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
 
         MimeMessage realMimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
     }
 
     @AfterEach

@@ -19,9 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import static org.mockito.ArgumentMatchers.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.TokenExpiredException;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.PasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import static org.mockito.Mockito.*;
@@ -97,7 +95,7 @@ public class MOK3Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/" + wrongToken )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
     }
 
 //    @Test

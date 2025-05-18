@@ -11,7 +11,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,6 +22,10 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenBaseException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenTypeInvalidException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
@@ -92,9 +95,8 @@ public class JwtService implements IJwtService {
         if (Objects.equals(token, "")){
             throw new CookieNotFoundException();
         }
-        if(!jwtTokenProvider.validateToken(token)) {
-            throw new TokenSignatureInvalidException();
-        } else if(!tokenRepository.existsByToken(token)) {
+        jwtTokenProvider.validateToken(token);
+        if(!tokenRepository.existsByToken(token)) {
             throw new TokenNotFoundException();
         } else if(!jwtTokenProvider.getType(token).equals("refresh")) {
             throw new TokenTypeInvalidException();

@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
 import jakarta.validation.ConstraintViolationException;
-import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.UnknownFilterException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenBaseException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidException;
 
 @RestControllerAdvice
 public class GeneralControllerExceptionHandler {
@@ -120,6 +123,26 @@ public class GeneralControllerExceptionHandler {
         }
 
         return new ResponseEntity<>("A database error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); //TODO SPRAWDZIC !!
+    }
+
+    @ExceptionHandler(TokenBaseException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public ResponseEntity<Object> handleTokenBaseException(
+            TokenBaseException ex,
+            WebRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization exception: "+ex.getMessage());
+    }
+
+    @ExceptionHandler(UnknownFilterException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public ResponseEntity<Object> handleTokenNotFoundException(
+            UnknownFilterException ex,
+            WebRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unknown authorization exception: "+ex.getMessage());
     }
 
 //    // For general unknown exceptions handling

@@ -1,12 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import jakarta.persistence.OptimisticLockException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
@@ -30,17 +25,17 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenExpiredException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IPasswordResetTokenService;
@@ -48,7 +43,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
 
 import java.security.SecureRandom;
 
-import java.sql.SQLTransientConnectionException;
 import java.sql.Timestamp;
 import java.util.*;
 

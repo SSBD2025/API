@@ -1,8 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.io.InputStream;
@@ -174,12 +173,19 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser().verifyWith(getPublicKey()).build().parseSignedClaims(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException();
+        } catch (SignatureException e) {
+            throw new TokenSignatureInvalidException();
+        } catch (MalformedJwtException e) {
+            throw new TokenMalformedException();
+        } catch (UnsupportedJwtException e) {
+            throw new TokenUnsupportedException();
+        } catch (IllegalArgumentException e) {
+            throw new TokenInvalidException();
         }
     }
 
@@ -244,7 +250,7 @@ public class JwtTokenProvider {
         Cookie cookie = new Cookie("refreshToken", refresh);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        cookie.setPath("/api/account/refresh");
+        cookie.setPath("/");
         cookie.setMaxAge(jwtRefreshExpiration/1000);
         response.addCookie(cookie);
     }
