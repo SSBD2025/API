@@ -340,7 +340,7 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isForbidden())
-                .andExpect(result -> Assertions.assertTrue(Objects.requireNonNull(result.getResponse().getErrorMessage()).contains("Account not active")));
+                .andExpect(result -> Assertions.assertTrue(Objects.requireNonNull(result.getResponse().getErrorMessage()).contains("account_not_active")));
     }
 
     @Test
@@ -391,7 +391,7 @@ public class MOK1Test extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isForbidden())
-                .andExpect(result -> Assertions.assertTrue(Objects.requireNonNull(result.getResponse().getErrorMessage()).contains("Account not verified")));
+                .andExpect(result -> Assertions.assertTrue(Objects.requireNonNull(result.getResponse().getErrorMessage()).contains("account_not_verified")));
     }
 
     @Test
