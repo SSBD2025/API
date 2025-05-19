@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.NutritionGoal;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.SurveyConsts;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -16,11 +17,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "survey")
+@Table(name = SurveyConsts.TABLE_NAME)
 @ToString(callSuper = true)
 public class Survey extends AbstractEntity {
     @OneToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false, unique = true, updatable = false)
+    @JoinColumn(name = SurveyConsts.COLUMN_CLIENT_ID, nullable = false, unique = true, updatable = false)
     private Client client;
 
     @Column(nullable = false)
@@ -35,7 +36,7 @@ public class Survey extends AbstractEntity {
 
     @ElementCollection
     @Builder.Default
-    @Column(name = "diet_preferences", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_DIET_PREFERENCES, nullable = false)
     private List<String> dietPreferences = new ArrayList<>();
 
     @ElementCollection
@@ -44,13 +45,13 @@ public class Survey extends AbstractEntity {
     private List<String> allergies = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "activity_level", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_ACTIVITY_LEVEL, nullable = false)
     private ActivityLevel activityLevel;
 
     @Column(nullable = false)
     private boolean smokes;
 
-    @Column(name = "drinks_alcohol", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_DRINKS_ALCOHOL, nullable = false)
     private boolean drinksAlcohol;
 
     @ElementCollection
@@ -63,20 +64,20 @@ public class Survey extends AbstractEntity {
     @Column(nullable = false)
     private List<String> medications = new ArrayList<>();
 
-    @Size(min = 1, max = 10)
-    @Column(name = "meals_per_day", nullable = false)
+    @Size(min = SurveyConsts.MEALS_PER_DAY_MIN, max = SurveyConsts.MEALS_PER_DAY_MAX)
+    @Column(name = SurveyConsts.COLUMN_MEALS_PER_DAY, nullable = false)
     private int mealsPerDay;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nutrition_goal", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_NUTRITION_GOAL, nullable = false)
     private NutritionGoal nutritionGoal;
 
     @ElementCollection
     @Builder.Default
-    @Column(name = "meal_times", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_MEAL_TIMES, nullable = false)
     private List<Timestamp> mealTimes = new ArrayList<>();
 
     @Lob
-    @Column(name = "eating_habits", nullable = false)
+    @Column(name = SurveyConsts.COLUMN_EATING_HABITS, nullable = false)
     private String eatingHabits;
 }

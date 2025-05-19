@@ -6,6 +6,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -22,34 +23,35 @@ public record AccountDTO(
 
         @NotNull(groups = {OnCreate.class, OnRead.class})
         @Null(groups = OnUpdate.class)
-        @Size(min = 4, max = 50, groups = OnCreate.class)
+        @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX, groups = OnCreate.class)
         String login,
 
         @Null(groups = {OnUpdate.class, OnRead.class})
-        @Size(min = 8, max = 60, groups = OnCreate.class)
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()]).{8,60}$",
-                message = "Password must include at least: 1 lower case letter, 1 upper case letter, 1 number and 1 special character",
+        @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX, groups = OnCreate.class)
+        @Pattern(regexp = AccountConsts.PASSWORD_REGEX,
+                message = AccountConsts.PASSWORD_MESSAGE,
                 groups = {OnCreate.class})
         String password,
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
         Boolean verified,
+
         @Null(groups = {OnCreate.class, OnUpdate.class, OnRead.class})
         Boolean active,
 
         @NotBlank(groups = {OnCreate.class, OnRead.class})
-        @Size(min = 1, max = 50, groups = {OnCreate.class, OnUpdate.class})
+        @Size(min = AccountConsts.NAME_MIN, max = AccountConsts.NAME_MAX, groups = {OnCreate.class, OnUpdate.class})
         String firstName,
 
         @NotBlank(groups = {OnCreate.class, OnRead.class})
-        @Size(min = 1, max = 50, groups = {OnCreate.class, OnUpdate.class})
+        @Size(min = AccountConsts.NAME_MIN, max = AccountConsts.NAME_MAX, groups = {OnCreate.class, OnUpdate.class})
         String lastName,
 
         @NotNull(groups = {OnCreate.class, OnRead.class})
         @NotBlank(groups = OnCreate.class)
         @Email(groups = OnCreate.class)
-        @Size(max = 128, groups = {OnCreate.class, OnUpdate.class})
+        @Size(max = AccountConsts.EMAIL_MAX, groups = {OnCreate.class, OnUpdate.class})
         String email,
 
         @NotNull(groups = OnRead.class)
@@ -66,12 +68,12 @@ public record AccountDTO(
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
-        @Max(45)
+        @Max(AccountConsts.IP_MAX)
         String lastSuccessfulLoginIp,
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
-        @Max(45)
+        @Max(AccountConsts.IP_MAX)
         String lastFailedLoginIp,
 
         @NotNull(groups = {OnRead.class, OnCreate.class, OnUpdate.class})

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.MailSendException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailSendingException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailTemplateLoadingException;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.EmailConsts;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,19 +39,22 @@ public class EmailService {
     private String senderEmail;
 
 //    private static final String RESET_PASSWORD_URL = "http://localhost:5173/reset/password/"; //TODO locally
-    private static final String RESET_PASSWORD_URL = "https://team-2.proj-sum.it.p.lodz.pl/reset/password/"; //TODO on machine
+    //private static final String RESET_PASSWORD_URL = "https://team-2.proj-sum.it.p.lodz.pl/reset/password/"; //TODO on machine
+
+    @Value("$app.environment}")
+    private String environment;
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Async
     public void sendChangeEmail(String username, String receiver, String confirmationURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("changeEmailTemplate.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.change.body", language))
-                    .replace("${url}", confirmationURL)
-                    .replace("${linkText}", I18n.getMessage("email.change.link", language));
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.change.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_URL, confirmationURL)
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.change.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -70,12 +73,12 @@ public class EmailService {
     public void sendRevertChangeEmail(String username, String receiver, String revertChangeURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("changeEmailTemplate.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.revert.change.body", language))
-                    .replace("${url}", revertChangeURL)
-                    .replace("${linkText}", I18n.getMessage("email.revert.change.link", language));
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.revert.change.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_URL, revertChangeURL)
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.revert.change.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -94,12 +97,13 @@ public class EmailService {
     public void sendResetPasswordEmail(String to, String username, Language language, String token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("changeEmailTemplate.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.own.reset.body", language))
-                    .replace("${url}", RESET_PASSWORD_URL+token)
-                    .replace("${linkText}", I18n.getMessage("email.own.reset.link", language));
+            String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.own.reset.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token)
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.own.reset.link", language));
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
             helper.setTo(to);
@@ -117,10 +121,10 @@ public class EmailService {
     public void sendBlockAccountEmail(String to, String username, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("emailTemplate.html")
-                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage(I18n.EMAIL_BLOCK_BODY, language));
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage(I18n.EMAIL_BLOCK_BODY, language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
@@ -141,13 +145,14 @@ public class EmailService {
     public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("adminChangedPassword.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.reset.password.body", language))
-                    .replace("${url}", RESET_PASSWORD_URL+token)
-                    .replace("${linkText}", I18n.getMessage("email.reset.link", language))
-                    .replace("${manually}", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
+            String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_ADMIN_CHANGED_PASSWORD)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.reset.password.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token)
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.reset.link", language))
+                    .replace(EmailConsts.PLACEHOLDER_MANUALLY, I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -161,7 +166,7 @@ public class EmailService {
         }
     }
 
-    @PreAuthorize("permitAll()") //TODO sprawdzic
+    @PreAuthorize("permitAll()")
     private String loadTemplate(String templateName) {
         try {
             Resource resource = resourceLoader.getResource("classpath:templates/" + templateName);
@@ -203,11 +208,11 @@ public class EmailService {
     public void sendAdminLoginEmail(String to, String username, String IP, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("emailAdminLoginTemplate.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.login_as_admin.body", language))
-                    .replace("${ip_addr}", IP);
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_ADMIN_LOGIN)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.login_as_admin.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_IP_ADDR, IP);
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -227,11 +232,11 @@ public class EmailService {
     public void sendTwoFactorCode(String to, String username, String code, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String emailBody = loadTemplate("twoFactorTemplate.html")
-                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                    .replace("${name}", username)
-                    .replace("${body}", I18n.getMessage("email.2fa.body", language))
-                    .replace("${code}", code);
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_TWO_FACTOR)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.2fa.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_CODE, code);
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -290,10 +295,10 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-            } catch (MessagingException | MailSendException e) {
-                throw new EmailSendingException(e);
-            }
+        } catch (MessagingException | MailSendException e) {
+            throw new EmailSendingException(e);
         }
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Async

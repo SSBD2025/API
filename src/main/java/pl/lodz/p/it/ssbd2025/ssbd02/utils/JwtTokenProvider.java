@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.JwtConsts;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -52,8 +53,8 @@ public class JwtTokenProvider {
     public String generateAccessToken(Account account, List<String> roles) {
         return Jwts.builder()
                 .subject(account.getLogin())
-                .claim("roles", roles)
-                .claim("typ", "access")
+                .claim(JwtConsts.CLAIM_ROLES, roles)
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_ACCESS)
                 .id(account.getId().toString())
                 .subject(account.getLogin())
                 .issuer(issuer)
@@ -69,7 +70,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .id(account.getId().toString())
                 .subject(account.getLogin())
-                .claim("typ", "refresh")
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_REFRESH)
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
@@ -83,7 +84,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .id(account.getId().toString())
                 .subject(account.getLogin())
-                .claim("typ", "access2fa")
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_ACCESS_2FA)
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + access2faExpiration))
@@ -106,7 +107,7 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.get("roles", List.class);
+        return claims.get(JwtConsts.CLAIM_ROLES, List.class);
     }
 
     public String getIssuer(String token) {
@@ -146,19 +147,19 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("typ");
+                .get(JwtConsts.CLAIM_TYPE);
     }
 
     @PreAuthorize("permitAll()")
     private RSAPrivateKey getPrivateKey() {
-        try (InputStream is = new ClassPathResource("keys/private_key.pem").getInputStream()) {
+        try (InputStream is = new ClassPathResource(JwtConsts.PRIVATE_KEY_PATH).getInputStream()) {
             String key = new String(is.readAllBytes(), StandardCharsets.UTF_8)
-                    .replace("-----BEGIN PRIVATE KEY-----", "")
-                    .replace("-----END PRIVATE KEY-----", "")
+                    .replace(JwtConsts.BEGIN_PRIVATE_KEY, "")
+                    .replace(JwtConsts.END_PRIVATE_KEY, "")
                     .replaceAll("\\s+", "");
             byte[] decoded = Base64.getDecoder().decode(key);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
+            KeyFactory kf = KeyFactory.getInstance(JwtConsts.ALGORITHM);
             return (RSAPrivateKey) kf.generatePrivate(keySpec);
         } catch (Exception e) {
             throw new RuntimeException("Unable to load private key", e);
@@ -167,14 +168,14 @@ public class JwtTokenProvider {
 
     @PreAuthorize("permitAll()")
     public RSAPublicKey getPublicKey() {
-        try (InputStream is = new ClassPathResource("keys/public_key.pem").getInputStream()) {
+        try (InputStream is = new ClassPathResource(JwtConsts.PUBLIC_KEY_PATH).getInputStream()) {
             String key = new String(is.readAllBytes(), StandardCharsets.UTF_8)
-                    .replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
+                    .replace(JwtConsts.BEGIN_PUBLIC_KEY, "")
+                    .replace(JwtConsts.END_PUBLIC_KEY, "")
                     .replaceAll("\\s+", "");
             byte[] decoded = Base64.getDecoder().decode(key);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
+            KeyFactory kf = KeyFactory.getInstance(JwtConsts.ALGORITHM);
             return (RSAPublicKey) kf.generatePublic(keySpec);
         } catch (Exception e) {
             throw new RuntimeException("Unable to load public key", e);
@@ -204,8 +205,8 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(account.getLogin())
                 .id(account.getId().toString())
-                .claim("newEmail", newEmail)
-                .claim("typ", "EMAIL_CHANGE")
+                .claim(JwtConsts.CLAIM_NEW_EMAIL, newEmail)
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_EMAIL_CHANGE)
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
@@ -219,8 +220,8 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(account.getLogin())
                 .id(account.getId().toString())
-                .claim("oldEmail", oldEmail)
-                .claim("typ", "EMAIL_REVERT")
+                .claim(JwtConsts.CLAIM_OLD_EMAIL, oldEmail)
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_EMAIL_REVERT)
                 .issuer(issuer)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
@@ -236,7 +237,7 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return claims.get("newEmail", String.class);
+        return claims.get(JwtConsts.CLAIM_NEW_EMAIL, String.class);
     }
 
     @PreAuthorize("permitAll()")
@@ -247,7 +248,7 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return claims.get("oldEmail", String.class);
+        return claims.get(JwtConsts.CLAIM_OLD_EMAIL, String.class);
     }
 
     @PreAuthorize("permitAll()")
@@ -264,9 +265,9 @@ public class JwtTokenProvider {
 
     @PreAuthorize("permitAll()") //TODO sprawdzic
     public void cookieSetter(String refresh, int jwtRefreshExpiration, HttpServletResponse response) {
-        Cookie cookie = new Cookie("refreshToken", refresh);
+        Cookie cookie = new Cookie(JwtConsts.REFRESH_TOKEN_COOKIE, refresh);
         cookie.setHttpOnly(true);
-        cookie.setSecure("prod".equalsIgnoreCase(environment));
+        cookie.setSecure(JwtConsts.ENVIRONMENT_PROD.equalsIgnoreCase(environment));
         cookie.setPath("/");
         cookie.setMaxAge(jwtRefreshExpiration/1000);
         response.addCookie(cookie);

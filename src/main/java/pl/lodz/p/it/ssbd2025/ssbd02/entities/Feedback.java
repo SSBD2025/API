@@ -7,11 +7,13 @@ import java.sql.Timestamp;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.FeedbackConsts;
 
-@Table(indexes = {
-    @Index(name = "feedback_client_id_index", columnList = "client_id"),
-    @Index(name = "feedback_food_pyramid_id_index", columnList = "food_pyramid_id")
-})
+@Table(name = FeedbackConsts.TABLE_NAME,
+        indexes = {
+                @Index(name = FeedbackConsts.CLIENT_ID_INDEX, columnList = FeedbackConsts.COLUMN_CLIENT_ID),
+                @Index(name = FeedbackConsts.FOOD_PYRAMID_ID_INDEX, columnList = FeedbackConsts.COLUMN_FOOD_PYRAMID_ID)
+        })
 @Entity
 @Getter
 @Setter
@@ -19,18 +21,23 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class Feedback extends AbstractEntity {
-    @Size(min = 1, max = 5)
+    @Size(min = FeedbackConsts.RATING_MIN, max = FeedbackConsts.RATING_MAX)
+    @Column(name = FeedbackConsts.COLUMN_RATING)
     private int rating;
-    @Length(min = 1, max = 255)
+
+    @Length(min = FeedbackConsts.DESCRIPTION_MIN, max = FeedbackConsts.DESCRIPTION_MAX)
+    @Column(name = FeedbackConsts.COLUMN_DESCRIPTION)
     private String description;
+
+    @Column(name = FeedbackConsts.COLUMN_TIMESTAMP)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false, updatable = false)
+    @JoinColumn(name = FeedbackConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "food_pyramid_id", nullable = false, updatable = false)
+    @JoinColumn(name = FeedbackConsts.COLUMN_FOOD_PYRAMID_ID, nullable = false, updatable = false)
     private FoodPyramid foodPyramid;
 }

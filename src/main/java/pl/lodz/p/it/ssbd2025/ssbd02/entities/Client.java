@@ -2,16 +2,17 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "client",
-    indexes = {
-        @Index(name = "client_dietician_id_index", columnList = "dietician_id"),
-    })
-@DiscriminatorValue("CLIENT")
+@Table(name = ClientConsts.TABLE_NAME,
+        indexes = {
+                @Index(name = ClientConsts.DIETICIAN_ID_INDEX, columnList = ClientConsts.COLUMN_DIETICIAN_ID),
+        })
+@DiscriminatorValue(ClientConsts.DISCRIMINATOR_VALUE)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,24 +21,24 @@ import java.util.List;
 public class Client extends UserRole {
 
     @ManyToOne
-    @JoinColumn(name = "dietician_id", nullable = true)
+    @JoinColumn(name = ClientConsts.COLUMN_DIETICIAN_ID, nullable = true)
     private Dietician dietician;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = PeriodicSurveyConsts.FIELD_CLIENT)
     private List<PeriodicSurvey> periodicSurveys = new ArrayList<>();
 
-    @OneToOne(mappedBy = "client")
+    @OneToOne(mappedBy = SurveyConsts.FIELD_CLIENT)
     private Survey survey;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = BloodTestConsts.FIELD_CLIENT)
     private List<ClientBloodTestReport> bloodTestReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = FoodPyramidConsts.FIELD_CLIENT)
     private List<ClientFoodPyramid> foodPyramidIds = new ArrayList<>();
 
-    @OneToOne(mappedBy = "client", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = DietaryRestrictionsConsts.FIELD_CLIENT, cascade = CascadeType.PERSIST)
     private DietaryRestrictions dietaryRestrictions;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = FeedbackConsts.FIELD_CLIENT)
     private List<Feedback> feedbacks = new ArrayList<>();
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.UserRoleConsts;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -17,11 +18,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "account",
+@Table(name = AccountConsts.TABLE_NAME,
         indexes = {
-        @Index(name = "login_index", columnList = "login"),
-        @Index(name = "email_index", columnList = "email")
-})
+                @Index(name = AccountConsts.LOGIN_INDEX, columnList = AccountConsts.COLUMN_LOGIN),
+                @Index(name = AccountConsts.EMAIL_INDEX, columnList = AccountConsts.COLUMN_EMAIL)
+        })
 @SecondaryTable(name = "user_data")
 @ToString(callSuper = true)
 @Getter
@@ -36,54 +37,54 @@ public class Account extends AbstractEntity {
     @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX)
     private String login;
 
-    @Column(name = "password", nullable = false, length = 60)
-    @Size(min = 8, max = 60)
+    @Column(name = AccountConsts.COLUMN_PASSWORD, nullable = false, length = AccountConsts.PASSWORD_MAX)
+    @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX)
     @ToString.Exclude
     private String password;
 
-    @Column(name = "email", nullable = false, unique = true, length = 60)
+    @Column(name = AccountConsts.COLUMN_EMAIL, nullable = false, unique = true, length = AccountConsts.EMAIL_MAX)
     private String email;
 
     @Column(nullable = false)
-    private boolean active = false;
+    private boolean active = AccountConsts.DEFAULT_ACTIVE;
 
-    @Column(name = "last_successful_login", nullable = true)
+    @Column(name = AccountConsts.COLUMN_LAST_SUCCESSFUL_LOGIN, nullable = true)
     private Timestamp lastSuccessfulLogin;
 
-    @Column(name = "last_failed_login", nullable = true)
+    @Column(name = AccountConsts.COLUMN_LAST_FAILED_LOGIN, nullable = true)
     private Timestamp lastFailedLogin;
 
     @Column(nullable = false)
-    private boolean verified = false;
+    private boolean verified = AccountConsts.DEFAULT_VERIFIED;
 
-    @Column(name = "language", nullable = true)
+    @Column(name = AccountConsts.COLUMN_LANGUAGE, nullable = true)
     private Language language;
 
-    @Column(name = "last_successful_login_ip", length = 45, nullable = true)
+    @Column(name = AccountConsts.COLUMN_LAST_SUCCESSFUL_LOGIN_IP, length = AccountConsts.IP_MAX, nullable = true)
     private String lastSuccessfulLoginIp;
 
-    @Column(name = "last_failed_login_ip", length = 45, nullable = true)
+    @Column(name = AccountConsts.COLUMN_LAST_FAILED_LOGIN_IP, length = AccountConsts.IP_MAX, nullable = true)
     private String lastFailedLoginIp;
 
-    @OneToMany(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = UserRoleConsts.FIELD_ACCOUNT, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @ToString.Exclude
     private Collection<UserRole> userRoles = new ArrayList<>();
 
-    @Column(name = "first_name", table = "user_data", nullable = false, length = 50)
+    @Column(name = "first_name", table = "user_data", nullable = false, length = AccountConsts.NAME_MAX)
     private String firstName;
 
-    @Column(name = "last_name", table = "user_data", nullable = false, length = 50)
+    @Column(name = "last_name", table = "user_data", nullable = false, length = AccountConsts.NAME_MAX)
     private String lastName;
 
-    @Column(name = "two_factor_auth", nullable = false)
-    private boolean twoFactorAuth = false;
+    @Column(name = AccountConsts.COLUMN_TWO_FACTOR_AUTH, nullable = false)
+    private boolean twoFactorAuth = AccountConsts.DEFAULT_TWO_FACTOR_AUTH;
 
-    @Column(name = "reminded", nullable = false)
-    private boolean reminded = false;
+    @Column(name = AccountConsts.COLUMN_REMINDED, nullable = false)
+    private boolean reminded = AccountConsts.DEFAULT_REMINDED;
 
-    @Column(name = "login_attempts", nullable = false)
-    private int loginAttempts = 0;
+    @Column(name = AccountConsts.COLUMN_LOGIN_ATTEMPTS, nullable = false)
+    private int loginAttempts = AccountConsts.DEFAULT_LOGIN_ATTEMPTS;
 
-    @Column(name = "locked_until", nullable = true)
+    @Column(name = AccountConsts.COLUMN_LOCKED_UNTIL, nullable = true)
     private Timestamp lockedUntil;
 }

@@ -33,6 +33,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.JwtConsts;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.TokenConsts;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,14 +82,14 @@ public class JwtService implements IJwtService {
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
-            TokenNotFoundException.class, //chyba teoretycznie moze zostac wygenerowany wspolbieznie przy logowaniu i refreshu jednoczesnie
-            AccountHasNoRolesException.class //admin moze je dodac/aktywowac wspolbieznie
+            TokenNotFoundException.class,
+            AccountHasNoRolesException.class
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public SensitiveDTO refresh(HttpServletRequest request, HttpServletResponse response) { //takes refresh token, produces access token and saves it into the database
+    public SensitiveDTO refresh(HttpServletRequest request, HttpServletResponse response) {
         String token = "";
         if(request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if ("refreshToken".equals(cookie.getName())) {
+                if (TokenConsts.REFRESH_TOKEN_COOKIE.equals(cookie.getName())) {
                     token = cookie.getValue();
                 }
             }
@@ -98,7 +100,7 @@ public class JwtService implements IJwtService {
         jwtTokenProvider.validateToken(token);
         if(!tokenRepository.existsByToken(token)) {
             throw new TokenNotFoundException();
-        } else if(!jwtTokenProvider.getType(token).equals("refresh")) {
+        } else if(!jwtTokenProvider.getType(token).equals(JwtConsts.TYPE_REFRESH)) {
             throw new TokenTypeInvalidException();
         }
         Account account = accountRepository.findByLogin(jwtTokenProvider.getSubject(token)).orElseThrow(AccountNotFoundException::new);

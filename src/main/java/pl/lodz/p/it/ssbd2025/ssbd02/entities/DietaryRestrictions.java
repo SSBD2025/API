@@ -2,9 +2,10 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DietaryRestrictionsConsts;
 
 @Entity
-@Table(name = "dietary_restrictions")
+@Table(name = DietaryRestrictionsConsts.TABLE_NAME)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,18 +14,18 @@ import lombok.*;
 public class DietaryRestrictions extends AbstractEntity {
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false, unique = true, updatable = false)
+    @JoinColumn(name = DietaryRestrictionsConsts.COLUMN_CLIENT_ID, nullable = false, unique = true, updatable = false)
     private Client client;
 
-    @Column(name = "is_vegan", nullable = false)
-    private boolean vegan;
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGAN, nullable = false)
+    private boolean vegan = DietaryRestrictionsConsts.DEFAULT_IS_VEGAN;
 
-    @Column(name = "is_vegetarian", nullable = false)
-    private boolean vegetarian;
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGETARIAN, nullable = false)
+    private boolean vegetarian = DietaryRestrictionsConsts.DEFAULT_IS_VEGETARIAN;
 
-    @Column(name = "is_keto", nullable = false)
-    private boolean keto;
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_KETO, nullable = false)
+    private boolean keto = DietaryRestrictionsConsts.DEFAULT_IS_KETO;
 
-    @Column(name = "is_gluten_free", nullable = false)
-    private boolean glutenFree;
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_GLUTEN_FREE, nullable = false)
+    private boolean glutenFree = DietaryRestrictionsConsts.DEFAULT_IS_GLUTEN_FREE;
 }
