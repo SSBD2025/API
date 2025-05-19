@@ -3,11 +3,12 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
 
 @Entity
-@Table(name = "blood_test_results",
+@Table(name = BloodTestConsts.TABLE_NAME,
         indexes = {
-                @Index(name = "btr_report_id_index", columnList = "report_id")
+                @Index(name = BloodTestConsts.REPORT_ID_INDEX, columnList = BloodTestConsts.COLUMN_REPORT_ID)
         })
 @Getter
 @Setter
@@ -16,14 +17,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 @Builder
 @ToString(callSuper = true)
 public class BloodTestResult extends AbstractEntity {
-    @Column(name = "result", nullable = false)
+    @Column(name = BloodTestConsts.COLUMN_RESULT, nullable = false)
     private String result;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "blood_marker", nullable = false)
+    @Column(name = BloodTestConsts.COLUMN_BLOOD_MARKER, nullable = false)
     private BloodParameter bloodParameter;
 
     @ManyToOne
-    @JoinColumn(name = "report_id", nullable = false)
+    @JoinColumn(name = BloodTestConsts.COLUMN_REPORT_ID, nullable = false)
     private ClientBloodTestReport report;
 }

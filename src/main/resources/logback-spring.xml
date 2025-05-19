@@ -37,7 +37,7 @@
         </encoder>
     </appender>
 
-    <logger name="RoleChangeLogger" level="INFO" additivity="false">
+    <logger name="RoleChangeLogger" level="INFO">
         <appender-ref ref="ROLE_CHANGES_FILE" />
         <appender-ref ref="CONSOLE" />
     </logger>

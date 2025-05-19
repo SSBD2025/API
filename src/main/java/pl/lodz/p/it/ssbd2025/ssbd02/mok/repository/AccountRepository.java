@@ -19,6 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -34,7 +35,7 @@ import java.util.UUID;
 public interface AccountRepository extends AbstractRepository<Account> {
 
     @PreAuthorize("permitAll()")
-    Optional<Account> findByLogin(@NotBlank @Size(min = 4, max = 50) String login);
+    Optional<Account> findByLogin(@NotBlank @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX) String login);
 
     Optional<Account> findByEmail(@Email String email);
 
@@ -44,7 +45,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
         from Account a join a.userRoles ur
         where a.login = :login
     """)
-    List<AccountRolesProjection> findAccountRolesByLogin(@NotBlank @Size(min = 4, max = 50) String login);
+    List<AccountRolesProjection> findAccountRolesByLogin(@NotBlank @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX) String login);
 
     @Modifying
     @Query("UPDATE Account a SET a.password = :newPassword WHERE a.login = :login")

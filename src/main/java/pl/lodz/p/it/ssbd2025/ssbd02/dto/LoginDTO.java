@@ -9,18 +9,18 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginDTO {
-
-    @Size(min = 4, max = 50, groups = OnCreate.class)
+    @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX, groups = OnCreate.class)
     @NotBlank(groups = {OnCreate.class})
     private String login;
 
     @ToString.Exclude
-    @Size(min = 8, max = 60, groups = OnCreate.class)
+    @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX)
     @NotBlank(groups = {OnCreate.class})
     private String password;
 }

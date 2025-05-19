@@ -2,16 +2,17 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ClientFoodPyramidConsts;
 
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "client_food_pyramid",
-    indexes = {
-        @Index(name = "cfp_client_id_index", columnList = "client_id"),
-        @Index(name = "cfp_food_pyramid_id_index", columnList = "food_pyramid_id"),
-        @Index(name = "cfp_timestamp_index", columnList = "timestamp")
-})
+@Table(name = ClientFoodPyramidConsts.TABLE_NAME,
+        indexes = {
+                @Index(name = ClientFoodPyramidConsts.CLIENT_ID_INDEX, columnList = ClientFoodPyramidConsts.COLUMN_CLIENT_ID),
+                @Index(name = ClientFoodPyramidConsts.FOOD_PYRAMID_ID_INDEX, columnList = ClientFoodPyramidConsts.COLUMN_FOOD_PYRAMID_ID),
+                @Index(name = ClientFoodPyramidConsts.TIMESTAMP_INDEX, columnList = ClientFoodPyramidConsts.COLUMN_TIMESTAMP)
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,19 +26,19 @@ public class ClientFoodPyramid {
 
     @ManyToOne
     @MapsId("clientId")
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_CLIENT_ID)
     private Client client;
 
     @ManyToOne
     @MapsId("foodPyramidId")
-    @JoinColumn(name = "food_pyramid_id")
+    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_FOOD_PYRAMID_ID)
     private FoodPyramid foodPyramid;
 
-    @Column(nullable = false)
+    @Column(name = ClientFoodPyramidConsts.COLUMN_TIMESTAMP, nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
     @Version
-    @Column(nullable = false)
+    @Column(name = ClientFoodPyramidConsts.COLUMN_VERSION, nullable = false)
     private Long version;
 }
