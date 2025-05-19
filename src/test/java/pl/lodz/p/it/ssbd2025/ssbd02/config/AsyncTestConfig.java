@@ -11,7 +11,7 @@ import org.springframework.core.task.TaskExecutor;
 @Configuration
 public class AsyncTestConfig {
     @Bean
-    @Primary  // ensures this bean takes precedence over the default async executor
+    @Primary
     public TaskExecutor taskExecutor() {
         return new SyncTaskExecutor();
     }

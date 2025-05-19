@@ -17,7 +17,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "account")
+@Table(name = "account",
+        indexes = {
+        @Index(name = "login_index", columnList = "login"),
+        @Index(name = "email_index", columnList = "email")
+})
 @SecondaryTable(name = "user_data")
 @ToString(callSuper = true)
 @Getter

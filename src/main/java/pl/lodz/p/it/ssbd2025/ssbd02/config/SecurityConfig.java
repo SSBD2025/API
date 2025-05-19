@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 
 import org.springframework.security.web.SecurityFilterChain;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.AuthEntryPoint;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.AuthEntryPointHandler;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtAuthFilter;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtOAuthConverter;
 
@@ -24,6 +26,8 @@ public class SecurityConfig {
 
     private final JwtOAuthConverter jwtOAuthConverter;
     private final JwtAuthFilter jwtAuthFilter;
+    private final AuthEntryPointHandler authEntryPointHandler;
+    private final AuthEntryPoint authEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,7 +63,10 @@ public class SecurityConfig {
 //                                ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                                 .anyRequest().authenticated())
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(authEntryPoint)
+                        .accessDeniedHandler(authEntryPointHandler));
         return http.build();
     }
 }

@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
@@ -43,4 +44,10 @@ public class AdminController {
     //activate dietician
     //create admin
     //activate admin
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/test")
+    public ResponseEntity<Object> test() {
+        return ResponseEntity.status(HttpStatus.OK).body("TEST");
+    }
 }

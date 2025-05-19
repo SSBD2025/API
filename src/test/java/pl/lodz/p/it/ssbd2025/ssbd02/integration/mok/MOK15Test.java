@@ -88,7 +88,7 @@ public class MOK15Test extends BaseIntegrationTest {
     @Test
     void shouldReturn403WhenNoAuthorization() throws Exception {
         mockMvc.perform(get("/api/account/" + accountId))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -134,6 +134,6 @@ public class MOK15Test extends BaseIntegrationTest {
     @Test
     void shouldReturn403WhenNoToken() throws Exception {
         mockMvc.perform(get("/api/account/me"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

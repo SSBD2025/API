@@ -137,7 +137,7 @@ public class MOK9Test extends BaseIntegrationTest {
     public void resetPasswordByGuest() throws Exception {
         doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), anyString(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
-        ).andExpect(status().isForbidden());
+        ).andExpect(status().isUnauthorized());
     }
 
     @Order(4)

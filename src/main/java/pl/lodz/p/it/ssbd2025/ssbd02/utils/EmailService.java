@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -58,7 +60,7 @@ public class EmailService {
             helper.setText(emailBody, true);
 
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -82,7 +84,7 @@ public class EmailService {
             helper.setText(emailBody, true);
 
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -105,7 +107,7 @@ public class EmailService {
             helper.setText(emailBody, true);
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -129,7 +131,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | EmailTemplateLoadingException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -154,7 +156,7 @@ public class EmailService {
             helper.setText(emailBody, true);
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -191,7 +193,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -215,7 +217,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -239,7 +241,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -258,11 +260,11 @@ public class EmailService {
 
             helper.setFrom(senderEmail);
             helper.setTo(to);
-            helper.setSubject(I18n.getMessage("email.delete.account.subject", language));
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_DELETE_ACCOUNT_SUBJECT, language));
             helper.setText(emailBody, true);
 
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
 
             throw new EmailSendingException(e);
         }
@@ -288,10 +290,10 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
-            throw new EmailSendingException(e);
+            } catch (MessagingException | MailSendException e) {
+                throw new EmailSendingException(e);
+            }
         }
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Async
@@ -312,7 +314,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
@@ -336,7 +338,7 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailSendException e) {
             throw new EmailSendingException(e);
         }
     }
