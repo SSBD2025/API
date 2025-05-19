@@ -225,4 +225,12 @@ public class AccountController {
         accountService.disableTwoFactor();
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/log-role-change")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    public ResponseEntity<Void> logRoleChange(@RequestBody @Valid RoleChangeLogDTO roleChangeLogDTO) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        accountService.logUserRoleChange(login, roleChangeLogDTO.previousRole(), roleChangeLogDTO.newRole());
+        return ResponseEntity.ok().build();
+    }
 }

@@ -24,4 +24,16 @@ public class Pointcuts {
             "execution(* pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.AccountService.login(..))"
     )
     public void loginMethod() {}
+
+    @Pointcut(
+            "execution(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RoleChangeLogged * *(..)) " +
+                    "|| within(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RoleChangeLogged *)"
+    )
+    public void roleChangeLoggedAnnotatedMethods() {}
+
+    @Pointcut(
+            "execution(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.UserRoleChangeLogged * *(..)) " +
+                    "|| within(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.UserRoleChangeLogged *)"
+    )
+    public void userRoleChangeLoggedAnnotatedMethods() {}
 }
