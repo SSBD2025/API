@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -15,8 +15,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,7 +41,7 @@ public class MOK10Test extends BaseIntegrationTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private IAccountService accountService;
+    private AccountTestHelper accountTestHelper;
 
     private String accessToken;
 
@@ -95,7 +95,7 @@ public class MOK10Test extends BaseIntegrationTest {
                         .param("token", token.getToken()))
                 .andExpect(status().isOk());
 
-        Assertions.assertEquals("newemail@example.com", accountService.getAccountByLogin("drice").account().email());
+        Assertions.assertEquals("newemail@example.com", accountTestHelper.getClientByLogin("drice").getEmail());
     }
 
     @Test
@@ -300,7 +300,7 @@ public class MOK10Test extends BaseIntegrationTest {
                         .param("token", revertToken.getToken()))
                 .andExpect(status().isOk());
 
-        Assertions.assertEquals("tcheese@example.com", accountService.getAccountByLogin(loginDTO.getLogin()).account().email());
+        Assertions.assertEquals("tcheese@example.com", accountTestHelper.getClientByLogin("tcheese").getEmail());
     }
 
     @Test
@@ -315,7 +315,7 @@ public class MOK10Test extends BaseIntegrationTest {
     @Test
     public void resendEmailChangeLinkPositiveTest() throws Exception {
         LoginDTO loginDTO = new LoginDTO(
-                "drice",
+                "jcheddar",
                 "P@ssw0rd!"
         );
 

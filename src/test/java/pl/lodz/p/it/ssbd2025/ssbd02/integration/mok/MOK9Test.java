@@ -1,11 +1,10 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +19,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.PasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import static org.mockito.ArgumentMatchers.any;

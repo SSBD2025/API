@@ -33,7 +33,7 @@ public class AdminController {
     private final UserRoleMapper userRoleMapper;
 
 //    @PreAuthorize("hasRole('client_admin')")
-//    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
+    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     public AdminDTO registerAdmin(@RequestBody @Validated(OnCreate.class) AdminDTO adminDTO) {
         Admin newAdminData = userRoleMapper.toNewAdminData(adminDTO.admin());

@@ -97,6 +97,7 @@ public class AccountService implements IAccountService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
@@ -107,6 +108,7 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @PreAuthorize("hasRole('ADMIN')")
     public void setGeneratedPassword(UUID uuid) {
         Optional<Account> account = accountRepository.findById(uuid);
         if(account.isEmpty()) {
@@ -194,6 +196,7 @@ public class AccountService implements IAccountService {
     }
 
 //    @PreAuthorize("hasRole('SYSTEM')")
+    @PreAuthorize("permitAll()") //????
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -300,6 +303,7 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @PreAuthorize("permitAll()")
     //TODO tu raczej bez powtarzania ale do ustalenia
     public void sendResetPasswordEmail(String email) {
         if(accountRepository.findByEmail(email).isPresent()) {
@@ -312,6 +316,7 @@ public class AccountService implements IAccountService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("permitAll()")
     public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
         TokenEntity tokenEntity = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
         passwordResetTokenService.validatePasswordResetToken(token);
@@ -324,6 +329,7 @@ public class AccountService implements IAccountService {
 
     @TransactionLogged
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified) {
         List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
 
@@ -358,6 +364,7 @@ public class AccountService implements IAccountService {
         handleEmailChange(account, newEmail);
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     private void handleEmailChange(Account account, String newEmail) {
         if (account.getEmail().equals(newEmail)) {
             throw new AccountSameEmailException();
@@ -454,6 +461,7 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> projections = accountRepository.findAccountRolesByLogin(login);
@@ -467,7 +475,7 @@ public class AccountService implements IAccountService {
         return new AccountWithTokenDTO(dto, token, roles);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true, transactionManager = "mokTransactionManager")
     public AccountWithTokenDTO getAccountById(UUID id) {
         Account account = accountRepository.findById(id)
@@ -490,6 +498,7 @@ public class AccountService implements IAccountService {
                 .orElseThrow(AccountNotFoundException::new), dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(
             retryFor = {JpaSystemException.class, ConcurrentUpdateException.class, OptimisticLockException.class},
@@ -546,6 +555,7 @@ public class AccountService implements IAccountService {
         emailService.sendActivateAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {
@@ -595,6 +605,7 @@ public class AccountService implements IAccountService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {
