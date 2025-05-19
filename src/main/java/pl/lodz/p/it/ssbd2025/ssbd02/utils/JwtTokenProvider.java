@@ -74,6 +74,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateAccess2FAToken(Account account) {
         return Jwts.builder()
                 .id(account.getId().toString())
@@ -113,6 +115,7 @@ public class JwtTokenProvider {
                 .getIssuer();
     }
 
+    @PreAuthorize("permitAll()")
     public String getSubject(String token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -143,6 +146,7 @@ public class JwtTokenProvider {
                 .get("typ");
     }
 
+    @PreAuthorize("permitAll()")
     private RSAPrivateKey getPrivateKey() {
         try (InputStream is = new ClassPathResource("keys/private_key.pem").getInputStream()) {
             String key = new String(is.readAllBytes(), StandardCharsets.UTF_8)
@@ -158,6 +162,7 @@ public class JwtTokenProvider {
         }
     }
 
+    @PreAuthorize("permitAll()")
     public RSAPublicKey getPublicKey() {
         try (InputStream is = new ClassPathResource("keys/public_key.pem").getInputStream()) {
             String key = new String(is.readAllBytes(), StandardCharsets.UTF_8)
@@ -173,6 +178,7 @@ public class JwtTokenProvider {
         }
     }
 
+    @PreAuthorize("permitAll()") //TODO sprawdzic
     public void validateToken(String token) {
         try {
             Jwts.parser().verifyWith(getPublicKey()).build().parseSignedClaims(token);
@@ -189,6 +195,8 @@ public class JwtTokenProvider {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateEmailChangeToken(Account account, String newEmail) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -202,6 +210,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateEmailRevertToken(Account account, String oldEmail) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -215,6 +225,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    @PreAuthorize("permitAll()")
     public String getNewEmailFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -225,6 +236,7 @@ public class JwtTokenProvider {
         return claims.get("newEmail", String.class);
     }
 
+    @PreAuthorize("permitAll()")
     public String getOldEmailFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -235,6 +247,7 @@ public class JwtTokenProvider {
         return claims.get("oldEmail", String.class);
     }
 
+    @PreAuthorize("permitAll()")
     public UUID getAccountIdFromToken(String token) {
         String id = Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -246,6 +259,7 @@ public class JwtTokenProvider {
         return UUID.fromString(id);
     }
 
+    @PreAuthorize("permitAll()") //TODO sprawdzic
     public void cookieSetter(String refresh, int jwtRefreshExpiration, HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", refresh);
         cookie.setHttpOnly(true);

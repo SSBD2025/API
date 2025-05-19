@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,6 +30,7 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
     private final TokenRepository tokenRepository;
     private final TokenUtil tokenUtil;
 
+    @PreAuthorize("permitAll()") //TODO sprawdzic
     public void createPasswordResetToken(Account account, String token) {
         if(tokenRepository.existsByAccountWithType(account, TokenType.PASSWORD_RESET)) {
             tokenRepository.deleteAllByAccountWithType(account, TokenType.PASSWORD_RESET);
@@ -36,6 +38,7 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateMinuteExpiration(5), account, TokenType.PASSWORD_RESET));
     }
 
+    @PreAuthorize("permitAll()")
     public void validatePasswordResetToken(String passwordResetToken) {
         TokenEntity passwordToken = tokenRepository.findByToken(passwordResetToken).orElseThrow(TokenNotFoundException::new);
         tokenRepository.delete(passwordToken);

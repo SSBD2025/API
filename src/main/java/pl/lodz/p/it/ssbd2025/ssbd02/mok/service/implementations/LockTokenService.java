@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
@@ -22,12 +23,14 @@ public class LockTokenService implements ILockTokenService {
     @Value("${app.optimistic-lock-secret}")
     private String secret;
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
     public String generateToken(UUID id, Long version) {
         String payload = id + ":" + version;
         String signature = hmacSha256(payload, secret);
         return Base64.getEncoder().encodeToString((payload + ":" + signature).getBytes(StandardCharsets.UTF_8));
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
     public Record<UUID, Long> verifyToken(String token) {
         String decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
         String[] parts = decoded.split(":");
@@ -47,6 +50,7 @@ public class LockTokenService implements ILockTokenService {
         return new Record<>(id, version);
     }
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
     private String hmacSha256(String data, String key) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");

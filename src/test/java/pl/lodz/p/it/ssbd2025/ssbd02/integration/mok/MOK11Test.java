@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

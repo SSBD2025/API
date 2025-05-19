@@ -2,21 +2,16 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.util.FileCopyUtils;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailSendingException;
@@ -44,6 +39,7 @@ public class EmailService {
 //    private static final String RESET_PASSWORD_URL = "http://localhost:5173/reset/password/"; //TODO locally
     private static final String RESET_PASSWORD_URL = "team-2.proj-sum.it.p.lodz.pl/reset/password/"; //TODO on machine
 
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Async
     public void sendChangeEmail(String username, String receiver, String confirmationURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -67,6 +63,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("permitAll()")
     @Async
     public void sendRevertChangeEmail(String username, String receiver, String revertChangeURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -90,6 +87,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("permitAll()")
     @Async
     public void sendResetPasswordEmail(String to, String username, Language language, String token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -112,6 +110,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Async
     public void sendBlockAccountEmail(String to, String username, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -130,12 +129,12 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
-        } catch (MessagingException | EmailTemplateLoadingException e) {
-            //TODO
-            e.printStackTrace();
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Async
     public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -147,7 +146,7 @@ public class EmailService {
                     .replace("${url}", RESET_PASSWORD_URL+token)
                     .replace("${linkText}", I18n.getMessage("email.reset.link", language))
                     .replace("${manually}", I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
-            ;
+
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
             helper.setTo(to);
@@ -160,6 +159,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("permitAll()") //TODO sprawdzic
     private String loadTemplate(String templateName) {
         try {
             Resource resource = resourceLoader.getResource("classpath:templates/" + templateName);
@@ -196,7 +196,7 @@ public class EmailService {
         }
     }
 
-
+    //TODO co z tym
     @Async
     public void sendAdminLoginEmail(String to, String username, String IP, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -220,6 +220,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("permitAll()")
     @Async
     public void sendTwoFactorCode(String to, String username, String code, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -292,6 +293,7 @@ public class EmailService {
             }
         }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Async
     public void sendUnblockAccountEmail(String to, String username, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -311,8 +313,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            //TODO
-            e.printStackTrace();
+            throw new EmailSendingException(e);
         }
     }
 
@@ -336,7 +337,7 @@ public class EmailService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            e.printStackTrace(); // TODO: proper logging
+            throw new EmailSendingException(e);
         }
     }
 

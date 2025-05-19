@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.integration;
+package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +15,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
