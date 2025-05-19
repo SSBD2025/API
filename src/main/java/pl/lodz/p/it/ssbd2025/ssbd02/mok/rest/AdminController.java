@@ -33,21 +33,11 @@ public class AdminController {
     private final AccountMapper accountMapper;
     private final UserRoleMapper userRoleMapper;
 
-//    @PreAuthorize("hasRole('client_admin')")
-    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     public AdminDTO registerAdmin(@RequestBody @Validated(OnCreate.class) AdminDTO adminDTO) {
         Admin newAdminData = userRoleMapper.toNewAdminData(adminDTO.admin());
         Account newAccount = accountMapper.toNewAccount(adminDTO.account());
         return adminMapper.toAdminDTO(adminService.createAdmin(newAdminData, newAccount));
-    }
-    //activate dietician
-    //create admin
-    //activate admin
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/test")
-    public ResponseEntity<Object> test() {
-        return ResponseEntity.status(HttpStatus.OK).body("TEST");
     }
 }

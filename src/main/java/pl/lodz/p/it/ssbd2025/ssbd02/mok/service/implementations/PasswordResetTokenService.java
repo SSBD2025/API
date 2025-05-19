@@ -23,14 +23,13 @@ import java.util.Date;
 @Service
 @EnableMethodSecurity(prePostEnabled=true)
 @MethodCallLogged
-@Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager")
 public class PasswordResetTokenService implements IPasswordResetTokenService {
 
-//    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final TokenRepository tokenRepository;
     private final TokenUtil tokenUtil;
 
-    @PreAuthorize("permitAll()") //TODO sprawdzic
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = false)
+    @PreAuthorize("permitAll()")
     public void createPasswordResetToken(Account account, String token) {
         if(tokenRepository.existsByAccountWithType(account, TokenType.PASSWORD_RESET)) {
             tokenRepository.deleteAllByAccountWithType(account, TokenType.PASSWORD_RESET);
@@ -38,6 +37,7 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateMinuteExpiration(5), account, TokenType.PASSWORD_RESET));
     }
 
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = false)
     @PreAuthorize("permitAll()")
     public void validatePasswordResetToken(String passwordResetToken) {
         TokenEntity passwordToken = tokenRepository.findByToken(passwordResetToken).orElseThrow(TokenNotFoundException::new);

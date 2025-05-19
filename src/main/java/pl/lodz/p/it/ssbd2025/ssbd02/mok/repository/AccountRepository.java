@@ -31,14 +31,17 @@ import java.util.UUID;
 @Component("MOKAccountRepository")
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.MANDATORY)
 public interface AccountRepository extends AbstractRepository<Account> {
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("permitAll()")
     Optional<Account> findByLogin(@NotBlank @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX) String login);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("permitAll()")
     Optional<Account> findByEmail(@Email String email);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("permitAll()")
     @Query("""
         select a.login as login, ur.roleName as roleName, ur.active as active
@@ -47,13 +50,17 @@ public interface AccountRepository extends AbstractRepository<Account> {
     """)
     List<AccountRolesProjection> findAccountRolesByLogin(@NotBlank @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX) String login);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Modifying
     @Query("UPDATE Account a SET a.password = :newPassword WHERE a.login = :login")
     void updatePassword(@Param("login") String login, @Param("newPassword") String newPassword);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     Account saveAndFlush(Account account);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         SELECT a FROM Account a 
         WHERE (:active IS NULL OR a.active = :active) 
@@ -62,6 +69,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     List<Account> findByActiveAndVerified(@Param("active") Boolean active, @Param("verified") Boolean verified);
 
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     @Modifying
     @Query("UPDATE Account a SET a.lastSuccessfulLogin = :lastSuccessfulLogin, a.lastSuccessfulLoginIp = :lastSuccessfulLoginIp, a.loginAttempts = :loginAttempts  WHERE a.login = :login")
@@ -70,6 +78,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
                                @Param("lastSuccessfulLoginIp") String lastSuccessfulLoginIp,
                                @Param("loginAttempts") int loginAttempts);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     @Modifying
     @Query("UPDATE Account a SET a.lastFailedLogin = :lastFailedLogin, a.lastFailedLoginIp = :lastFailedLoginIp, a.loginAttempts = :loginAttempts WHERE a.login = :login")
@@ -78,20 +87,25 @@ public interface AccountRepository extends AbstractRepository<Account> {
                            @Param("lastFailedLoginIp") String lastFailedLoginIp,
                            @Param("loginAttempts") int loginAttempts);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("permitAll()")
     @Modifying
     @Query("""
         update Account a set a.lockedUntil = :lockedUntil, a.active = false where a.login = :login
     """)
     void lockTemporarily(@Param("login") String login, @Param("lockedUntil") Timestamp lockedUntil);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         select a from Account a where a.lockedUntil is not null
     """)
     List<Account> findByHasLockedUntil();
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.id = :id")
     Optional<Account> findByIdWithRoles(@Param("id") UUID id);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.login = :login")
     Optional<Account> findByLoginWithRoles(@Param("login") String login);
 }

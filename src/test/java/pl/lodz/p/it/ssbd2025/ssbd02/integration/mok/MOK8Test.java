@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -59,6 +60,7 @@ public class MOK8Test extends BaseIntegrationTest {
 
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void changePassword_Success() throws Exception {
         accountTestHelper.setPassword("drice", "P@ssw0rd!");
         LoginDTO loginDTO = new LoginDTO(
@@ -150,6 +152,7 @@ public class MOK8Test extends BaseIntegrationTest {
 
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void oldPassword_tooShort() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -172,6 +175,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void oldPassword_tooLong() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -194,6 +198,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_tooShort() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -216,6 +221,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_tooLong() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -239,6 +245,7 @@ public class MOK8Test extends BaseIntegrationTest {
 
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_UppercaseLetter_Digit_SpecialChar_Missing() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -261,6 +268,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_Digit_SpecialChar_Missing() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -283,6 +291,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_Digit_Missing() throws Exception {
         String userAccessToken = loginAsUser();
 
@@ -305,6 +314,7 @@ public class MOK8Test extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"CLIENT"})
     public void newPassword_SpecialChar_Missing() throws Exception {
         String userAccessToken = loginAsUser();
 

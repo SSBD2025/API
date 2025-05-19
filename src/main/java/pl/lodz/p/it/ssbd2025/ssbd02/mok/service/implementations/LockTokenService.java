@@ -23,14 +23,14 @@ public class LockTokenService implements ILockTokenService {
     @Value("${app.optimistic-lock-secret}")
     private String secret;
 
-    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public String generateToken(UUID id, Long version) {
         String payload = id + ":" + version;
         String signature = hmacSha256(payload, secret);
         return Base64.getEncoder().encodeToString((payload + ":" + signature).getBytes(StandardCharsets.UTF_8));
     }
 
-    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public Record<UUID, Long> verifyToken(String token) {
         String decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
         String[] parts = decoded.split(":");
@@ -50,7 +50,7 @@ public class LockTokenService implements ILockTokenService {
         return new Record<>(id, version);
     }
 
-    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')") //TODO sprawdzic
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     private String hmacSha256(String data, String key) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
