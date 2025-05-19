@@ -32,4 +32,5 @@ public final class ExceptionConsts {
     public static final String TOKEN_SIGNATURE_INVALID = "token_signature_invalid";
     public static final String TOKEN_TYPE_INVALID = "token_type_invalid";
     public static final String TWO_FACTOR_TOKEN_INVALID = "two_factor_token_invalid";
+    public static final String MISSING_HTTP_REQUEST = "no_active_HTTP_request_context";
 }
