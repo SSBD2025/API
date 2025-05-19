@@ -44,6 +44,9 @@ public class JwtTokenProvider {
     @Value("${email.change_expiration}")
     private int emailChangeExpiration;
 
+    @Value("${app.environment}")
+    private String environment;
+
     @PreAuthorize("permitAll()")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateAccessToken(Account account, List<String> roles) {
@@ -263,7 +266,7 @@ public class JwtTokenProvider {
     public void cookieSetter(String refresh, int jwtRefreshExpiration, HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", refresh);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure("prod".equalsIgnoreCase(environment));
         cookie.setPath("/");
         cookie.setMaxAge(jwtRefreshExpiration/1000);
         response.addCookie(cookie);
