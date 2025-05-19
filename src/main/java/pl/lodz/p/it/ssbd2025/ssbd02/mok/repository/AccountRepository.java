@@ -61,6 +61,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     List<Account> findByActiveAndVerified(@Param("active") Boolean active, @Param("verified") Boolean verified);
 
 
+    @PreAuthorize("permitAll()")
     @Modifying
     @Query("UPDATE Account a SET a.lastSuccessfulLogin = :lastSuccessfulLogin, a.lastSuccessfulLoginIp = :lastSuccessfulLoginIp, a.loginAttempts = :loginAttempts  WHERE a.login = :login")
     void updateSuccessfulLogin(@Param("login") String login,
@@ -68,6 +69,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
                                @Param("lastSuccessfulLoginIp") String lastSuccessfulLoginIp,
                                @Param("loginAttempts") int loginAttempts);
 
+    @PreAuthorize("permitAll()")
     @Modifying
     @Query("UPDATE Account a SET a.lastFailedLogin = :lastFailedLogin, a.lastFailedLoginIp = :lastFailedLoginIp, a.loginAttempts = :loginAttempts WHERE a.login = :login")
     void updateFailedLogin(@Param("login") String login,
