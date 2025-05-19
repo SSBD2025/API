@@ -112,7 +112,7 @@ public class AccountController {
     @GetMapping("/confirm-email")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
-    public ResponseEntity<?> confirmEmail(@RequestParam("token") String token ) {
+    public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
         accountService.confirmEmail(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

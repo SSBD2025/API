@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.repository;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,5 +16,6 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.MANDATORY)
 public interface DieticianRepository extends AbstractRepository<Dietician> {
+    @PreAuthorize("permitAll()")
     Dietician saveAndFlush(Dietician dietician);
 }
