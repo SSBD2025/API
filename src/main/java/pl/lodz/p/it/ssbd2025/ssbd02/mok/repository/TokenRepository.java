@@ -27,9 +27,10 @@ import java.util.UUID;
 @EnableMethodSecurity(prePostEnabled=true)
 @Component("MOKTokenRepository")
 @Transactional(propagation = Propagation.MANDATORY)
-public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, AbstractRepository<TokenEntity> {
+public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, AbstractRepository<TokenEntity> { // TODO zastanowic sie czy zostawic JpaRepository
     List<TokenEntity> findByAccount(Account account);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     @Modifying
     @Query("""
@@ -37,11 +38,14 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     """)
     void deleteAllByAccountWithType(Account account, TokenType type);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("permitAll()")
     @Query("""
         select count(t) > 0 from TokenEntity t where t.account = :account and t.type = :type
     """)
     boolean existsByAccountWithType(Account account, TokenType type);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         select t from TokenEntity t where t.account=:account and t.type=:type
     """)
@@ -51,14 +55,16 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
 
 //    @Query("SELECT j FROM TokenEntity j WHERE j.token = :token")
 //    TokenEntity findByTokenValue(String token);
-
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("permitAll()")
     Optional<TokenEntity> findByToken(String token);
 
-    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     @PreAuthorize("permitAll()")
     TokenEntity saveAndFlush(TokenEntity entity);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     TokenEntity findByType(TokenType type);
 
     List<TokenEntity> findByExpirationBefore(Date date);

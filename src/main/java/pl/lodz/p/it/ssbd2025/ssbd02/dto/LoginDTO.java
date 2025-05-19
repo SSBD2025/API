@@ -20,7 +20,7 @@ public class LoginDTO {
     private String login;
 
     @ToString.Exclude
-    @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX)
+    @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX, groups = OnCreate.class)
     @NotBlank(groups = {OnCreate.class})
     private String password;
 }

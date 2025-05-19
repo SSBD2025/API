@@ -1,10 +1,12 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.helpers;
 
+import jakarta.annotation.security.RunAs;
 import jakarta.mail.BodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;

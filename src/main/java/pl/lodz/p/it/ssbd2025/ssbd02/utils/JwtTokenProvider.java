@@ -49,7 +49,6 @@ public class JwtTokenProvider {
     private String environment;
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateAccessToken(Account account, List<String> roles) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -65,7 +64,6 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateRefreshToken(Account account) {
         return Jwts.builder()
                 .id(account.getId().toString())
@@ -79,7 +77,6 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateAccess2FAToken(Account account) {
         return Jwts.builder()
                 .id(account.getId().toString())
@@ -130,7 +127,6 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public Date getExpiration(String token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
@@ -200,7 +196,6 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateEmailChangeToken(Account account, String newEmail) {
         return Jwts.builder()
                 .subject(account.getLogin())
@@ -215,7 +210,6 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager")
     public String generateEmailRevertToken(Account account, String oldEmail) {
         return Jwts.builder()
                 .subject(account.getLogin())
