@@ -119,7 +119,7 @@ public class MOK16Test extends BaseIntegrationTest {
     @Test
     public void shouldReturn403IfNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/account"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

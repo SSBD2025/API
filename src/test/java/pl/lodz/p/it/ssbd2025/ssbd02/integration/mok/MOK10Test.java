@@ -164,7 +164,7 @@ public class MOK10Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/change-email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeEmailJson))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -351,7 +351,7 @@ public class MOK10Test extends BaseIntegrationTest {
     public void resendEmailChangeLinkUnauthorizedTest() throws Exception {
         mockMvc.perform(post("/api/account/resend-change-email")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

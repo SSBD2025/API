@@ -5,6 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,10 +16,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailSendingException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.UnknownFilterException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidException;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 @RestControllerAdvice
 public class GeneralControllerExceptionHandler {
@@ -143,6 +146,26 @@ public class GeneralControllerExceptionHandler {
             WebRequest request
     ) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unknown authorization exception: "+ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ResponseBody
+    public ResponseEntity<Object> handleEmailSendingException(
+            EmailSendingException ex,
+            WebRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Email sending exception: "+ex.getMessage());
+    }
+
+    @ExceptionHandler(MailSendException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ResponseBody
+    public ResponseEntity<Object> handleMailSendException(
+            MailSendException ex,
+            WebRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Email sending exception: "+ex.getMessage());
     }
 
 //    // For general unknown exceptions handling

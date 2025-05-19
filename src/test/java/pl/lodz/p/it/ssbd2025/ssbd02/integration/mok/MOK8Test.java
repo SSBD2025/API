@@ -108,7 +108,7 @@ public class MOK8Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/changePassword")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonChangePassword))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
     }
 

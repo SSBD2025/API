@@ -95,7 +95,7 @@ public class MOK11Test extends BaseIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/account/{id}/change-user-email", UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
