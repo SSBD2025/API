@@ -36,4 +36,5 @@ public interface IAccountService {
     SensitiveDTO verifyTwoFactorCode(String code, String ipAddress, HttpServletResponse response);
     void enableTwoFactor();
     void disableTwoFactor();
+    void logUserRoleChange(String login, String previousRole, String newRole);
 }

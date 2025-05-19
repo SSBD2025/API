@@ -24,6 +24,24 @@
         </encoder>
     </appender>
 
+    <appender name="ROLE_CHANGES_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/role-changes.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/role-changes.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} : %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="RoleChangeLogger" level="INFO" additivity="false">
+        <appender-ref ref="ROLE_CHANGES_FILE" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>

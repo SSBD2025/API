@@ -23,6 +23,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
@@ -32,7 +33,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.InvalidCredentialsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenExpiredException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RoleChangeLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.UserRoleChangeLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
@@ -164,6 +167,15 @@ public class AccountService implements IAccountService {
         }
         Date currentTime = new Date(System.currentTimeMillis());
         if (tokenUtil.checkPassword(password, account.getPassword())) {
+            String acceptLanguage = MiscellaneousUtil.getAcceptLanguage();
+            if (acceptLanguage != null) {
+                Language newLanguage = acceptLanguage.toLowerCase().contains("pl") ? Language.pl_PL : Language.en_EN;
+                if (account.getLanguage() != newLanguage) {
+                    account.setLanguage(newLanguage);
+                    accountRepository.saveAndFlush(account);
+                }
+            }
+
             accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress, 0);
             if(account.isTwoFactorAuth()){
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
@@ -555,6 +567,7 @@ public class AccountService implements IAccountService {
         emailService.sendActivateAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
+    @RoleChangeLogged
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
@@ -603,9 +616,12 @@ public class AccountService implements IAccountService {
             newRole.setActive(true);
             userRoleRepository.saveAndFlush(newRole);
         }
+
+        emailService.sendRoleAssignedEmail(account.getEmail(), account.getLogin(), accessRole.name(), account.getLanguage());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @RoleChangeLogged
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {
@@ -629,6 +645,7 @@ public class AccountService implements IAccountService {
         }
 
         userRoleRepository.updateRoleActiveStatus(account.getLogin(), roleName, false);
+        emailService.sendRoleUnassignedEmail(account.getEmail(), account.getLogin(), accessRole.name(), account.getLanguage());
     }
 
     @TransactionLogged
@@ -655,5 +672,12 @@ public class AccountService implements IAccountService {
             throw new AccountTwoFactorAlreadyDisabled();
         account.setTwoFactorAuth(false);
         accountRepository.saveAndFlush(account);
+    }
+
+    @UserRoleChangeLogged
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    public void logUserRoleChange(String login, String previousRole, String newRole) {
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 }

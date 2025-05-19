@@ -271,27 +271,27 @@ public class EmailService {
     @Async
     @PreAuthorize("permitAll()")
     public void sendVerificationReminderEmail(String to, String username, String verificationURL, Language language, String token) {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            try {
-                String emailBody = loadTemplate("changeEmailTemplate.html")
-                        .replace("${welcome}", I18n.getMessage("email.welcome", language))
-                        .replace("${name}", username)
-                        .replace("${body}", I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_BODY, language))
-                        .replace("${url}", verificationURL+token)
-                        .replace("${linkText}", I18n.getMessage("email.verification.link", language));
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate("changeEmailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage("email.welcome", language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_BODY, language))
+                    .replace("${url}", verificationURL+token)
+                    .replace("${linkText}", I18n.getMessage("email.verification.link", language));
 
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                helper.setFrom(senderEmail);
-                helper.setTo(to);
-                helper.setSubject(I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_SUBJECT, language));
-                helper.setText(emailBody, true);
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_SUBJECT, language));
+            helper.setText(emailBody, true);
 
-                mailSender.send(mimeMessage);
+            mailSender.send(mimeMessage);
 
-            } catch (MessagingException e) {
-                throw new EmailSendingException(e);
-            }
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
         }
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Async
@@ -341,4 +341,53 @@ public class EmailService {
         }
     }
 
+    @Async
+    public void sendRoleAssignedEmail(String to, String username, String roleName, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String translatedRoleName = I18n.getMessage("role." + roleName.toLowerCase(), language);
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_ROLE_ASSIGNED_BODY, language)
+                            + " " + translatedRoleName);
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_ROLE_ASSIGNED_SUBJECT, language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
+        }
+    }
+
+    @Async
+    public void sendRoleUnassignedEmail(String to, String username, String roleName, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String translatedRoleName = I18n.getMessage("role." + roleName.toLowerCase(), language);
+            String emailBody = loadTemplate("emailTemplate.html")
+                    .replace("${welcome}", I18n.getMessage(I18n.EMAIL_WELCOME, language))
+                    .replace("${name}", username)
+                    .replace("${body}", I18n.getMessage(I18n.EMAIL_ROLE_UNASSIGNED_BODY, language)
+                            + " " + translatedRoleName);
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(senderEmail);
+            helper.setTo(to);
+            helper.setSubject(I18n.getMessage(I18n.EMAIL_ROLE_UNASSIGNED_SUBJECT, language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
+        }
+    }
 }
