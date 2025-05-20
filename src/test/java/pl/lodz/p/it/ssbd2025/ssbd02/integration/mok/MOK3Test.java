@@ -101,6 +101,7 @@ public class MOK3Test extends BaseIntegrationTest {
     }
 
 //    @Test
+//    @WithMockUser(roles = {"CLIENT"})
 //    public void resetPasswordRequest_TokenExpired() throws Exception {
 //        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
 //        String email = "jcheddar@example.com";
@@ -127,10 +128,8 @@ public class MOK3Test extends BaseIntegrationTest {
 //
 //        String capturedToken = tokenCaptor.getValue();
 //
-//        doThrow(new TokenExpiredException()).when(passwordResetTokenService)
-//                .validatePasswordResetToken(eq(capturedToken));
 //
-//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(email, newPassword);
+//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(null, newPassword);
 //        String resetJson = objectMapper.writeValueAsString(resetPasswordDTO);
 //
 //        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
