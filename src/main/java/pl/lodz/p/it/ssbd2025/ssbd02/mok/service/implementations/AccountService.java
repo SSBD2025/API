@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -334,14 +336,13 @@ public class AccountService implements IAccountService {
 //        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
     }
 
+    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified) {
-        List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
+    public Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, Pageable pageable) {
+        Page<Account> accounts = accountRepository.findByActiveAndVerified(active, verified, pageable);
 
-        return accounts.stream()
-                .map(accountMapper::toAccountWithUserRolesDTO)
-                .collect(Collectors.toList());
+        return accounts.map(accountMapper::toAccountWithUserRolesDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")

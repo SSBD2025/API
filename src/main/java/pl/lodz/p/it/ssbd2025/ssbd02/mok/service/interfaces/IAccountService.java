@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
@@ -19,7 +21,7 @@ public interface IAccountService {
     void unblockAccount(UUID id);
     void sendResetPasswordEmail(String email);
     void resetPassword(SensitiveDTO token, ResetPasswordDTO resetPasswordDTO);
-    List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified);
+    Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, Pageable pageable);
     void changeOwnEmail(String newEmail);
     void changeUserEmail(UUID accountId, String newEmail);
     void confirmEmail(SensitiveDTO token);

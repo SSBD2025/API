@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -176,11 +178,12 @@ public class AccountController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AccountWithRolesDTO> getAllAccounts(
+    public Page<AccountWithRolesDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,
-            @RequestParam(required = false) Boolean verified
+            @RequestParam(required = false) Boolean verified,
+            Pageable pageable
     ) {
-        return accountService.getAllAccounts(active, verified);
+        return accountService.getAllAccounts(active, verified, pageable);
     }
 
     @GetMapping("/{id}")

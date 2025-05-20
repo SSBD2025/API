@@ -3,6 +3,8 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mok.repository;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -67,7 +69,11 @@ public interface AccountRepository extends AbstractRepository<Account> {
         WHERE (:active IS NULL OR a.active = :active) 
         AND (:verified IS NULL OR a.verified = :verified)
     """)
-    List<Account> findByActiveAndVerified(@Param("active") Boolean active, @Param("verified") Boolean verified);
+    Page<Account> findByActiveAndVerified(
+            @Param("active") Boolean active,
+            @Param("verified") Boolean verified,
+            Pageable pageable
+    );
 
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
