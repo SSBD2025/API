@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
@@ -26,13 +27,13 @@ public class TokenUtil {
     private int twoFactorExpiration;
 
     @PreAuthorize("permitAll()")
-    public boolean checkPassword(String passwordPlaintext, String passwordHash) {
-        return BCrypt.checkpw(passwordPlaintext, passwordHash);
+    public boolean checkPassword(SensitiveDTO passwordPlaintext, String passwordHash) {
+        return BCrypt.checkpw(passwordPlaintext.getValue(), passwordHash);
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public String generateTwoFactorCode(Account account) {
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public SensitiveDTO generateTwoFactorCode(Account account) {
         SecureRandom random = new SecureRandom();
         random.setSeed(System.currentTimeMillis());
         StringBuilder sb = new StringBuilder(8);
@@ -44,7 +45,7 @@ public class TokenUtil {
         String hashedCode = BCrypt.hashpw(code, BCrypt.gensalt());
         tokenRepository.deleteAllByAccountWithType(account, TokenType.TWO_FACTOR);
         tokenRepository.saveAndFlush(new TokenEntity(hashedCode, generateMinuteExpiration(twoFactorExpiration), account, TokenType.TWO_FACTOR));
-        return code;
+        return new SensitiveDTO(code);
     }
 
     //TODO sprawdzic

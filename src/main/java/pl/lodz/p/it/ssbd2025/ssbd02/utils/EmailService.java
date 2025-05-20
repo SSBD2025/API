@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.EmailSendingException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
@@ -48,14 +49,14 @@ public class EmailService {
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Async
-    public void sendChangeEmail(String username, String receiver, String confirmationURL, Language language) {
+    public void sendChangeEmail(String username, String receiver, SensitiveDTO confirmationURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.change.body", language))
-                    .replace(EmailConsts.PLACEHOLDER_URL, confirmationURL)
+                    .replace(EmailConsts.PLACEHOLDER_URL, confirmationURL.getValue())
                     .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.change.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -72,14 +73,14 @@ public class EmailService {
 
     @PreAuthorize("permitAll()")
     @Async
-    public void sendRevertChangeEmail(String username, String receiver, String revertChangeURL, Language language) {
+    public void sendRevertChangeEmail(String username, String receiver, SensitiveDTO revertChangeURL, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.revert.change.body", language))
-                    .replace(EmailConsts.PLACEHOLDER_URL, revertChangeURL)
+                    .replace(EmailConsts.PLACEHOLDER_URL, revertChangeURL.getValue())
                     .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.revert.change.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -96,7 +97,7 @@ public class EmailService {
 
     @PreAuthorize("permitAll()")
     @Async
-    public void sendResetPasswordEmail(String to, String username, Language language, String token) {
+    public void sendResetPasswordEmail(String to, String username, Language language, SensitiveDTO token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
@@ -104,7 +105,7 @@ public class EmailService {
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.own.reset.body", language))
-                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token)
+                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token.getValue())
                     .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.own.reset.link", language));
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -144,7 +145,7 @@ public class EmailService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Async
-    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, String token, String password) {
+    public void sendPasswordChangedByAdminEmail(String to, String username, Language language, SensitiveDTO token, String password) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
@@ -152,7 +153,7 @@ public class EmailService {
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.reset.password.body", language))
-                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token)
+                    .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token.getValue())
                     .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.reset.link", language))
                     .replace(EmailConsts.PLACEHOLDER_MANUALLY, I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
 
@@ -182,14 +183,14 @@ public class EmailService {
 
     @Async
     @PreAuthorize("permitAll()")
-    public void sendActivationMail(String to, String username, String verificationURL, Language language, String token) {
+    public void sendActivationMail(String to, String username, String verificationURL, Language language, SensitiveDTO token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate("changeEmailTemplate.html")
                     .replace("${welcome}", I18n.getMessage("email.welcome", language))
                     .replace("${name}", username)
                     .replace("${body}", I18n.getMessage("email.verification.body", language))
-                    .replace("${url}", verificationURL+token)
+                    .replace("${url}", verificationURL+token.getValue())
                     .replace("${linkText}", I18n.getMessage("email.verification.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -230,14 +231,14 @@ public class EmailService {
 
     @PreAuthorize("permitAll()")
     @Async
-    public void sendTwoFactorCode(String to, String username, String code, Language language){
+    public void sendTwoFactorCode(String to, String username, SensitiveDTO code, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate(EmailConsts.TEMPLATE_TWO_FACTOR)
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.2fa.body", language))
-                    .replace(EmailConsts.PLACEHOLDER_CODE, code);
+                    .replace(EmailConsts.PLACEHOLDER_CODE, code.getValue());
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
@@ -278,14 +279,14 @@ public class EmailService {
 
     @Async
     @PreAuthorize("permitAll()")
-    public void sendVerificationReminderEmail(String to, String username, String verificationURL, Language language, String token) {
+    public void sendVerificationReminderEmail(String to, String username, String verificationURL, Language language, SensitiveDTO token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             String emailBody = loadTemplate("changeEmailTemplate.html")
                     .replace("${welcome}", I18n.getMessage("email.welcome", language))
                     .replace("${name}", username)
                     .replace("${body}", I18n.getMessage(I18n.EMAIL_VERIFICATION_REMINDER_BODY, language))
-                    .replace("${url}", verificationURL+token)
+                    .replace("${url}", verificationURL+token.getValue())
                     .replace("${linkText}", I18n.getMessage("email.verification.link", language));
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.UnknownFilterException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.JwtService;
@@ -46,24 +47,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 try {
-                    jwtTokenProvider.validateToken(token);
+                    jwtTokenProvider.validateToken(new SensitiveDTO(token));
                 } catch (TokenBaseException e) {
                     handlerExceptionResolver.resolveException(request, response, null, e);
                     return;
                 }
-                if (Objects.equals(jwtTokenProvider.getIssuer(token), issuer)) {
+                if (Objects.equals(jwtTokenProvider.getIssuer(new SensitiveDTO(token)), issuer)) {
                     // makes sure it doesnt accidentally check oauth2 before its own dedicated filter, skips altogether
                     filterChain.doFilter(request, response);
                     return;
                 }
-                if (jwtTokenProvider.getType(token).equals("access")) {
+                if (jwtTokenProvider.getType(new SensitiveDTO(token)).equals("access")) {
                     if (!jwtService.check(token)) {
                         handlerExceptionResolver.resolveException(request, response, null, new TokenNotFoundException());
                         return;
                     }
 
-                    String login = jwtTokenProvider.getLogin(token);
-                    List<String> roles = jwtTokenProvider.getRoles(token);
+                    String login = jwtTokenProvider.getLogin(new SensitiveDTO(token));
+                    List<String> roles = jwtTokenProvider.getRoles(new SensitiveDTO(token));
 
                     Collection<? extends GrantedAuthority> authorities = roles.stream()
                             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
@@ -79,12 +80,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                     return;
                 }
-                if (jwtTokenProvider.getType(token).equals("access2fa")) {
+                if (jwtTokenProvider.getType(new SensitiveDTO(token)).equals("access2fa")) {
                     if (!jwtService.check(token)) {
                         handlerExceptionResolver.resolveException(request, response, null, new TokenNotFoundException());
                         return;
                     }
-                    String login = jwtTokenProvider.getLogin(token);
+                    String login = jwtTokenProvider.getLogin(new SensitiveDTO(token));
                     Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("2FA_AUTHORITY"));
 
                     Authentication auth = new UsernamePasswordAuthenticationToken(login, null, authorities);

@@ -6,9 +6,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ISchedulerService;
@@ -21,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+@TransactionLogged
 @Service
 @RequiredArgsConstructor
 public class SchedulerService implements ISchedulerService {
@@ -71,7 +74,7 @@ public class SchedulerService implements ISchedulerService {
             if (token.getExpiration().before(date) && !token.getAccount().isReminded()) {
                 token.getAccount().setReminded(true);
                 accountRepository.saveAndFlush(token.getAccount());
-                emailService.sendVerificationReminderEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), verificationURL, token.getAccount().getLanguage(), token.getToken());
+                emailService.sendVerificationReminderEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), verificationURL, token.getAccount().getLanguage(), new SensitiveDTO(token.getToken()));
             }
         }
     }

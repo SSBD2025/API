@@ -36,8 +36,8 @@ public class ClientController {
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
     public ClientDTO registerClient(@RequestBody @Validated(OnCreate.class) ClientDTO clientDTO) {
-        Client newClientData = userRoleMapper.toNewClientData(clientDTO.client());
-        Account newAccount = accountMapper.toNewAccount(clientDTO.account());
+        Client newClientData = userRoleMapper.toNewClientData(clientDTO.getClient());
+        Account newAccount = accountMapper.toNewAccount(clientDTO.getAccount());
         return clientMapper.toClientDTO(clientService.createClient(newClientData, newAccount));
     }
 }

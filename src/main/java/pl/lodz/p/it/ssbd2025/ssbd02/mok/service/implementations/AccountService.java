@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
@@ -62,6 +63,9 @@ import java.util.UUID;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 
+import static pl.lodz.p.it.ssbd2025.ssbd02.utils.MiscellaneousUtil.generateRandomPassword;
+
+@TransactionLogged
 @Component
 @RequiredArgsConstructor
 @Service
@@ -104,10 +108,12 @@ public class AccountService implements IAccountService {
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-        if(!BCrypt.checkpw(changePasswordDTO.oldPassword(), account.getPassword())) {
+        if(!BCrypt.checkpw(changePasswordDTO.getOldPassword(), account.getPassword())) {
             throw new InvalidCredentialsException();
         }
-        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.newPassword(), BCrypt.gensalt()));
+        account.setPassword(BCrypt.hashpw(changePasswordDTO.getNewPassword(), BCrypt.gensalt()));
+//        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.getNewPassword(), BCrypt.gensalt()));
+        accountRepository.saveAndFlush(account);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
@@ -118,30 +124,22 @@ public class AccountService implements IAccountService {
             throw new AccountNotFoundException();
         }
         String password = generateRandomPassword();
-        accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
+        account.get().setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        accountRepository.saveAndFlush(account.get());
+//        accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
         String token = UUID.randomUUID().toString();
-        passwordResetTokenService.createPasswordResetToken(account.get(), token);
-        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), token, password);
-    }
-
-    private String generateRandomPassword() {
-        final int length = 12;
-        SecureRandom random = new SecureRandom();
-
-        return random.ints(length,33, 127)
-                .mapToObj(i -> String.valueOf((char) i))
-                .collect(Collectors.joining());
+        passwordResetTokenService.createPasswordResetToken(account.get(), new SensitiveDTO(token));
+        emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), new SensitiveDTO(token), password);
     }
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}",
             noRollbackFor = {InvalidCredentialsException.class, ExcessiveLoginAttemptsException.class})
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public SensitiveDTO login(String username, String password, String ipAddress, HttpServletResponse response) {
+    public SensitiveDTO login(String username, SensitiveDTO password, String ipAddress, HttpServletResponse response) {
         Account account = accountRepository.findByLogin(username).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
         List<String> userRoles = new ArrayList<>();
@@ -159,7 +157,7 @@ public class AccountService implements IAccountService {
         if (!account.isActive()) {
             throw new AccountNotActiveException();
         }
-        if (!account.isVerified()) { //uncomment later
+        if (!account.isVerified()) {
             throw new AccountNotVerifiedException();
         }
         Date currentTime = new Date(System.currentTimeMillis());
@@ -177,20 +175,20 @@ public class AccountService implements IAccountService {
             if(account.isTwoFactorAuth()){
                 emailService.sendTwoFactorCode(account.getEmail(), account.getLogin(), tokenUtil.generateTwoFactorCode(account), account.getLanguage());
 
-                String access2FAToken = jwtTokenProvider.generateAccess2FAToken(account);
+                SensitiveDTO access2FAToken = jwtTokenProvider.generateAccess2FAToken(account);
 
-                tokenRepository.saveAndFlush(new TokenEntity(access2FAToken, jwtTokenProvider.getExpiration(access2FAToken), account, TokenType.ACCESS_2FA));
+                tokenRepository.saveAndFlush(new TokenEntity(access2FAToken.getValue(), jwtTokenProvider.getExpiration(access2FAToken), account, TokenType.ACCESS_2FA));
 
-                return new SensitiveDTO(jwtTokenProvider.generateAccess2FAToken(account));
+                return access2FAToken;
             }
             if(userRoles.contains("ADMIN")) {
                 emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
             }
             TokenPairDTO pair = jwtService.generatePair(account, userRoles);
-            String access = pair.accessToken();
-            String refresh = pair.refreshToken();
+            String access = pair.getAccessToken();
+            String refresh = pair.getRefreshToken();
 
-            jwtTokenProvider.cookieSetter(refresh, jwtRefreshExpiration, response);
+            jwtTokenProvider.cookieSetter(new SensitiveDTO(refresh), jwtRefreshExpiration, response);
 
             return new SensitiveDTO(access);
         } else {
@@ -205,7 +203,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
             = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -216,7 +213,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public SensitiveDTO verifyTwoFactorCode(String code, String ipAddress, HttpServletResponse response) {
+    public SensitiveDTO verifyTwoFactorCode(SensitiveDTO code, String ipAddress, HttpServletResponse response) {
         Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString()).orElseThrow(AccountNotFoundException::new);
 
@@ -232,7 +229,7 @@ public class AccountService implements IAccountService {
             throw new TokenExpiredException();
         }
 
-        boolean isValid = BCrypt.checkpw(code, token.getToken());
+        boolean isValid = BCrypt.checkpw(code.getValue(), token.getToken());
         if (!isValid) {
             throw new TwoFactorTokenInvalidException();
         }
@@ -253,14 +250,13 @@ public class AccountService implements IAccountService {
 
         TokenPairDTO pair = jwtService.generatePair(account, userRoles);
 
-        jwtTokenProvider.cookieSetter(pair.refreshToken(), jwtRefreshExpiration, response);
+        jwtTokenProvider.cookieSetter(new SensitiveDTO(pair.getRefreshToken()), jwtRefreshExpiration, response);
 
 
-        return new SensitiveDTO(pair.accessToken());
+        return new SensitiveDTO(pair.getAccessToken());
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
             = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -274,7 +270,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -296,7 +291,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -319,8 +313,8 @@ public class AccountService implements IAccountService {
         if(accountRepository.findByEmail(email).isPresent()) {
             Account account = accountRepository.findByEmail(email).get();
             String token = UUID.randomUUID().toString();
-            passwordResetTokenService.createPasswordResetToken(account, token);
-            emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), token);
+            passwordResetTokenService.createPasswordResetToken(account, new SensitiveDTO(token));
+            emailService.sendResetPasswordEmail(account.getEmail(), account.getLogin(), account.getLanguage(), new SensitiveDTO(token));
         }
     }
 
@@ -328,17 +322,18 @@ public class AccountService implements IAccountService {
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("permitAll()")
-    public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) {
-        TokenEntity tokenEntity = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+    public void resetPassword(SensitiveDTO token, ResetPasswordDTO resetPasswordDTO) {
+        TokenEntity tokenEntity = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
         passwordResetTokenService.validatePasswordResetToken(token);
         Account account = tokenEntity.getAccount();
         if(account == null) {
             throw new AccountNotFoundException();
         }
-        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.password(), BCrypt.gensalt()));
+        account.setPassword(BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
+        accountRepository.saveAndFlush(account);
+//        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
     }
 
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
     public List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified) {
@@ -350,7 +345,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
@@ -364,7 +358,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
@@ -383,24 +376,23 @@ public class AccountService implements IAccountService {
             throw new AccountEmailAlreadyInUseException();
         }
 
-        String emailChangeToken = jwtTokenProvider.generateEmailChangeToken(account, newEmail);
+        SensitiveDTO emailChangeToken = jwtTokenProvider.generateEmailChangeToken(account, newEmail);
         String confirmationURL = confirmURL + emailChangeToken;
 
-        TokenEntity jwt = new TokenEntity(emailChangeToken, jwtTokenProvider.getExpiration(emailChangeToken), account, TokenType.EMAIL_CHANGE);
+        TokenEntity jwt = new TokenEntity(emailChangeToken.getValue(), jwtTokenProvider.getExpiration(emailChangeToken), account, TokenType.EMAIL_CHANGE);
         tokenRepository.save(jwt);
 
-        emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
+        emailService.sendChangeEmail(account.getLogin(), newEmail, new SensitiveDTO(confirmationURL), account.getLanguage());
     }
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public void confirmEmail(String token) {
-        TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+    public void confirmEmail(SensitiveDTO token) {
+        TokenEntity jwt = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
             tokenRepository.delete(jwt);
             throw new TokenExpiredException();
@@ -417,24 +409,23 @@ public class AccountService implements IAccountService {
         accountRepository.saveAndFlush(account);
         tokenRepository.delete(jwt);
 
-        String revertToken = jwtTokenProvider.generateEmailRevertToken(account, oldEmail);
+        SensitiveDTO revertToken = jwtTokenProvider.generateEmailRevertToken(account, oldEmail);
         String revertChangeURL = revertURL + revertToken;
 
-        TokenEntity tokenEntity = new TokenEntity(revertToken, jwtTokenProvider.getExpiration(revertToken), account, TokenType.EMAIL_REVERT);
+        TokenEntity tokenEntity = new TokenEntity(revertToken.getValue(), jwtTokenProvider.getExpiration(revertToken), account, TokenType.EMAIL_REVERT);
         tokenRepository.save(tokenEntity);
 
-        emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, revertChangeURL, account.getLanguage());
+        emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, new SensitiveDTO(revertChangeURL), account.getLanguage());
     }
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
     }, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public void revertEmailChange(String token) {
-        TokenEntity jwt = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+    public void revertEmailChange(SensitiveDTO token) {
+        TokenEntity jwt = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
         if (jwt.getExpiration().before(new Date())) {
             tokenRepository.delete(jwt);
             throw new TokenExpiredException();
@@ -451,7 +442,6 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public void resendEmailChangeLink() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -464,14 +454,13 @@ public class AccountService implements IAccountService {
         }
 
         String emailChangeToken = tokenEntity.getToken();
-        String newEmail = jwtTokenProvider.getNewEmailFromToken(emailChangeToken);
+        String newEmail = jwtTokenProvider.getNewEmailFromToken(new SensitiveDTO(emailChangeToken));
         String confirmationURL = confirmURL + emailChangeToken;
 
-        emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
+        emailService.sendChangeEmail(account.getLogin(), newEmail, new SensitiveDTO(confirmationURL), account.getLanguage());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    @TransactionLogged
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public AccountWithTokenDTO getAccountByLogin(String login) {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
@@ -481,27 +470,26 @@ public class AccountService implements IAccountService {
                 .toList();
 
         AccountDTO dto = accountMapper.toAccountDTO(account);
-        String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+        SensitiveDTO token = lockTokenService.generateToken(account.getId(), account.getVersion());
 
-        return new AccountWithTokenDTO(dto, token, roles);
+        return new AccountWithTokenDTO(dto, token.getValue(), roles);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public AccountWithTokenDTO getAccountById(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
 
         AccountDTO dto = accountMapper.toAccountDTO(account);
-        String token = lockTokenService.generateToken(account.getId(), account.getVersion());
+        SensitiveDTO token = lockTokenService.generateToken(account.getId(), account.getVersion());
         List<AccountRolesProjection> projections = accountRepository.findAccountRolesByLogin(account.getLogin());
 
         List<AccountRoleDTO> roles = projections.stream()
                 .map(p -> new AccountRoleDTO(p.getRoleName(), p.isActive()))
                 .toList();
 
-        return new AccountWithTokenDTO(dto, token, roles);
+        return new AccountWithTokenDTO(dto, token.getValue(), roles);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -512,7 +500,6 @@ public class AccountService implements IAccountService {
     }
 
     @UserRoleChangeLogged
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void logUserRoleChange(String login, String previousRole, String newRole) {
@@ -527,7 +514,7 @@ public class AccountService implements IAccountService {
             maxAttemptsExpression = "${app.retry.maxattempts}"
     )
     public void updateAccount(Supplier<Account> accountSupplier, UpdateAccountDTO dto) {
-        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.lockToken());
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.getLockToken());
 
         Account account = accountSupplier.get();
 
@@ -543,8 +530,8 @@ public class AccountService implements IAccountService {
             throw new ConcurrentUpdateException();
         }
 
-        account.setFirstName(dto.firstName());
-        account.setLastName(dto.lastName());
+        account.setFirstName(dto.getFirstName());
+        account.setLastName(dto.getLastName());
 
         accountRepository.saveAndFlush(account);
     }
@@ -556,12 +543,11 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public void verifyAccount(String token) {
-        TokenEntity verificationToken = tokenRepository.findByToken(token).orElseThrow(TokenNotFoundException::new);
+    public void verifyAccount(SensitiveDTO token) {
+        TokenEntity verificationToken = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
         if(verificationToken.getExpiration().before(new Date())) {
             throw new TokenExpiredException();
         }
@@ -580,7 +566,6 @@ public class AccountService implements IAccountService {
 
     @RoleChangeLogged
     @PreAuthorize("hasRole('ADMIN')")
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
@@ -633,7 +618,6 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @RoleChangeLogged
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
@@ -659,7 +643,6 @@ public class AccountService implements IAccountService {
         emailService.sendRoleUnassignedEmail(account.getEmail(), account.getLogin(), accessRole.name(), account.getLanguage());
     }
 
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -673,7 +656,6 @@ public class AccountService implements IAccountService {
         accountRepository.saveAndFlush(account);
     }
 
-    @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")

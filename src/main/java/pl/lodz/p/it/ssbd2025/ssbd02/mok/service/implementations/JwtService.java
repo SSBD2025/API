@@ -46,7 +46,6 @@ import java.util.Objects;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
 public class JwtService implements IJwtService {
     @NotNull
     private final TokenRepository tokenRepository;
@@ -63,17 +62,16 @@ public class JwtService implements IJwtService {
     private final TokenUtil tokenUtil;
 
     @PreAuthorize("permitAll()")
-    @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class,}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public TokenPairDTO generatePair(@NotNull Account account, @NotNull List<String> roles) {
-        String accessToken = jwtTokenProvider.generateAccessToken(account, roles);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(account);
+        SensitiveDTO accessToken = jwtTokenProvider.generateAccessToken(account, roles);
+        SensitiveDTO refreshToken = jwtTokenProvider.generateRefreshToken(account);
         Date accessExpiration = jwtTokenProvider.getExpiration(accessToken);
         Date refreshExpiration = jwtTokenProvider.getExpiration(refreshToken);
-        tokenRepository.saveAndFlush(new TokenEntity(accessToken, accessExpiration, account, TokenType.ACCESS));
-        tokenRepository.saveAndFlush(new TokenEntity(refreshToken, refreshExpiration, account, TokenType.REFRESH));
-        return new TokenPairDTO(accessToken, refreshToken, account.isTwoFactorAuth());
+        tokenRepository.saveAndFlush(new TokenEntity(accessToken.getValue(), accessExpiration, account, TokenType.ACCESS));
+        tokenRepository.saveAndFlush(new TokenEntity(refreshToken.getValue(), refreshExpiration, account, TokenType.REFRESH));
+        return new TokenPairDTO(accessToken.getValue(), refreshToken.getValue(), account.isTwoFactorAuth());
     }
 
     @PreAuthorize("permitAll()")
@@ -97,13 +95,13 @@ public class JwtService implements IJwtService {
         if (Objects.equals(token, "")){
             throw new CookieNotFoundException();
         }
-        jwtTokenProvider.validateToken(token);
+        jwtTokenProvider.validateToken(new SensitiveDTO(token));
         if(!tokenRepository.existsByToken(token)) {
             throw new TokenNotFoundException();
-        } else if(!jwtTokenProvider.getType(token).equals(JwtConsts.TYPE_REFRESH)) {
+        } else if(!jwtTokenProvider.getType(new SensitiveDTO(token)).equals(JwtConsts.TYPE_REFRESH)) {
             throw new TokenTypeInvalidException();
         }
-        Account account = accountRepository.findByLogin(jwtTokenProvider.getSubject(token)).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.findByLogin(jwtTokenProvider.getSubject(new SensitiveDTO(token))).orElseThrow(AccountNotFoundException::new);
         List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(account.getLogin());
         List<String> userRoles = new ArrayList<>();
         if(roles.isEmpty()) {
@@ -117,18 +115,21 @@ public class JwtService implements IJwtService {
         if(userRoles.isEmpty()) {
             throw new AccountHasNoRolesException();
         }
-        String newAccessToken = jwtTokenProvider.generateAccessToken(account, userRoles);
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(account);
+        SensitiveDTO newAccessToken = jwtTokenProvider.generateAccessToken(account, userRoles);
+        SensitiveDTO newRefreshToken = jwtTokenProvider.generateRefreshToken(account);
 
-        jwtTokenProvider.cookieSetter(newRefreshToken, jwtRefreshExpiration, response);
-        Date expiration = jwtTokenProvider.getExpiration(token);
+        jwtTokenProvider.cookieSetter(new SensitiveDTO(newRefreshToken.getValue()), jwtRefreshExpiration, response);
+        Date expiration = jwtTokenProvider.getExpiration(new SensitiveDTO(token));
         tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);
         tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
-        tokenRepository.saveAndFlush(new TokenEntity(newAccessToken, expiration, account, TokenType.ACCESS));
-        tokenRepository.saveAndFlush(new TokenEntity(newRefreshToken, expiration, account, TokenType.REFRESH));
-        return new SensitiveDTO(newAccessToken);
+        tokenRepository.saveAndFlush(new TokenEntity(newAccessToken.getValue(), expiration, account, TokenType.ACCESS));
+        tokenRepository.saveAndFlush(new TokenEntity(newRefreshToken.getValue(), expiration, account, TokenType.REFRESH));
+        return newAccessToken;
     }
 
+    @PreAuthorize("permitAll()")
+    @TransactionLogged
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
     public boolean check(String token) { //checks if token is actually in database
         return tokenRepository.existsByToken(token);
     }

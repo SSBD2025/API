@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @MappedSuperclass
 @Getter
-@ToString
 public abstract class AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,4 +17,12 @@ public abstract class AbstractEntity {
     @Version
     @Column(nullable = false)
     private Long version;
+
+    @Override
+    public String toString() {
+        return "AbstractEntity{" +
+                "id=" + id +
+                ", version=" + version +
+                '}';
+    }
 }

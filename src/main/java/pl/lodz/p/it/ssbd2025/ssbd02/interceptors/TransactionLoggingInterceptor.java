@@ -24,7 +24,7 @@ public class TransactionLoggingInterceptor {
 
         TransactionSynchronizationLogger synchronizationLogger = new TransactionSynchronizationLogger(transactionId);
         TransactionSynchronizationManager.registerSynchronization(synchronizationLogger);
-        log.trace("Transaction synchronization: {} registered", synchronizationLogger.getTransactionId());
+        log.trace("[TRANSACTION LOGGER] Transaction synchronization: {} registered", synchronizationLogger.getTransactionId());
     }
 
 }

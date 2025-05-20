@@ -20,11 +20,11 @@ public class TransactionSynchronizationLogger implements TransactionSynchronizat
 
     @Override
     public void beforeCommit(boolean readOnly) {
-        log.info("Transaction synchronization: {} goes to commit as {}", transactionId, readOnly?"RO":"RW");
+        log.info("[TRANSACTION LOGGER] Transaction synchronization: {} goes to commit as {}", transactionId, readOnly?"RO":"RW");
     }
 
     @Override
     public void afterCompletion(int status) {
-        log.info("Transaction synchronization: {} is after completion with: {}", transactionId, TransactionSynchronizationStatus.values()[status]);
+        log.info("[TRANSACTION LOGGER] Transaction synchronization: {} is after completion with: {}", transactionId, TransactionSynchronizationStatus.values()[status]);
     }
 }
