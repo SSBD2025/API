@@ -40,7 +40,7 @@ import java.util.stream.StreamSupport;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
+@Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
 public class ClientService implements IClientService {
 
     private final ClientRepository clientRepository;
@@ -59,7 +59,7 @@ public class ClientService implements IClientService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public Client createClient(Client newClient, Account newAccount) {
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));

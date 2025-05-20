@@ -31,7 +31,7 @@ public class TokenUtil {
     }
 
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public String generateTwoFactorCode(Account account) {
         SecureRandom random = new SecureRandom();
         random.setSeed(System.currentTimeMillis());

@@ -38,7 +38,7 @@ import java.util.stream.StreamSupport;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager")
+@Transactional(propagation = Propagation.REQUIRES_NEW,  readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
 public class AdminService implements IAdminService {
 
     private final AdminRepository adminRepository;
@@ -56,7 +56,7 @@ public class AdminService implements IAdminService {
 
     @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public Admin createAdmin(Admin newAdmin, Account newAccount) {
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));
