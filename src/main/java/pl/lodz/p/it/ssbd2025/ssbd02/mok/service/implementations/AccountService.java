@@ -447,11 +447,11 @@ public class AccountService implements IAccountService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-        TokenEntity tokenEntity = tokenRepository.findByType(TokenType.EMAIL_CHANGE);
-
-        if (tokenEntity == null) {
-            throw new EmailChangeTokenNotFoundException();
-        }
+        List<TokenEntity> tokens = tokenRepository.findAllByAccountWithType(account, TokenType.EMAIL_CHANGE);
+        TokenEntity tokenEntity = tokens.stream()
+                .filter(t -> t.getExpiration().after(new Date()))
+                .max(Comparator.comparing(TokenEntity::getExpiration))
+                .orElseThrow(EmailChangeTokenNotFoundException::new);
 
         String emailChangeToken = tokenEntity.getToken();
         String newEmail = jwtTokenProvider.getNewEmailFromToken(new SensitiveDTO(emailChangeToken));
