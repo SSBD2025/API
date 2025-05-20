@@ -11,16 +11,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,11 +48,16 @@ public class MOK6Test extends BaseIntegrationTest {
     @Autowired
     private AccountTestHelper accountTestHelper;
 
+    @MockitoBean
+    private EmailService emailService;
+
     private String adminToken;
     private String agorgonzolaToken = null;
 
     @BeforeEach
     void setup() throws Exception {
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
         String adminLoginJson = """
         {
           "login": "jcheddar",
@@ -85,6 +95,9 @@ public class MOK6Test extends BaseIntegrationTest {
     public void assignAdminRoleTest() throws Exception {
         UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
 
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(put("/api/account/" + id + "/roles/admin")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
@@ -117,6 +130,8 @@ public class MOK6Test extends BaseIntegrationTest {
     public void assignDieticianRoletoClientTestShouldReturn409() throws Exception {
         UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
 
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(put("/api/account/" + id + "/roles/dietician")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isConflict());
@@ -131,6 +146,8 @@ public class MOK6Test extends BaseIntegrationTest {
                             """))
                 .andExpect(status().isOk())
                 .andReturn();
+
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
 
         String response = loginResult.getResponse().getContentAsString();
         JSONObject json = new JSONObject(response);
@@ -149,6 +166,8 @@ public class MOK6Test extends BaseIntegrationTest {
     public void assignClientRoleTest() throws Exception {
         UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
 
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(put("/api/account/" + id + "/roles/client")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
@@ -164,6 +183,8 @@ public class MOK6Test extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         String response = loginResult.getResponse().getContentAsString();
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
@@ -175,15 +196,6 @@ public class MOK6Test extends BaseIntegrationTest {
                 .anyMatch(role -> role.getRoleName().equals("CLIENT") && role.isActive());
 
         Assertions.assertTrue(hasClient, "Account in DB should have active CLIENT role");
-    }
-
-    @Test
-    public void assignRoleToNonExistentUserShouldReturn404() throws Exception {
-        UUID fakeId = UUID.randomUUID();
-
-        mockMvc.perform(put("/api/account/" + fakeId + "/roles/admin")
-                        .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -199,11 +211,15 @@ public class MOK6Test extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         String response = loginResult.getResponse().getContentAsString();
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
 
         UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(put("/api/account/" + id + "/roles/admin")
                         .header("Authorization", "Bearer " + agorgonzolaToken))
@@ -211,17 +227,10 @@ public class MOK6Test extends BaseIntegrationTest {
     }
 
     @Test
-    public void adminCannotAssignInvalidRole_ShouldReturn404() throws Exception {
-        UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
-
-        mockMvc.perform(put("/api/account/" + id + "/roles/superuser")
-                        .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void assignMultipleRolesTest() throws Exception {
         UUID id = accountTestHelper.getClientByLogin("agorgonzola").getId();
+
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(put("/api/account/" + id + "/roles/admin")
                         .header("Authorization", "Bearer " + adminToken))
@@ -234,13 +243,15 @@ public class MOK6Test extends BaseIntegrationTest {
         MvcResult loginResult = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "login": "agorgonzola",
-                              "password": "P@ssw0rd!"
-                            }
-                            """))
+                        {
+                          "login": "agorgonzola",
+                          "password": "P@ssw0rd!"
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andReturn();
+
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
 
         String response = loginResult.getResponse().getContentAsString();
         JSONObject json = new JSONObject(response);

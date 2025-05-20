@@ -11,10 +11,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.everyItem;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,18 +37,26 @@ public class MOK16Test extends BaseIntegrationTest {
     private AccountTestHelper accountTestHelper;
 
     @MockitoBean
-    private JavaMailSender mailSender;
+    private EmailService emailService;
 
     private String adminToken;
 
     @BeforeEach
     void setUp() throws Exception {
+        doNothing().when(emailService).sendActivationMail(any(), any(), any(), any(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendActivateAccountEmail(any(), any(), any());
+
+
         accountTestHelper.activateAndVerifyByLogin("agorgonzola"); // CLIENT
         accountTestHelper.activateAndVerifyByLogin("jcheddar"); // ADMIN
         adminToken = loginAndGetToken("jcheddar", "P@ssw0rd!");
     }
 
     private String loginAndGetToken(String login, String password) throws Exception {
+        doNothing().when(emailService).sendActivationMail(any(), any(), any(), any(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendActivateAccountEmail(any(), any(), any());
         String loginJson = String.format("""
         {
           "login": "%s",
