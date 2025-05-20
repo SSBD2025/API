@@ -75,7 +75,6 @@ public class GeneralControllerExceptionHandler {
                             new ValidationErrorResponse.Violation(fieldError.getField(), fieldError.getDefaultMessage()));
                 }
         );
-//        return ResponseEntity.ofNullable(error);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -125,7 +124,7 @@ public class GeneralControllerExceptionHandler {
             return new ResponseEntity<>("Constraint error: " + violation, HttpStatus.CONFLICT);
         }
 
-        return new ResponseEntity<>("A database error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); //TODO SPRAWDZIC !!
+        return new ResponseEntity<>("A data integrity error occurred: " + ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(TokenBaseException.class)
@@ -147,43 +146,4 @@ public class GeneralControllerExceptionHandler {
     ) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unknown authorization exception: "+ex.getMessage());
     }
-
-    @ExceptionHandler(EmailSendingException.class)
-    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
-    @ResponseBody
-    public ResponseEntity<Object> handleEmailSendingException(
-            EmailSendingException ex,
-            WebRequest request
-    ) {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Email sending exception: "+ex.getMessage());
-    }
-
-    @ExceptionHandler(MailSendException.class)
-    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
-    @ResponseBody
-    public ResponseEntity<Object> handleMailSendException(
-            MailSendException ex,
-            WebRequest request
-    ) {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Email sending exception: "+ex.getMessage());
-    }
-
-//    // For general unknown exceptions handling
-//    @ExceptionHandler(RuntimeException.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ResponseEntity<Object> handleAllUncaughtException(
-//            RuntimeException exception,
-//            WebRequest request
-//    ){
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception thrown by controller: "+exception);
-//    }
-
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
-//    @ResponseBody
-//    public ResponseEntity<Object> catchEverything(
-//            Exception ex,
-//            WebRequest request) {
-//        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(ex.getMessage());
-//    }
 }
