@@ -8,14 +8,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangeEmailDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,11 +34,16 @@ public class MOK11Test extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockitoBean
+    private EmailService emailService;
+
     @Test
     @WithMockUser(roles = "ADMIN")
     public void changeUserEmailPositiveTest() throws Exception {
         ChangeEmailDTO dto = new ChangeEmailDTO("newemail@example.com");
         String json = objectMapper.writeValueAsString(dto);
+
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/account/{id}/change-user-email", "00000000-0000-0000-0000-000000000003")
                         .contentType(MediaType.APPLICATION_JSON)
