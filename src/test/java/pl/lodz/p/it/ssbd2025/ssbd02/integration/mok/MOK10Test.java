@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,8 +18,12 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +48,9 @@ public class MOK10Test extends BaseIntegrationTest {
     @Autowired
     private AccountTestHelper accountTestHelper;
 
+    @MockitoBean
+    private EmailService emailService;
+
     private String accessToken;
 
     @AfterEach
@@ -62,6 +70,8 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String json = objectMapper.writeValueAsString(loginDTO);
 
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -75,6 +85,8 @@ public class MOK10Test extends BaseIntegrationTest {
         ChangeEmailDTO changeEmailDTO = new ChangeEmailDTO("newemail@example.com");
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
+
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
@@ -91,6 +103,8 @@ public class MOK10Test extends BaseIntegrationTest {
         Assertions.assertEquals(TokenType.EMAIL_CHANGE, token.getType());
         Assertions.assertEquals("newemail@example.com", jwtTokenProvider.getNewEmailFromToken(token.getToken()));
 
+        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
                 .andExpect(status().isOk());
@@ -106,6 +120,8 @@ public class MOK10Test extends BaseIntegrationTest {
         );
 
         String json = objectMapper.writeValueAsString(loginDTO);
+
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,6 +151,8 @@ public class MOK10Test extends BaseIntegrationTest {
         );
 
         String json = objectMapper.writeValueAsString(loginDTO);
+
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -175,6 +193,8 @@ public class MOK10Test extends BaseIntegrationTest {
         );
 
         String json = objectMapper.writeValueAsString(loginDTO);
+
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -227,6 +247,8 @@ public class MOK10Test extends BaseIntegrationTest {
         );
         String json = objectMapper.writeValueAsString(loginDTO);
 
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -269,6 +291,8 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
 
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -283,6 +307,8 @@ public class MOK10Test extends BaseIntegrationTest {
         Assertions.assertNotNull(token);
         Assertions.assertEquals(TokenType.EMAIL_CHANGE, token.getType());
         Assertions.assertEquals("changeEmail@example.com", jwtTokenProvider.getNewEmailFromToken(token.getToken()));
+
+        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
@@ -335,11 +361,15 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
 
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeEmailJson))
                 .andExpect(status().isOk());
+
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
 
         mockMvc.perform(post("/api/account/resend-change-email")
                         .header("Authorization", "Bearer " + accessToken)
