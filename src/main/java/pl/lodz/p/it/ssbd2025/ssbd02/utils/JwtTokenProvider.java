@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
@@ -49,8 +50,8 @@ public class JwtTokenProvider {
     private String environment;
 
     @PreAuthorize("permitAll()")
-    public String generateAccessToken(Account account, List<String> roles) {
-        return Jwts.builder()
+    public SensitiveDTO generateAccessToken(Account account, List<String> roles) {
+        return new SensitiveDTO(Jwts.builder()
                 .subject(account.getLogin())
                 .claim(JwtConsts.CLAIM_ROLES, roles)
                 .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_ACCESS)
@@ -60,12 +61,12 @@ public class JwtTokenProvider {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getPrivateKey())
-                .compact();
+                .compact());
     }
 
     @PreAuthorize("permitAll()")
-    public String generateRefreshToken(Account account) {
-        return Jwts.builder()
+    public SensitiveDTO generateRefreshToken(Account account) {
+        return new SensitiveDTO(Jwts.builder()
                 .id(account.getId().toString())
                 .subject(account.getLogin())
                 .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_REFRESH)
@@ -73,12 +74,12 @@ public class JwtTokenProvider {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getPrivateKey())
-                .compact();
+                .compact());
     }
 
     @PreAuthorize("permitAll()")
-    public String generateAccess2FAToken(Account account) {
-        return Jwts.builder()
+    public SensitiveDTO generateAccess2FAToken(Account account) {
+        return new SensitiveDTO(Jwts.builder()
                 .id(account.getId().toString())
                 .subject(account.getLogin())
                 .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_ACCESS_2FA)
@@ -86,62 +87,62 @@ public class JwtTokenProvider {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + access2faExpiration))
                 .signWith(getPrivateKey())
-                .compact();
+                .compact());
     }
 
-    public String getLogin(String token) {
+    public String getLogin(SensitiveDTO token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .getSubject();
     }
 
-    public List<String> getRoles(String token) {
+    public List<String> getRoles(SensitiveDTO token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload();
         return claims.get(JwtConsts.CLAIM_ROLES, List.class);
     }
 
-    public String getIssuer(String token) {
+    public String getIssuer(SensitiveDTO token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .getIssuer();
     }
 
     @PreAuthorize("permitAll()")
-    public String getSubject(String token) {
+    public String getSubject(SensitiveDTO token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .getSubject();
     }
 
     @PreAuthorize("permitAll()")
-    public Date getExpiration(String token) {
+    public Date getExpiration(SensitiveDTO token) {
         return Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .getExpiration();
     }
 
     @PreAuthorize("permitAll()")
-    public String getType(String token) {
+    public String getType(SensitiveDTO token) {
         return (String) Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .get(JwtConsts.CLAIM_TYPE);
     }
@@ -178,10 +179,10 @@ public class JwtTokenProvider {
         }
     }
 
-    @PreAuthorize("permitAll()") //TODO sprawdzic
-    public void validateToken(String token) {
+    @PreAuthorize("permitAll()")
+    public void validateToken(SensitiveDTO token) {
         try {
-            Jwts.parser().verifyWith(getPublicKey()).build().parseSignedClaims(token);
+            Jwts.parser().verifyWith(getPublicKey()).build().parseSignedClaims(token.getValue());
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
         } catch (SignatureException e) {
@@ -196,8 +197,8 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    public String generateEmailChangeToken(Account account, String newEmail) {
-        return Jwts.builder()
+    public SensitiveDTO generateEmailChangeToken(Account account, String newEmail) {
+        return new SensitiveDTO(Jwts.builder()
                 .subject(account.getLogin())
                 .id(account.getId().toString())
                 .claim(JwtConsts.CLAIM_NEW_EMAIL, newEmail)
@@ -206,12 +207,12 @@ public class JwtTokenProvider {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
                 .signWith(getPrivateKey())
-                .compact();
+                .compact());
     }
 
     @PreAuthorize("permitAll()")
-    public String generateEmailRevertToken(Account account, String oldEmail) {
-        return Jwts.builder()
+    public SensitiveDTO generateEmailRevertToken(Account account, String oldEmail) {
+        return new SensitiveDTO(Jwts.builder()
                 .subject(account.getLogin())
                 .id(account.getId().toString())
                 .claim(JwtConsts.CLAIM_OLD_EMAIL, oldEmail)
@@ -220,37 +221,37 @@ public class JwtTokenProvider {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + emailChangeExpiration))
                 .signWith(getPrivateKey())
-                .compact();
+                .compact());
     }
 
     @PreAuthorize("permitAll()")
-    public String getNewEmailFromToken(String token) {
+    public String getNewEmailFromToken(SensitiveDTO token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload();
 
         return claims.get(JwtConsts.CLAIM_NEW_EMAIL, String.class);
     }
 
     @PreAuthorize("permitAll()")
-    public String getOldEmailFromToken(String token) {
+    public String getOldEmailFromToken(SensitiveDTO token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload();
 
         return claims.get(JwtConsts.CLAIM_OLD_EMAIL, String.class);
     }
 
     @PreAuthorize("permitAll()")
-    public UUID getAccountIdFromToken(String token) {
+    public UUID getAccountIdFromToken(SensitiveDTO token) {
         String id = Jwts.parser()
                 .verifyWith(getPublicKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.getValue())
                 .getPayload()
                 .getId();
 
@@ -258,8 +259,8 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()") //TODO sprawdzic
-    public void cookieSetter(String refresh, int jwtRefreshExpiration, HttpServletResponse response) {
-        Cookie cookie = new Cookie(JwtConsts.REFRESH_TOKEN_COOKIE, refresh);
+    public void cookieSetter(SensitiveDTO refresh, int jwtRefreshExpiration, HttpServletResponse response) {
+        Cookie cookie = new Cookie(JwtConsts.REFRESH_TOKEN_COOKIE, refresh.getValue());
         cookie.setHttpOnly(true);
         cookie.setSecure(JwtConsts.ENVIRONMENT_PROD.equalsIgnoreCase(environment));
         cookie.setPath("/");

@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
@@ -117,7 +118,7 @@ public class MOK6Test extends BaseIntegrationTest {
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
 
-        Assertions.assertTrue(tokenProvider.getRoles(agorgonzolaToken).contains("ADMIN"));
+        Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(agorgonzolaToken)).contains("ADMIN"));
 
         Account updated = accountTestHelper.getClientWithRolesByLogin("agorgonzola");
         boolean hasAdmin = updated.getUserRoles().stream()
@@ -153,7 +154,7 @@ public class MOK6Test extends BaseIntegrationTest {
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
 
-        Assertions.assertFalse(tokenProvider.getRoles(agorgonzolaToken).contains("DIETICIAN"));
+        Assertions.assertFalse(tokenProvider.getRoles(new SensitiveDTO(agorgonzolaToken)).contains("DIETICIAN"));
 
         Account updated = accountTestHelper.getClientWithRolesByLogin("agorgonzola");
         boolean hasDietician = updated.getUserRoles().stream()
@@ -189,7 +190,7 @@ public class MOK6Test extends BaseIntegrationTest {
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
 
-        Assertions.assertTrue(tokenProvider.getRoles(agorgonzolaToken).contains("CLIENT"));
+        Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(agorgonzolaToken)).contains("CLIENT"));
 
         Account updated = accountTestHelper.getClientWithRolesByLogin("agorgonzola");
         boolean hasClient = updated.getUserRoles().stream()
@@ -257,7 +258,7 @@ public class MOK6Test extends BaseIntegrationTest {
         JSONObject json = new JSONObject(response);
         agorgonzolaToken = json.getString("value");
 
-        var roles = tokenProvider.getRoles(agorgonzolaToken);
+        var roles = tokenProvider.getRoles(new SensitiveDTO(agorgonzolaToken));
         Assertions.assertTrue(roles.contains("ADMIN"));
 
         Account updated = accountTestHelper.getClientWithRolesByLogin("agorgonzola");

@@ -8,6 +8,9 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Aspect
 @Order(Ordered.LOWEST_PRECEDENCE)
 @Component
@@ -20,7 +23,9 @@ public class LoginLoggerInterceptor {
         Object[] args = jp.getArgs();
         String login = (String) args[0];
         String ip = (String) args[2];
-        String toLog = "User: " + login + " has attempted to log in with IP: " + ip;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+        String formattedDate = ZonedDateTime.now().format(formatter);
+        String toLog = "[AUTH LOGGER] [" + formattedDate + "] User: " + login + " has attempted to log in with IP: " + ip;
         log.info(toLog);
         return toLog;
     }

@@ -36,8 +36,8 @@ public class DieticianController {
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
     public DieticianDTO registerDietician(@RequestBody @Validated(OnCreate.class) DieticianDTO dieticianDTO) {
-        Dietician newDieticianData = userRoleMapper.toNewDietician(dieticianDTO.dietician());
-        Account newAccount = accountMapper.toNewAccount(dieticianDTO.account());
+        Dietician newDieticianData = userRoleMapper.toNewDietician(dieticianDTO.getDietician());
+        Account newAccount = accountMapper.toNewAccount(dieticianDTO.getAccount());
         return dieticianMapper.toDieticianDTO(dieticianService.createDietician(newDieticianData, newAccount));
     }
 }

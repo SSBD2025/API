@@ -43,7 +43,7 @@ public class MOK11Test extends BaseIntegrationTest {
         ChangeEmailDTO dto = new ChangeEmailDTO("newemail@example.com");
         String json = objectMapper.writeValueAsString(dto);
 
-        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/account/{id}/change-user-email", "00000000-0000-0000-0000-000000000003")
                         .contentType(MediaType.APPLICATION_JSON)

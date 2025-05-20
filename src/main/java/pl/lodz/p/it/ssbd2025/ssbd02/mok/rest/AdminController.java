@@ -36,8 +36,8 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     public AdminDTO registerAdmin(@RequestBody @Validated(OnCreate.class) AdminDTO adminDTO) {
-        Admin newAdminData = userRoleMapper.toNewAdminData(adminDTO.admin());
-        Account newAccount = accountMapper.toNewAccount(adminDTO.account());
+        Admin newAdminData = userRoleMapper.toNewAdminData(adminDTO.getAdmin());
+        Account newAccount = accountMapper.toNewAccount(adminDTO.getAccount());
         return adminMapper.toAdminDTO(adminService.createAdmin(newAdminData, newAccount));
     }
 }

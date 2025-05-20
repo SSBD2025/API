@@ -21,6 +21,7 @@ import java.util.Date;
 public class TokenEntity extends AbstractEntity {
 
     @Column(name = TokenConsts.COLUMN_TOKEN, unique = true, nullable = false, updatable = false, columnDefinition = "TEXT")
+    @ToString.Exclude
     private String token;
 
     @Future

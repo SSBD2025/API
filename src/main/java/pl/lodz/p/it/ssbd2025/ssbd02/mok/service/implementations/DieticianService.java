@@ -14,12 +14,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountConstraintViolationException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
@@ -29,6 +31,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IDieticianService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ExceptionConsts;
 
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +53,7 @@ public class DieticianService implements IDieticianService {
     private final EmailService emailService;
     private final TokenRepository tokenRepository;
     private final TokenUtil tokenUtil;
+    private final AccountService accountService;
 
     @Value("${mail.verify.url}")
     private String verificationURL;
@@ -62,15 +66,30 @@ public class DieticianService implements IDieticianService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public Dietician createDietician(Dietician newDietician, Account newAccount) {
+        if(!isLoginUnique(newAccount.getLogin())) {
+            throw new AccountConstraintViolationException(ExceptionConsts.ACCOUNT_CONSTRAINT_VIOLATION + ": login already in use");
+        } else if(!isEmailUnique(newAccount.getEmail())) {
+            throw new AccountConstraintViolationException(ExceptionConsts.ACCOUNT_CONSTRAINT_VIOLATION + ": email already in use");
+        }
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));
         newDietician.setAccount(newAccount);
         newAccount.getUserRoles().add(newDietician);
-        //the only difference between this and client is the fact that admin must manually activate the account
-        Account createdAccount = accountRepository.saveAndFlush(newAccount);//todo check if this is correct
+        Account createdAccount = accountRepository.saveAndFlush(newAccount);
         String token = UUID.randomUUID().toString();
-        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), token);
-//        verificationTokenRepository.saveAndFlush(new VerificationToken(token, createdAccount));
+        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), new SensitiveDTO(token));
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
-        return dieticianRepository.saveAndFlush(newDietician); //todo check if this is correct
+        return dieticianRepository.saveAndFlush(newDietician);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = true)
+    @PreAuthorize("permitAll()")
+    public boolean isLoginUnique(String login) {
+        return accountRepository.findByLogin(login).isEmpty();
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = true)
+    @PreAuthorize("permitAll()")
+    public boolean isEmailUnique(String email) {
+        return accountRepository.findByEmail(email).isEmpty();
     }
 }

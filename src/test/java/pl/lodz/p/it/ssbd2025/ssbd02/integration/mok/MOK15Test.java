@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
 
 import java.util.UUID;
@@ -69,7 +70,7 @@ public class MOK15Test extends BaseIntegrationTest {
         String expectedToken = "fixed-token-123";
 
         when(lockTokenService.generateToken(any(UUID.class), anyLong()))
-                .thenReturn(expectedToken);
+                .thenReturn(new SensitiveDTO(expectedToken));
 
         mockMvc.perform(get("/api/account/" + accountId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -114,7 +115,7 @@ public class MOK15Test extends BaseIntegrationTest {
         String expectedToken = "fixed-token-123";
 
         when(lockTokenService.generateToken(any(UUID.class), anyLong()))
-                .thenReturn(expectedToken);
+                .thenReturn(new SensitiveDTO(expectedToken));
 
         mockMvc.perform(get("/api/account/me").contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))

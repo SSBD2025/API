@@ -6,10 +6,14 @@ import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 
 import java.util.UUID;
 
 @Data
+@Setter(AccessLevel.NONE)
+@Getter
+@AllArgsConstructor
 public class UserRoleDTO {
     @EqualsAndHashCode.Include
     @Null(groups = {OnCreate.class, OnUpdate.class})
@@ -25,22 +29,39 @@ public class UserRoleDTO {
     @Null(groups = {OnCreate.class, OnUpdate.class})
     private Boolean active;
 
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    @AllArgsConstructor
+    @Setter(AccessLevel.NONE)
     @Getter
-    @Setter
     @ToString(callSuper = true)
-    public static class AdminDTO extends UserRoleDTO {//todo
-    }
+    public static class AdminDTO extends UserRoleDTO { }
 
-    @Getter @Setter
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    @AllArgsConstructor
+    @Setter(AccessLevel.NONE)
+    @Getter
     @ToString(callSuper = true)
-    public static class DieticianDTO extends UserRoleDTO {//todo
-    }
+    public static class DieticianDTO extends UserRoleDTO { }
 
-    @Getter @Setter
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    @AllArgsConstructor
+    @Setter(AccessLevel.NONE)
+    @Getter
     @ToString(callSuper = true)
-    public static class ClientDTO extends UserRoleDTO {//todo
-//        @NotNull(groups = OnCreate.class)
-//        @Null(groups = OnUpdate.class)
-//        private Survey survey;
+    public static class ClientDTO extends UserRoleDTO { }
+
+    private UserRoleDTO() {}
+
+    @Override
+    public String toString() {
+        return "UserRoleDTO{" +
+                "roleName='" + roleName + '\'' +
+                ", active=" + active +
+                ", version=" + version +
+                ", id=" + id +
+                '}';
     }
 }

@@ -1,6 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +24,16 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.UnknownFilterException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenBaseException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.LoginLoggerInterceptor;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestControllerAdvice
 public class GeneralControllerExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GeneralControllerExceptionHandler.class);
 
     // not-so-pretty way to exclude App Exceptions from default handling
     @ExceptionHandler(AppBaseException.class)
@@ -100,8 +109,14 @@ public class GeneralControllerExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<Object> handleAuthorizationException(
             RuntimeException exception,
-            WebRequest request
+            WebRequest webRequest,
+            HttpServletRequest request
     ){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+        String formattedDate = ZonedDateTime.now().format(formatter);
+        String calledBy = request.getUserPrincipal()!=null ? request.getUserPrincipal().getName() : "--ANONYMOUS--";
+        String toLog = "[AUTH LOGGER] [" + formattedDate + "] User: " + calledBy + " has attempted to access a resource "+ request.getRequestURL().toString() +" that they do not have permission to.";
+        log.warn(toLog);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Authorization exception: "+exception.getMessage());
     }
 

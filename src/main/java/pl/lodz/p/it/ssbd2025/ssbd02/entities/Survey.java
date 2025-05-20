@@ -29,6 +29,7 @@ public class Survey extends AbstractEntity {
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @ToString.Exclude
     private Timestamp dateOfBirth;
 
     @Column(nullable = false, updatable = false)

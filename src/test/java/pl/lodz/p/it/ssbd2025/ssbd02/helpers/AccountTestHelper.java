@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
@@ -29,7 +30,6 @@ public class AccountTestHelper {
     @Autowired
     private UserRoleRepository userRoleRepository;
 
-    //TODO THIS ABSOLUTELY CANNOT LEAK TO PROD
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     public void activateByLogin(String login) {
         Account account = accountRepository.findByLogin(login)
@@ -84,7 +84,7 @@ public class AccountTestHelper {
     public void checkPassword(String login, String password) {
         Account account = accountRepository.findByLogin(login)
                 .orElseThrow(() -> new IllegalStateException("Account not found"));
-        if(!tokenUtil.checkPassword(password, account.getPassword())) {
+        if(!tokenUtil.checkPassword(new SensitiveDTO(password), account.getPassword())) {
             throw new IllegalStateException("Wrong password");
         }
     }

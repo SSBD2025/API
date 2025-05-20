@@ -86,7 +86,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
 
-        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
@@ -101,9 +101,9 @@ public class MOK10Test extends BaseIntegrationTest {
 
         Assertions.assertNotNull(token);
         Assertions.assertEquals(TokenType.EMAIL_CHANGE, token.getType());
-        Assertions.assertEquals("newemail@example.com", jwtTokenProvider.getNewEmailFromToken(token.getToken()));
+        Assertions.assertEquals("newemail@example.com", jwtTokenProvider.getNewEmailFromToken(new SensitiveDTO(token.getToken())));
 
-        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
@@ -291,7 +291,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
 
-        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
@@ -306,9 +306,9 @@ public class MOK10Test extends BaseIntegrationTest {
 
         Assertions.assertNotNull(token);
         Assertions.assertEquals(TokenType.EMAIL_CHANGE, token.getType());
-        Assertions.assertEquals("changeEmail@example.com", jwtTokenProvider.getNewEmailFromToken(token.getToken()));
+        Assertions.assertEquals("changeEmail@example.com", jwtTokenProvider.getNewEmailFromToken(new SensitiveDTO(token.getToken())));
 
-        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRevertChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
@@ -361,7 +361,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         String changeEmailJson = objectMapper.writeValueAsString(changeEmailDTO);
 
-        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(post("/api/account/change-email")
                         .header("Authorization", "Bearer " + accessToken)
@@ -369,7 +369,7 @@ public class MOK10Test extends BaseIntegrationTest {
                         .content(changeEmailJson))
                 .andExpect(status().isOk());
 
-        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(post("/api/account/resend-change-email")
                         .header("Authorization", "Bearer " + accessToken)

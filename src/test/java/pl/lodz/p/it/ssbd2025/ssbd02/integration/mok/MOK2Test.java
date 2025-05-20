@@ -141,13 +141,13 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                    Assertions.assertEquals("refresh", tokenProvider.getType(new SensitiveDTO(refreshToken)));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
                 .andExpect(result -> {
                     Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("CLIENT"));
+                    Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(json.getString("value"))).contains("CLIENT"));
                 });
     }
 
@@ -200,13 +200,13 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                    Assertions.assertEquals("refresh", tokenProvider.getType(new SensitiveDTO(refreshToken)));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
                 .andExpect(result -> {
                     Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("DIETICIAN"));
+                    Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(json.getString("value"))).contains("DIETICIAN"));
                 });
     }
 
@@ -260,13 +260,13 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String refreshToken = Objects.requireNonNull(result.getResponse().getCookie("refreshToken")).getValue();
-                    Assertions.assertEquals("refresh", tokenProvider.getType(refreshToken));
+                    Assertions.assertEquals("refresh", tokenProvider.getType(new SensitiveDTO(refreshToken)));
                     Assertions.assertEquals(refreshToken,accountTestHelper.getToken(refreshToken));
                 })
                 .andExpect(result -> {
                     Assertions.assertTrue(result.getResponse().getContentAsString().contains("value"));
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
-                    Assertions.assertTrue(tokenProvider.getRoles(json.getString("value")).contains("ADMIN"));
+                    Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(json.getString("value"))).contains("ADMIN"));
                 });
 
         ArgumentCaptor<MimeMessage> messageCaptor = ArgumentCaptor.forClass(MimeMessage.class);

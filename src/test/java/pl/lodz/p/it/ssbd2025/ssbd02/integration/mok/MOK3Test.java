@@ -20,6 +20,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import static org.mockito.ArgumentMatchers.*;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
@@ -46,7 +47,7 @@ public class MOK3Test extends BaseIntegrationTest {
     private EmailService emailService;
 
     @Captor
-    private ArgumentCaptor<String> tokenCaptor;
+    private ArgumentCaptor<SensitiveDTO> tokenCaptor;
 
     @Test
     @WithMockUser(roles = {"CLIENT"})
@@ -71,10 +72,10 @@ public class MOK3Test extends BaseIntegrationTest {
                 eq("jcheddar@example.com"),
                 anyString(),
                 any(),
-                anyString()
+                any()
         );
 
-        String capturedToken = tokenCaptor.getValue();
+        String capturedToken = tokenCaptor.getValue().getValue();
 
         resetPasswordDTO = new ResetPasswordDTO(null, "P@ssw0rd?");
         json = objectMapper.writeValueAsString(resetPasswordDTO);

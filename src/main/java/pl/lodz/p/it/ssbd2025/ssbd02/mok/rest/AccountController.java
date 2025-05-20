@@ -48,14 +48,14 @@ public class AccountController {
     @PreAuthorize("permitAll()")
     public SensitiveDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
-        return accountService.login(loginDTO.getLogin(), loginDTO.getPassword(), ipAddress, response);
+        return accountService.login(loginDTO.getLogin(), new SensitiveDTO(loginDTO.getPassword()), ipAddress, response);
     }
 
     @PostMapping(value = "/login/2fa", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
     public SensitiveDTO verifyTwoFactor(@RequestBody @Validated(OnRequest.class)TwoFactorDTO twoFactorDTO, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
-        return accountService.verifyTwoFactorCode(twoFactorDTO.code(), ipAddress, response);
+        return accountService.verifyTwoFactorCode(new SensitiveDTO(twoFactorDTO.getCode()), ipAddress, response);
     }
 
     @PostMapping(value = "/refresh")
@@ -100,19 +100,19 @@ public class AccountController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.updateMyAccount(login, updateAccountDTO);
     }
-    
+
     @PostMapping("/change-email")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @MethodCallLogged
     public ResponseEntity<?> changeOwnEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-        accountService.changeOwnEmail(changeEmailDTO.email());
+        accountService.changeOwnEmail(changeEmailDTO.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/confirm-email")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
-    public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
+    public ResponseEntity<?> confirmEmail(@RequestParam("token") SensitiveDTO token) {
         accountService.confirmEmail(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -120,7 +120,7 @@ public class AccountController {
     @GetMapping("/revert-email-change")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
-    public ResponseEntity<?> revertEmailChange(@RequestParam("token") String token) {
+    public ResponseEntity<?> revertEmailChange(@RequestParam("token") SensitiveDTO token) {
         accountService.revertEmailChange(token);
         return ResponseEntity.ok().build();
     }
@@ -139,7 +139,7 @@ public class AccountController {
     public ResponseEntity<?> changeUserEmail(
             @PathVariable UUID id,
             @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-        accountService.changeUserEmail(id, changeEmailDTO.email());
+        accountService.changeUserEmail(id, changeEmailDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -161,14 +161,14 @@ public class AccountController {
     @PreAuthorize("permitAll()")
     @PostMapping("reset/password/request")
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
-        accountService.sendResetPasswordEmail(resetPasswordDTO.email());
+        accountService.sendResetPasswordEmail(resetPasswordDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @MethodCallLogged
     @PreAuthorize("permitAll()")
     @PostMapping("reset/password/{token}")
-    public ResponseEntity<Void> resetPassword(@PathVariable String token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
+    public ResponseEntity<Void> resetPassword(@PathVariable SensitiveDTO token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -192,17 +192,11 @@ public class AccountController {
 
     @GetMapping("/verify")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<Void> verifyAccount(@RequestParam String token) {
+    public ResponseEntity<Void> verifyAccount(@RequestParam SensitiveDTO token) {
         accountService.verifyAccount(token);
-//        try {
-//            response.sendRedirect("/login");
-//        } catch (IOException e) {
-//            response.setStatus(HttpStatus.OK.value());
-//        }
-//        response.setStatus(HttpStatus.OK.value());
         return ResponseEntity.ok().build();
     }
-    
+
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
@@ -230,7 +224,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Void> logRoleChange(@RequestBody @Valid RoleChangeLogDTO roleChangeLogDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        accountService.logUserRoleChange(login, roleChangeLogDTO.previousRole(), roleChangeLogDTO.newRole());
+        accountService.logUserRoleChange(login, roleChangeLogDTO.getPreviousRole(), roleChangeLogDTO.getNewRole());
         return ResponseEntity.ok().build();
     }
 }

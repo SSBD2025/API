@@ -5,6 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ILockTokenService;
 
@@ -24,10 +25,10 @@ public class LockTokenService implements ILockTokenService {
     private String secret;
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    public String generateToken(UUID id, Long version) {
+    public SensitiveDTO generateToken(UUID id, Long version) {
         String payload = id + ":" + version;
         String signature = hmacSha256(payload, secret);
-        return Base64.getEncoder().encodeToString((payload + ":" + signature).getBytes(StandardCharsets.UTF_8));
+        return new SensitiveDTO(Base64.getEncoder().encodeToString((payload + ":" + signature).getBytes(StandardCharsets.UTF_8)));
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")

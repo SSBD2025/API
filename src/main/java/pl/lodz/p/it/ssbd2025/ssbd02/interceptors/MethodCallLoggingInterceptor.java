@@ -16,14 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import pl.lodz.p.it.ssbd2025.ssbd02.utils.LogSanitizer;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 @Aspect @Order(Ordered.LOWEST_PRECEDENCE)
 @Component
@@ -46,7 +42,10 @@ public class MethodCallLoggingInterceptor {
 
         if(null != RetrySynchronizationManager.getContext())
             message.append("(retry # ").append(RetrySynchronizationManager.getContext().getRetryCount()).append(") ");
+
         Object result;
+        HttpServletResponse response = null;
+
         try {
             try {
                 message.append(" | ").append(joinPoint.getSignature().toLongString())
@@ -59,8 +58,7 @@ public class MethodCallLoggingInterceptor {
 
                 for (int i = 0; i < args.length; i++) {
                     String paramName = paramNames[i];
-                    Object sanitizedArg = LogSanitizer.sanitize(args[i], paramName);
-                    message.append(sanitizedArg).append(" ");
+                    message.append(paramName).append("=").append(String.valueOf(args[i])).append(" ");
                 }
                 String classPackage = joinPoint.getSignature().getDeclaringType().getPackage().getName();
 
@@ -68,13 +66,13 @@ public class MethodCallLoggingInterceptor {
                     RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
                     if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
                         jakarta.servlet.http.HttpServletRequest request = servletRequestAttributes.getRequest();
-                        HttpServletResponse response = servletRequestAttributes.getResponse();
+                        response = servletRequestAttributes.getResponse();
                         String ip = request.getRemoteAddr();
                         String url = request.getRequestURL().toString();
-                        String statusCode = response != null ? String.valueOf(response.getStatus()) : "unknown";
+                        String method = request.getMethod();
                         message.append(" | Request sender IP: ").append(ip);
                         message.append(" | Request URL: ").append(url);
-                        message.append(" | Status code: [").append(statusCode).append("]");
+                        message.append(" | Method: ").append(method);
                     }
                 }
             } catch (Exception e) {
@@ -84,28 +82,27 @@ public class MethodCallLoggingInterceptor {
 
             result = joinPoint.proceed();
 
+            if (response != null) {
+                message.append(" | Status code: [").append(response.getStatus()).append("]");
+            }
+
         } catch (Throwable t) {
+            int statusCode = 500;
+
+            if (t instanceof AppBaseException appException) {
+                statusCode = appException.getStatusCode().value();
+            }
+
+            message.append(" | Status code: [").append(statusCode).append("]");
             message.append(" | Thrown exception: ").append(t.getMessage());
             log.warn(message.toString(), t.getMessage());
             throw t;
         }
 
-        //TODO
-        //TODO
-        //TODO
-//        Object sanitizedResult = LogSanitizer.sanitize(result);
-//        message.append(" | returned: ").append(String.valueOf(sanitizedResult)).append(" ");
-//        fixme
-        message.append(" | returned: ").append(String.valueOf(result)).append(" ");
-        //TODO
-        //TODO
-        //TODO
+        message.append(" | returned: ").append(joinPoint.getSignature().toShortString()).append("=").append(String.valueOf(result)).append(" ");
 
         log.info(message.toString());
 
         return result;
-
     }
-
-
 }

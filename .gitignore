@@ -43,3 +43,4 @@ test.sql
 .mailmap
 .idea/compiler.xml
 logs/
+.idea/misc.xml

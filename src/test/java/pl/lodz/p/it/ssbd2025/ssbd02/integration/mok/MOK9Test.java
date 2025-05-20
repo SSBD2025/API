@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ResetPasswordDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.TokenPairDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
@@ -47,7 +48,7 @@ public class MOK9Test extends BaseIntegrationTest {
     private EmailService emailService;
 
     @Captor
-    private ArgumentCaptor<String> tokenCaptor;
+    private ArgumentCaptor<SensitiveDTO> tokenCaptor;
 
     @Captor
     private ArgumentCaptor<String> passwordCaptor;
@@ -90,7 +91,7 @@ public class MOK9Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + adminAccessToken)
         ).andExpect(status().isOk());
-        String token = tokenCaptor.getValue();
+        String token = tokenCaptor.getValue().getValue();
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
                 null,
                 "P@ssw0rd!!"
@@ -124,9 +125,9 @@ public class MOK9Test extends BaseIntegrationTest {
 
         TokenPairDTO tokenPair = objectMapper.readValue(responseBody, TokenPairDTO.class);
 
-        String accessToken = tokenPair.accessToken();
+        String accessToken = tokenPair.getAccessToken();
 
-        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), anyString(), anyString());
+        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), any(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + accessToken)
         ).andExpect(status().isUnauthorized());
@@ -135,7 +136,7 @@ public class MOK9Test extends BaseIntegrationTest {
     @Order(3)
     @Test
     public void resetPasswordByGuest() throws Exception {
-        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), anyString(), anyString());
+        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), any(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
         ).andExpect(status().isUnauthorized());
     }
