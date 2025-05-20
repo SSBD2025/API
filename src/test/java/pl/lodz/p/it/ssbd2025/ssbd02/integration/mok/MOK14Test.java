@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.Cookie;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -31,8 +32,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -151,6 +151,87 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
 
         mockMvc.perform(get("/api/account/me")
                 .header("Authorization", "Bearer "+accessToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void clientLogoutCookieClearTest() throws Exception {
+        UserRoleDTO.ClientDTO clientDTO = new UserRoleDTO.ClientDTO();
+
+        AccountDTO accountDTO = new AccountDTO(
+                null,
+                null,
+                "clientLogoutCookieClearTest",
+                "P@ssw0rd!",
+                null,
+                null,
+                "clientLogoutCookieClearTest",
+                "clientLogoutCookieClearTest",
+                "clientLogoutCookieClearTest@example.com",
+                null,
+                null,
+                Language.pl_PL,
+                null,
+                null,
+                false,
+                false,
+                0,
+                null
+        );
+
+        String loginRequestJson = """
+        {
+          "login": "clientLogoutCookieClearTest",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
+
+        String requestJson = objectMapper.writeValueAsString(clientDTO2);
+
+        mockMvc.perform(post("/api/client/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk());
+
+        accountTestHelper.verifyByLogin("clientLogoutCookieClearTest"); //only for tests
+
+
+        MvcResult result = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(status().isOk()).andReturn();
+        Cookie cookie = result.getResponse().getCookie("refreshToken");
+        String body = result.getResponse().getContentAsString();
+        Assertions.assertTrue(body.contains("value"));
+        JSONObject json = new JSONObject(body);
+
+        String accessToken = json.getString("value");
+
+        mockMvc.perform(get("/api/account/me")
+                        .header("Authorization", "Bearer "+accessToken))
+                .andExpect(status().isOk());
+
+        MvcResult response2 = mockMvc.perform(post("/api/account/refresh")
+                        .cookie(cookie))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(status().isOk()).andReturn();
+
+        Cookie cookie2 = response2.getResponse().getCookie("refreshToken");
+        JSONObject json2 = new JSONObject(response2.getResponse().getContentAsString());
+        String accessToken2 = json2.getString("value");
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + accessToken2)).andReturn();
+
+        mockMvc.perform(get("/api/account/me")
+                        .header("Authorization", "Bearer "+accessToken2))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(post("/api/account/refresh")
+                        .cookie(cookie2))
                 .andExpect(status().isUnauthorized());
     }
 

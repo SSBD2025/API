@@ -264,11 +264,12 @@ public class AccountService implements IAccountService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
             = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    public void logout() {
+    public void logout(HttpServletResponse response) {
         Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication()
                 .getName()).orElseThrow(AccountNotFoundException::new);
         tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);
         tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
+        jwtTokenProvider.cookieClear(response);
         SecurityContextHolder.clearContext();
     }
 

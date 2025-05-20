@@ -82,8 +82,8 @@ public class AccountController {
 
     @PostMapping("/logout")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    public ResponseEntity<?> logout() {
-        accountService.logout();
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        accountService.logout(response);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
