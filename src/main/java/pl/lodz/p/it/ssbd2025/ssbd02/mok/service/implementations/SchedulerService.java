@@ -47,12 +47,14 @@ public class SchedulerService implements ISchedulerService {
         Date date = new Date();
         List<TokenEntity> verificationTokens = new ArrayList<TokenEntity>();
         verificationTokens = tokenRepository.findAllByType(TokenType.VERIFICATION);
-        for (TokenEntity token : verificationTokens) {
-            if (token.getExpiration().before(date)) {
-                tokenRepository.delete(token);
-                if (!token.getAccount().isVerified()) {
-                    accountRepository.delete(token.getAccount());
-                    emailService.sendAccountDeletedEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), token.getAccount().getLanguage());
+        if(!verificationTokens.isEmpty()) {
+            for (TokenEntity token : verificationTokens) {
+                if (token.getExpiration().before(date)) {
+                    tokenRepository.delete(token);
+                    if (!token.getAccount().isVerified()) {
+                        accountRepository.delete(token.getAccount());
+                        emailService.sendAccountDeletedEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), token.getAccount().getLanguage());
+                    }
                 }
             }
         }
@@ -65,16 +67,18 @@ public class SchedulerService implements ISchedulerService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
         calendar.add(Calendar.HOUR, (int)accountVerificationThreshold / 2);
-        Date date = calendar.getTime(); //TODO sprawdzic
+        Date date = calendar.getTime();
 
         List<TokenEntity> tokensToRemind = new ArrayList<TokenEntity>();
         tokensToRemind = tokenRepository.findAllByType(TokenType.VERIFICATION);
 
-        for (TokenEntity token : tokensToRemind) {
-            if (token.getExpiration().before(date) && !token.getAccount().isReminded()) {
-                token.getAccount().setReminded(true);
-                accountRepository.saveAndFlush(token.getAccount());
-                emailService.sendVerificationReminderEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), verificationURL, token.getAccount().getLanguage(), new SensitiveDTO(token.getToken()));
+        if(!tokensToRemind.isEmpty()) {
+            for (TokenEntity token : tokensToRemind) {
+                if (token.getExpiration().before(date) && !token.getAccount().isReminded()) {
+                    token.getAccount().setReminded(true);
+                    accountRepository.saveAndFlush(token.getAccount());
+                    emailService.sendVerificationReminderEmail(token.getAccount().getEmail(), token.getAccount().getLogin(), verificationURL, token.getAccount().getLanguage(), new SensitiveDTO(token.getToken()));
+                }
             }
         }
     }
