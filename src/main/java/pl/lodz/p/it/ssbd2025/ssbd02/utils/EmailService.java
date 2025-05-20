@@ -43,9 +43,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
-//    private static final String RESET_PASSWORD_URL = "http://localhost:5173/reset/password/"; //TODO locally
-    //private static final String RESET_PASSWORD_URL = "https://team-2.proj-sum.it.p.lodz.pl/reset/password/"; //TODO on machine
-
     @Value("$app.environment}")
     private String environment;
 
