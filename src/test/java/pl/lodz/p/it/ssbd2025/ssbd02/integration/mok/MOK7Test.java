@@ -7,15 +7,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.JwtTokenProvider;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,6 +36,9 @@ public class MOK7Test extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockitoBean
+    private EmailService emailService;
+
     @Autowired
     private JwtTokenProvider tokenProvider;
 
@@ -41,6 +49,11 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() throws Exception {
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRoleUnassignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
+
         String loginJson = """
         {
           "login": "jcheddar",
@@ -72,6 +85,10 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignAdminRoleTest() throws Exception {
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRoleUnassignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/admin")
@@ -85,6 +102,10 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignDieticianRoleTest() throws Exception {
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRoleUnassignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/dietician")
@@ -98,6 +119,10 @@ public class MOK7Test extends BaseIntegrationTest {
 
     @Test
     public void unassignClientRoleTest() throws Exception {
+        doNothing().when(emailService).sendRoleAssignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendRoleUnassignedEmail(anyString(), anyString(), anyString(), any());
+        doNothing().when(emailService).sendAdminLoginEmail(anyString(), anyString(), anyString(), any());
+
         UUID id = accountTestHelper.getClientWithRolesByLogin("agorgonzola").getId();
 
         mockMvc.perform(put("/api/account/" + id + "/roles/client")
@@ -108,6 +133,7 @@ public class MOK7Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
     }
+
 
     // ============ NEGATIVE TESTS ============
 
