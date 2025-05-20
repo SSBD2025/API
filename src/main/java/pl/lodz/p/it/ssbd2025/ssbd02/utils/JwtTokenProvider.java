@@ -266,4 +266,14 @@ public class JwtTokenProvider {
         cookie.setMaxAge(jwtRefreshExpiration/1000);
         response.addCookie(cookie);
     }
+
+    @PreAuthorize("hasRole('ADMIN')||hasRole('DIETICIAN')||hasRole('CLIENT')")
+    public void cookieClear(HttpServletResponse response) {
+        Cookie cookie = new Cookie(JwtConsts.REFRESH_TOKEN_COOKIE, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(JwtConsts.ENVIRONMENT_PROD.equalsIgnoreCase(environment));
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
 }

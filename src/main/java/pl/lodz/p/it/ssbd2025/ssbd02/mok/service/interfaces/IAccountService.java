@@ -14,7 +14,7 @@ public interface IAccountService {
     void changePassword(ChangePasswordDTO changePasswordDTO);
     void setGeneratedPassword(UUID uuid);
     SensitiveDTO login(String username, String password, String ipAddress, HttpServletResponse response);
-    void logout();
+    void logout(HttpServletResponse response);
     void blockAccount(UUID id);
     void unblockAccount(UUID id);
     void sendResetPasswordEmail(String email);
