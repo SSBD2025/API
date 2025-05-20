@@ -40,7 +40,7 @@ import java.util.stream.StreamSupport;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
 public class DieticianService implements IDieticianService {
 
     private final DieticianRepository dieticianRepository;
@@ -59,7 +59,7 @@ public class DieticianService implements IDieticianService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public Dietician createDietician(Dietician newDietician, Account newAccount) {
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));

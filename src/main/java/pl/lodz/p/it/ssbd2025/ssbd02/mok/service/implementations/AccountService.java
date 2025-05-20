@@ -67,7 +67,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.ChangePasswordDTO;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
 public class AccountService implements IAccountService {
 
     @NotNull
@@ -98,7 +98,7 @@ public class AccountService implements IAccountService {
     @NotNull
     private final UserRoleRepository userRoleRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
@@ -110,7 +110,7 @@ public class AccountService implements IAccountService {
         accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.newPassword(), BCrypt.gensalt()));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
     public void setGeneratedPassword(UUID uuid) {
         Optional<Account> account = accountRepository.findById(uuid);
@@ -135,7 +135,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager",
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}",
             noRollbackFor = {InvalidCredentialsException.class, ExcessiveLoginAttemptsException.class})
     @Retryable(retryFor = {
             JpaSystemException.class,
@@ -206,7 +206,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
             = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     protected void lockTemporarily(String username, Timestamp until){
@@ -215,7 +215,7 @@ public class AccountService implements IAccountService {
 
 
     @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public SensitiveDTO verifyTwoFactorCode(String code, String ipAddress, HttpServletResponse response) {
         Account account = accountRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString()).orElseThrow(AccountNotFoundException::new);
@@ -261,7 +261,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
             = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void logout(HttpServletResponse response) {
@@ -275,7 +275,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void blockAccount(UUID id) {
@@ -297,7 +297,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void unblockAccount(UUID id) {
@@ -313,7 +313,7 @@ public class AccountService implements IAccountService {
         emailService.sendUnblockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("permitAll()")
     public void sendResetPasswordEmail(String email) {
         if(accountRepository.findByEmail(email).isPresent()) {
@@ -324,7 +324,7 @@ public class AccountService implements IAccountService {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("permitAll()")
@@ -339,7 +339,7 @@ public class AccountService implements IAccountService {
     }
 
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
     public List<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified) {
         List<Account> accounts = accountRepository.findByActiveAndVerified(active, verified);
@@ -351,7 +351,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
@@ -365,7 +365,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
@@ -394,7 +394,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
@@ -428,7 +428,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class
@@ -452,7 +452,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public void resendEmailChangeLink() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String login = authentication.getName();
@@ -470,7 +470,7 @@ public class AccountService implements IAccountService {
         emailService.sendChangeEmail(account.getLogin(), newEmail, confirmationURL, account.getLanguage());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @TransactionLogged
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public AccountWithTokenDTO getAccountByLogin(String login) {
@@ -488,7 +488,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public AccountWithTokenDTO getAccountById(UUID id) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
@@ -505,7 +505,7 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public void updateAccountById(UUID id, UpdateAccountDTO dto) {
         updateAccount(() -> accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new), dto);
@@ -513,7 +513,7 @@ public class AccountService implements IAccountService {
 
     @UserRoleChangeLogged
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public void logUserRoleChange(String login, String previousRole, String newRole) {
         accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
@@ -550,14 +550,14 @@ public class AccountService implements IAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     public void updateMyAccount(String login, UpdateAccountDTO dto) {
         updateAccount(() -> accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new), dto);
     }
 
     @PreAuthorize("permitAll()")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public void verifyAccount(String token) {
@@ -581,7 +581,7 @@ public class AccountService implements IAccountService {
     @RoleChangeLogged
     @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
@@ -634,7 +634,7 @@ public class AccountService implements IAccountService {
     @PreAuthorize("hasRole('ADMIN')")
     @RoleChangeLogged
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
@@ -660,7 +660,7 @@ public class AccountService implements IAccountService {
     }
 
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("permitAll()")
@@ -674,7 +674,7 @@ public class AccountService implements IAccountService {
     }
 
     @TransactionLogged
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("permitAll()")

@@ -4,7 +4,7 @@ import jakarta.mail.MessagingException;
 import org.springframework.mail.MailSendException;
 
 public class EmailSendingException extends RuntimeException {
-    public EmailSendingException(Throwable e) {
-        super("Email sending error " + e);
+    public EmailSendingException(Throwable cause) {
+        super("An error occurred while sending the email ", cause);
     }
 }
