@@ -81,30 +81,28 @@ public class MOK9Test extends BaseIntegrationTest {
         ).andExpect(status().isOk());
     }
 
-//    @Order(1)
-//    @Test
-//    @WithMockUser(roles = {"ADMIN"})
-//    public void resetPasswordByAdmin_Success() throws Exception {
-//        String adminAccessToken = loginAsAdmin();
-//        accountTestHelper.setPassword("agorgonzola", "P@ssw0rd!");
-//        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!");
-//        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), tokenCaptor.capture(), anyString());
-//        mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
-//                .header("Authorization", "Bearer " + adminAccessToken)
-//        ).andExpect(status().isOk());
-//        String token = tokenCaptor.getValue();
-//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
-//                null,
-//                "P@ssw0rd!!"
-//        );
-//        String json = objectMapper.writeValueAsString(resetPasswordDTO);
-//        mockMvc.perform(post("/api/account/reset/password/" + token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(json)
-//        ).andExpect(status().isOk());
-//        logout(adminAccessToken);
-//        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!!");
-//    }
+    @Order(1)
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    public void resetPasswordByAdmin_Success() throws Exception {
+        String adminAccessToken = loginAsAdmin();
+        doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), tokenCaptor.capture(), anyString());
+        mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
+                .header("Authorization", "Bearer " + adminAccessToken)
+        ).andExpect(status().isOk());
+        String token = tokenCaptor.getValue();
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+                null,
+                "P@ssw0rd!!"
+        );
+        String json = objectMapper.writeValueAsString(resetPasswordDTO);
+        mockMvc.perform(post("/api/account/reset/password/" + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(status().isOk());
+        logout(adminAccessToken);
+        accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!!");
+    }
 
     @Order(2)
     @Test
