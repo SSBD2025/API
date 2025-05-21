@@ -255,4 +255,12 @@ public class AccountController {
         accountService.unlockAccount(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @PostMapping("/auth/email/request")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
+    public ResponseEntity<?> authWithEmailRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+        accountService.authWithEmailRequest(changeEmailDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

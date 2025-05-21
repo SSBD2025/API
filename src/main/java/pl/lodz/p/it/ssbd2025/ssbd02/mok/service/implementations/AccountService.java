@@ -736,4 +736,16 @@ public class AccountService implements IAccountService {
         account.setActive(true);
         tokenRepository.deleteAllByAccountWithType(account, TokenType.UNLOCK_CODE);
     }
+
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public void authWithEmailRequest(ChangeEmailDTO changeEmailDTO){
+        Account account = accountRepository.findByEmail(changeEmailDTO.getEmail()).orElseThrow(AccountNotFoundException::new);
+        if(account.isActive() && account.isVerified()) {
+            SensitiveDTO dto = tokenUtil.generateAutoLockUnlockCode(account);
+            emailService.sendEmailAuth(account.getLogin(), account.getEmail(), new SensitiveDTO(dto.getValue()), account.getLanguage());
+        } else {
+            throw new AccountAutolockUnlockAttemptException();
+        }
+    }
 }
