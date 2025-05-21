@@ -75,6 +75,14 @@ public class AccountController {
     }
 
     @MethodCallLogged
+    @PostMapping("/force/changePassword")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Object> forceChangePassword(@RequestBody @Valid ForceChangePasswordDTO forceChangePasswordDTO) {
+        accountService.forceChangePassword(forceChangePasswordDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @MethodCallLogged
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> changeUserPassword(@PathVariable UUID id) {

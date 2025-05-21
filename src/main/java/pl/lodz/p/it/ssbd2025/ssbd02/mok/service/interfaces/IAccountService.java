@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 public interface IAccountService {
 
     void changePassword(ChangePasswordDTO changePasswordDTO);
+    void forceChangePassword(ForceChangePasswordDTO forceChangePasswordDTO);
     void setGeneratedPassword(UUID uuid);
     SensitiveDTO login(String username, SensitiveDTO password, String ipAddress, HttpServletResponse response);
     void logout(HttpServletResponse response);

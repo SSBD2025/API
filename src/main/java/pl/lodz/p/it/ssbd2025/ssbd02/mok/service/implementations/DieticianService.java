@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.ChangePasswordEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
@@ -25,6 +26,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AccountConstraintViolationExcepti
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ChangePasswordRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.DieticianRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
@@ -54,6 +56,7 @@ public class DieticianService implements IDieticianService {
     private final TokenRepository tokenRepository;
     private final TokenUtil tokenUtil;
     private final AccountService accountService;
+    private final ChangePasswordRepository changePasswordRepository;
 
     @Value("${mail.verify.url}")
     private String verificationURL;
@@ -75,6 +78,8 @@ public class DieticianService implements IDieticianService {
         newDietician.setAccount(newAccount);
         newAccount.getUserRoles().add(newDietician);
         Account createdAccount = accountRepository.saveAndFlush(newAccount);
+        ChangePasswordEntity changePasswordEntity = new ChangePasswordEntity(createdAccount, true);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
         String token = UUID.randomUUID().toString();
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), new SensitiveDTO(token));
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));

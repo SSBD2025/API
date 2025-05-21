@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.ChangePasswordEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ChangePasswordRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.TokenUtil;
@@ -29,6 +31,8 @@ public class AccountTestHelper {
     private TokenRepository tokenRepository;
     @Autowired
     private UserRoleRepository userRoleRepository;
+    @Autowired
+    private ChangePasswordRepository changePasswordRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     public void activateByLogin(String login) {
@@ -92,6 +96,14 @@ public class AccountTestHelper {
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
     public void setPassword(String login, String password) {
         accountRepository.updatePassword(login, BCrypt.hashpw(password, BCrypt.gensalt()));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")
+    public void markAsChanged(String login) {
+        Account account = accountRepository.findByLogin(login).orElseThrow(() -> new IllegalStateException("Account not found"));
+        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account);
+        changePasswordEntity.setPasswordToChange(false);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager")

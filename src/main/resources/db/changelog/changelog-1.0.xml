@@ -38,6 +38,13 @@
             <column name="id" value="00000000-0000-0000-0000-000000000002"/>
         </insert>
 
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
 <!--        Dietician-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000003"/>
@@ -72,6 +79,13 @@
             <column name="id" value="00000000-0000-0000-0000-000000000004"/>
         </insert>
 
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000000003"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000000003"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
 <!--        Client-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000005"/>
@@ -104,6 +118,13 @@
 
         <insert tableName="client">
             <column name="id" value="00000000-0000-0000-0000-000000000006"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000000005"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000000005"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
         </insert>
 
         <!-- Account with two roles - admin & dietician -->
@@ -152,6 +173,13 @@
             <column name="id" value="00000000-0000-0000-0000-000000000009"/>
         </insert>
 
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
         <!--        Client-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000010"/>
@@ -186,6 +214,12 @@
             <column name="id" value="00000000-0000-0000-0000-000000000011"/>
         </insert>
 
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
 
         <!--        Pyramids-->
 <!--        <insert tableName="food_pyramid">-->

@@ -114,6 +114,7 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 null
         );
 
+
         String loginRequestJson = """
         {
           "login": "clientLogoutTest",
@@ -131,7 +132,7 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 .andExpect(status().isOk());
 
         accountTestHelper.verifyByLogin("clientLogoutTest"); //only for tests
-
+        accountTestHelper.markAsChanged("clientLogoutTest");
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
@@ -196,7 +197,7 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 .andExpect(status().isOk());
 
         accountTestHelper.verifyByLogin("clientLogoutCookieClearTest"); //only for tests
-
+        accountTestHelper.markAsChanged("clientLogoutCookieClearTest");
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -281,6 +282,7 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 .andExpect(status().isOk());
 
         accountTestHelper.verifyByLogin("clientLogoutInvalidTokenTest"); //only for tests
+        accountTestHelper.markAsChanged("clientLogoutInvalidTokenTest");
 
         MvcResult result = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -134,6 +134,7 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk());
 
         accountTestHelper.verifyByLogin("clientLoginTest"); //only for tests
+        accountTestHelper.markAsChanged("clientLoginTest");
 
         mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -193,6 +194,7 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk());
 
         accountTestHelper.activateAndVerifyByLogin("dieticianLoginTest"); //only for tests
+        accountTestHelper.markAsChanged("dieticianLoginTest");
 
         mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -253,6 +255,7 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 .andExpect(status().isOk());
 
         accountTestHelper.activateAndVerifyByLogin("adminLoginTest"); //only for tests
+        accountTestHelper.markAsChanged("adminLoginTest");
 
         mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
