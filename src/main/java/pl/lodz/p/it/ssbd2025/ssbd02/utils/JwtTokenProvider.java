@@ -78,6 +78,19 @@ public class JwtTokenProvider {
     }
 
     @PreAuthorize("permitAll()")
+    public SensitiveDTO generateShorterRefreshToken(Account account) {
+        return new SensitiveDTO(Jwts.builder()
+                .id(account.getId().toString())
+                .subject(account.getLogin())
+                .claim(JwtConsts.CLAIM_TYPE, JwtConsts.TYPE_REFRESH)
+                .issuer(issuer)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + (refreshExpiration/2)))
+                .signWith(getPrivateKey())
+                .compact());
+    }
+
+    @PreAuthorize("permitAll()")
     public SensitiveDTO generateAccess2FAToken(Account account) {
         return new SensitiveDTO(Jwts.builder()
                 .id(account.getId().toString())
