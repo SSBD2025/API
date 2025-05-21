@@ -166,6 +166,8 @@ public class MOK9Test extends BaseIntegrationTest {
         ).andExpect(status().isOk());
         logout(adminAccessToken);
 
+        accountTestHelper.markAsChanged("agorgonzola");
+
         LoginDTO loginDTO = new LoginDTO(
                 "agorgonzola",
                 passwordCaptor.getValue()

@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/api/account/refresh",
                                 "/api/account/reset/password/**",
                                 "/api/account/reset/password/request",
-                                "/api/account/login/2fa"
+                                "/api/account/login/2fa",
+                                "/api/account/force/changePassword"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/swagger-ui/**",

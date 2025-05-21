@@ -40,6 +40,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RoleChangeLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.UserRoleChangeLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.AccountRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.ChangePasswordRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.TokenRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.repository.UserRoleRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
@@ -91,6 +92,7 @@ public class AccountService implements IAccountService {
     private final AccountMapper accountMapper;
     private final LockTokenService lockTokenService;
     private final TokenRepository tokenRepository;
+    private final ChangePasswordRepository changePasswordRepository;
     @Value("${mail.confirmation.url}")
     private String confirmURL;
     @Value("${mail.revert.url}")
@@ -119,6 +121,22 @@ public class AccountService implements IAccountService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("permitAll()")
+    public void forceChangePassword(ForceChangePasswordDTO forceChangePasswordDTO) {
+        String login = forceChangePasswordDTO.getLogin();
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        if(!BCrypt.checkpw(forceChangePasswordDTO.getOldPassword(), account.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account);
+        changePasswordEntity.setPasswordToChange(false);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
+        account.setPassword(BCrypt.hashpw(forceChangePasswordDTO.getNewPassword(), BCrypt.gensalt()));
+        accountRepository.saveAndFlush(account);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
     public void setGeneratedPassword(UUID uuid) {
         Optional<Account> account = accountRepository.findById(uuid);
@@ -128,7 +146,9 @@ public class AccountService implements IAccountService {
         String password = generateRandomPassword();
         account.get().setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
         accountRepository.saveAndFlush(account.get());
-//        accountRepository.updatePassword(account.get().getLogin(), BCrypt.hashpw(password, BCrypt.gensalt()));
+        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account.get());
+        changePasswordEntity.setPasswordToChange(true);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetToken(account.get(), new SensitiveDTO(token));
         emailService.sendPasswordChangedByAdminEmail(account.get().getEmail(), account.get().getLogin(), account.get().getLanguage(), new SensitiveDTO(token), password);
@@ -189,7 +209,9 @@ public class AccountService implements IAccountService {
             TokenPairDTO pair = jwtService.generatePair(account, userRoles);
             String access = pair.getAccessToken();
             String refresh = pair.getRefreshToken();
-
+            if(changePasswordRepository.findByAccount(account).isPasswordToChange()) {
+                throw new PasswordToChangeException();
+            }
             jwtTokenProvider.cookieSetter(new SensitiveDTO(refresh), jwtRefreshExpiration, response);
 
             return new SensitiveDTO(access);
@@ -332,8 +354,10 @@ public class AccountService implements IAccountService {
             throw new AccountNotFoundException();
         }
         account.setPassword(BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
+        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account);
+        changePasswordEntity.setPasswordToChange(false);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
         accountRepository.saveAndFlush(account);
-//        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
     }
 
     @TransactionLogged
