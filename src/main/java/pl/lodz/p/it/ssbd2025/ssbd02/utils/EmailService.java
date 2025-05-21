@@ -426,4 +426,27 @@ public class EmailService {
             log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
         }
     }
+
+    @PreAuthorize("permitAll()")
+    @Async
+    public void sendEmailAuth(String username, String receiver, SensitiveDTO code, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_TWO_FACTOR)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.auth.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_CODE, code.getValue());
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(receiver);
+            helper.setSubject(I18n.getMessage("email.auth.subject", language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException | MailSendException | MailAuthenticationException | EmailTemplateLoadingException e) {
+            log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
+        }
+    }
 }

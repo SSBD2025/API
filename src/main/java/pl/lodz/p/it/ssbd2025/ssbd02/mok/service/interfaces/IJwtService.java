@@ -12,6 +12,8 @@ import java.util.List;
 public interface IJwtService {
 
      TokenPairDTO generatePair(@NotNull Account account, @NotNull List<String> roles);
+     SensitiveDTO generateAccess(@NotNull Account account, @NotNull List<String> roles);
+     SensitiveDTO generateShorterRefresh(@NotNull Account account, @NotNull List<String> roles);
      SensitiveDTO refresh(HttpServletRequest request, HttpServletResponse response);
      boolean check(String token);
 }

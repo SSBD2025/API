@@ -75,6 +75,26 @@ public class JwtService implements IJwtService {
     }
 
     @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class,}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    public SensitiveDTO generateAccess(@NotNull Account account, @NotNull List<String> roles) {
+        SensitiveDTO accessToken = jwtTokenProvider.generateAccessToken(account, roles);
+        Date accessExpiration = jwtTokenProvider.getExpiration(accessToken);
+        tokenRepository.saveAndFlush(new TokenEntity(accessToken.getValue(), accessExpiration, account, TokenType.ACCESS));
+        return accessToken;
+    }
+
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class,}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
+    public SensitiveDTO generateShorterRefresh(@NotNull Account account, @NotNull List<String> roles) {
+        SensitiveDTO refreshToken = jwtTokenProvider.generateShorterRefreshToken(account);
+        Date refreshExpiration = jwtTokenProvider.getExpiration(refreshToken);
+        tokenRepository.saveAndFlush(new TokenEntity(refreshToken.getValue(), refreshExpiration, account, TokenType.REFRESH));
+        return refreshToken;
+    }
+
+    @PreAuthorize("permitAll()")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
