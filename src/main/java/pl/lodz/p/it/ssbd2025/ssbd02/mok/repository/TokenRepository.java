@@ -46,6 +46,7 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     """)
     boolean existsByAccountWithType(Account account, TokenType type);
 
+    @PreAuthorize("permitAll()")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         select t from TokenEntity t where t.account=:account and t.type=:type
@@ -70,6 +71,7 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
 
     List<TokenEntity> findByExpirationBefore(Date date);
 
+    @PreAuthorize("permitAll()")
     List<TokenEntity> findAllByType(TokenType type);
 
     @Modifying

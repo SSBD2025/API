@@ -63,6 +63,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @PreAuthorize("permitAll()")
     Account saveAndFlush(Account account);
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         SELECT a FROM Account a 
@@ -116,6 +117,7 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.login = :login")
     Optional<Account> findByLoginWithRoles(@Param("login") String login);
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT a FROM Account a WHERE " +
             "(:active IS NULL OR a.active = :active) AND " +
