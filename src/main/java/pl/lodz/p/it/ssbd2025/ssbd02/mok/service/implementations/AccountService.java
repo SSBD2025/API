@@ -103,6 +103,8 @@ public class AccountService implements IAccountService {
     private int lockedFor;
     @Value("${app.jwt_refresh_expiration}")
     private int jwtRefreshExpiration;
+    @Value("${mail.unlock.url}")
+    private String unlockURL;
     @NotNull
     private final UserRoleRepository userRoleRepository;
 
@@ -698,5 +700,31 @@ public class AccountService implements IAccountService {
             throw new AccountTwoFactorAlreadyDisabled();
         account.setTwoFactorAuth(false);
         accountRepository.saveAndFlush(account);
+    }
+
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public void unlockAccountRequest(ChangeEmailDTO changeEmailDTO) {
+        Account account = accountRepository.findByEmail(changeEmailDTO.getEmail()).orElseThrow(AccountNotFoundException::new);
+        if(account.isAutoLocked() && !account.isActive()) {
+            SensitiveDTO dto = tokenUtil.generateAutoLockUnlockCode(account);
+            emailService.sendAutolockUnlockLink(account.getLogin(), account.getEmail(), new SensitiveDTO(unlockURL+dto.getValue()), account.getLanguage());
+        } else {
+            throw new AccountAutolockUnlockAttemptException();
+        }
+    }
+
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public void unlockAccount(SensitiveDTO token) {
+        TokenEntity code = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
+        if (code.getExpiration().before(new Date())) {
+            tokenRepository.delete(code);
+            throw new TokenExpiredException();
+        }
+        Account account = code.getAccount();
+        account.setAutoLocked(false);
+        account.setActive(true);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.UNLOCK_CODE);
     }
 }
