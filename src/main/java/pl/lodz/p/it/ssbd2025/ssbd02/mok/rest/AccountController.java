@@ -263,4 +263,12 @@ public class AccountController {
         accountService.authWithEmailRequest(changeEmailDTO);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @PostMapping("/auth/email")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
+    public ResponseEntity<?> authWithEmail(@RequestBody @Valid SensitiveDTO code, HttpServletRequest request, HttpServletResponse response) {
+        String ipAddress = getClientIp(request);
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.authWithEmail(code, ipAddress, response));
+    }
 }

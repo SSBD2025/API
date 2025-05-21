@@ -748,4 +748,52 @@ public class AccountService implements IAccountService {
             throw new AccountAutolockUnlockAttemptException();
         }
     }
+
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public SensitiveDTO authWithEmail(SensitiveDTO token, String ipAddress, HttpServletResponse response) {
+        TokenEntity tokenEntity = tokenRepository.findByToken(token.getValue()).orElseThrow(TokenNotFoundException::new);
+        Account account = tokenEntity.getAccount();
+        String username = account.getLogin();
+        List<AccountRolesProjection> roles = accountRepository.findAccountRolesByLogin(username);
+        List<String> userRoles = new ArrayList<>();
+        if(roles.isEmpty()) {
+            throw new AccountHasNoRolesException();
+        }
+        roles.forEach(role -> {
+            if (role.isActive()) {
+                userRoles.add(role.getRoleName());
+            }
+        });
+        if(userRoles.isEmpty()) {
+            throw new AccountHasNoRolesException();
+        }
+        if (!account.isActive()) {
+            throw new AccountNotActiveException();
+        }
+        if (!account.isVerified()) {
+            throw new AccountNotVerifiedException();
+        }
+        Date currentTime = new Date(System.currentTimeMillis());
+        String acceptLanguage = MiscellaneousUtil.getAcceptLanguage();
+        if (acceptLanguage != null) {
+            Language newLanguage = acceptLanguage.toLowerCase().contains("pl") ? Language.pl_PL : Language.en_EN;
+            if (account.getLanguage() != newLanguage) {
+                account.setLanguage(newLanguage);
+                accountRepository.saveAndFlush(account);
+            }
+        }
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.UNLOCK_CODE);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.ACCESS);
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.REFRESH);
+        accountRepository.updateSuccessfulLogin(username, currentTime, ipAddress, 0);
+        if(userRoles.contains("ADMIN")) {
+            emailService.sendAdminLoginEmail(account.getEmail(), account.getLogin(), ipAddress, account.getLanguage());
+        }
+        String access = jwtService.generateAccess(account, userRoles).getValue();
+        String refresh = jwtService.generateShorterRefresh(account, userRoles).getValue();
+        jwtTokenProvider.cookieSetter(new SensitiveDTO(refresh), jwtRefreshExpiration/2, response);
+
+        return new SensitiveDTO(access);
+    }
 }
