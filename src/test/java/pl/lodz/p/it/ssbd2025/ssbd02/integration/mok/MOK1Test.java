@@ -123,7 +123,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
@@ -164,7 +165,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         DieticianDTO dieticianDTO1 = new DieticianDTO(dieticianDTO, accountDTO);
@@ -205,7 +207,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         AdminDTO adminDTO1 = new AdminDTO(adminDTO, accountDTO);
@@ -250,7 +253,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
@@ -282,7 +286,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO5 = new ClientDTO(clientDTO3, accountDTO4);
@@ -318,7 +323,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         DieticianDTO dieticianDTO1 = new DieticianDTO(dieticianDTO, accountDTO);
@@ -350,7 +356,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         DieticianDTO dieticianDTO5 = new DieticianDTO(dieticianDTO3, accountDTO4);
@@ -386,7 +393,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         AdminDTO adminDTO1 = new AdminDTO(adminDTO, accountDTO);
@@ -425,7 +433,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         AdminDTO adminDTO3 = new AdminDTO(adminDTO2, accountDTO2);
@@ -463,7 +472,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);
@@ -495,7 +505,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO5 = new ClientDTO(clientDTO3, accountDTO4);
@@ -531,7 +542,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         DieticianDTO dieticianDTO1 = new DieticianDTO(dieticianDTO, accountDTO);
@@ -563,7 +575,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         DieticianDTO dieticianDTO5 = new DieticianDTO(dieticianDTO3, accountDTO4);
@@ -599,7 +612,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         AdminDTO adminDTO1 = new AdminDTO(adminDTO, accountDTO);
@@ -638,7 +652,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         AdminDTO adminDTO3 = new AdminDTO(adminDTO2, accountDTO2);
@@ -668,7 +683,8 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         ClientDTO clientDTO2 = new ClientDTO(clientDTO, accountDTO);

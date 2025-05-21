@@ -48,6 +48,22 @@ public class TokenUtil {
         return new SensitiveDTO(code);
     }
 
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public SensitiveDTO generateAutoLockUnlockCode(Account account) {
+        SecureRandom random = new SecureRandom();
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(10);
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(characters.length());
+            sb.append(characters.charAt(index));
+        }
+        String code = sb.toString();
+        tokenRepository.deleteAllByAccountWithType(account, TokenType.UNLOCK_CODE);
+        tokenRepository.saveAndFlush(new TokenEntity(code, generateMinuteExpiration(twoFactorExpiration), account, TokenType.UNLOCK_CODE));
+        return new SensitiveDTO(code);
+    }
+
     //TODO sprawdzic
 
     @PreAuthorize("permitAll()")

@@ -206,6 +206,7 @@ public class EmailService {
         }
     }
 
+    @PreAuthorize("permitAll()")
     @Async
     public void sendAdminLoginEmail(String to, String username, String IP, Language language){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -395,6 +396,30 @@ public class EmailService {
 
             mailSender.send(mimeMessage);
 
+        } catch (MessagingException | MailSendException | MailAuthenticationException | EmailTemplateLoadingException e) {
+            log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
+        }
+    }
+
+    @PreAuthorize("permitAll()")
+    @Async
+    public void sendAutolockUnlockLink(String username, String receiver, SensitiveDTO unlockURL, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.autolock.unlock.body", language))
+                    .replace(EmailConsts.PLACEHOLDER_URL, unlockURL.getValue())
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.autolock.unlock.link", language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(receiver);
+            helper.setSubject(I18n.getMessage("email.autolock.unlock.subject", language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
         } catch (MessagingException | MailSendException | MailAuthenticationException | EmailTemplateLoadingException e) {
             log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
         }

@@ -87,4 +87,7 @@ public class Account extends AbstractEntity {
 
     @Column(name = AccountConsts.COLUMN_LOCKED_UNTIL, nullable = true)
     private Timestamp lockedUntil;
+
+    @Column(name = AccountConsts.COLUMN_AUTO_LOCKED)
+    private boolean autoLocked;
 }

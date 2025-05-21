@@ -30,7 +30,8 @@ public interface AccountMapper {
             @Mapping(target = "reminded", ignore = true),
             @Mapping(target = "loginAttempts", ignore = true),
             @Mapping(target = "lockedUntil", ignore = true),
-            @Mapping(target = "twoFactorAuth", ignore = true)
+            @Mapping(target = "twoFactorAuth", ignore = true),
+            @Mapping(target = "autoLocked", ignore = true)
     })
     Account toNewAccount(AccountDTO accountDTO);
 

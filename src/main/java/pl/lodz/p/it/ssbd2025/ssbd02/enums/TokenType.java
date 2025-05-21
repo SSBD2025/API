@@ -8,5 +8,6 @@ public enum TokenType {
     EMAIL_CHANGE,
     EMAIL_REVERT,
     TWO_FACTOR,
-    ACCESS_2FA
+    ACCESS_2FA,
+    UNLOCK_CODE
 }

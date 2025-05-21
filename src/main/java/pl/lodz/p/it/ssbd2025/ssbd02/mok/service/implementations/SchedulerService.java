@@ -17,11 +17,13 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ISchedulerService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 
 @TransactionLogged
 @Service
@@ -36,6 +38,9 @@ public class SchedulerService implements ISchedulerService {
 
     @Value("${account.verification.threshold}")
     private long accountVerificationThreshold;
+
+    @Value("${account.autolock.threshhold}")
+    private long accountAutolockThreshold;
 
     @Value("${mail.verify.url}")
     private String verificationURL;
@@ -104,5 +109,23 @@ public class SchedulerService implements ISchedulerService {
     public void deleteExpiredTokens() {
         Date currentDate = new Date();
         tokenRepository.deleteTokenEntitiesExceptVerification(currentDate);
+    }
+
+    @Scheduled(fixedRateString = "${scheduler.autolockAccounts.fixedRate}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    public void autolockAccounts() {
+        Instant now = Instant.now();
+        Instant then = now.minusMillis(accountAutolockThreshold);
+        List<Account> accountsToAutolock = accountRepository.findAccountsByLastSuccessfulLoginBefore(Timestamp.from(then));
+        if(!accountsToAutolock.isEmpty()) {
+            for (Account account : accountsToAutolock) {
+//                if(account.isActive() && account.isVerified()) {
+                if(account.isActive()) {
+                    account.setActive(false);
+                    account.setAutoLocked(true);
+                    accountRepository.saveAndFlush(account);
+                }
+            }
+        }
     }
 }

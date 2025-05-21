@@ -114,7 +114,8 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """
@@ -174,7 +175,8 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """
@@ -234,7 +236,8 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """
@@ -319,7 +322,8 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """
@@ -369,7 +373,8 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """

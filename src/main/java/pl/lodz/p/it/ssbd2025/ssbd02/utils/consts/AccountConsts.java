@@ -5,7 +5,6 @@ public class AccountConsts {
     public static final String PASSWORD_MESSAGE = "Password must contain a lowercase letter, an uppercase letter, a digit, and a special character.";
     public static final int PASSWORD_MIN = 8;
     public static final int PASSWORD_MAX = 60;
-
     public static final int LOGIN_MIN = 4;
     public static final int LOGIN_MAX = 50;
 
@@ -29,6 +28,7 @@ public class AccountConsts {
     public static final String COLUMN_REMINDED = "reminded";
     public static final String COLUMN_LOGIN_ATTEMPTS = "login_attempts";
     public static final String COLUMN_LOCKED_UNTIL = "locked_until";
+    public static final String COLUMN_AUTO_LOCKED = "auto_locked";
 
     public static final String LOGIN_INDEX = "login_index";
     public static final String EMAIL_INDEX = "email_index";

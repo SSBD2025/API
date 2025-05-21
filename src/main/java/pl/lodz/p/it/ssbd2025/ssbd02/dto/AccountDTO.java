@@ -62,7 +62,6 @@ public class AccountDTO {
         @Null(groups = {OnCreate.class, OnUpdate.class})
         Timestamp lastSuccessfulLogin;
 
-
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
         Timestamp lastFailedLogin;
@@ -92,6 +91,9 @@ public class AccountDTO {
 
         @Null(groups = {OnCreate.class})
         Timestamp lockedUntil;
+
+        @NotNull(groups = {OnCreate.class})
+        boolean autoLocked;
 
         private AccountDTO(){}
 
