@@ -77,4 +77,8 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
         DELETE FROM TokenEntity t WHERE t.expiration < :currentDate AND t.type <> pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType.VERIFICATION
     """)
     void deleteTokenEntitiesExceptVerification(@Param("currentDate") Date currentDate);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("permitAll()")
+    void delete(TokenEntity entity);
 }

@@ -352,6 +352,7 @@ public class EmailService {
     }
 
     @Async
+    @PreAuthorize("hasRole('ADMIN')")
     public void sendRoleAssignedEmail(String to, String username, String roleName, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
@@ -377,6 +378,7 @@ public class EmailService {
     }
 
     @Async
+    @PreAuthorize("hasRole('ADMIN')")
     public void sendRoleUnassignedEmail(String to, String username, String roleName, Language language) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
