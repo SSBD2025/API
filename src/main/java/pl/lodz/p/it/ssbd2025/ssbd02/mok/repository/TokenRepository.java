@@ -65,13 +65,8 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     @PreAuthorize("permitAll()")
     TokenEntity saveAndFlush(TokenEntity entity);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
-    TokenEntity findByType(TokenType type);
-
-    List<TokenEntity> findByExpirationBefore(Date date);
-
     @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     List<TokenEntity> findAllByType(TokenType type);
 
     @Modifying
