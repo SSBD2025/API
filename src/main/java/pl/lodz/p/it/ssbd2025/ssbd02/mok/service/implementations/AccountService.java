@@ -339,8 +339,14 @@ public class AccountService implements IAccountService {
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, Pageable pageable) {
-        Page<Account> accounts = accountRepository.findByActiveAndVerified(active, verified, pageable);
+    public Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, String searchPhrase, Pageable pageable) {
+        Page<Account> accounts;
+
+        if (searchPhrase != null && !searchPhrase.isEmpty()) {
+            accounts = accountRepository.findByActiveAndVerifiedAndNameContaining(active, verified, searchPhrase, pageable);
+        } else {
+            accounts = accountRepository.findByActiveAndVerified(active, verified, pageable);
+        }
 
         return accounts.map(accountMapper::toAccountWithUserRolesDTO);
     }
