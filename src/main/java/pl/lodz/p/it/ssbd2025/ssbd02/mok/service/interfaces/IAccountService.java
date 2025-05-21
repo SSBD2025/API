@@ -21,7 +21,7 @@ public interface IAccountService {
     void unblockAccount(UUID id);
     void sendResetPasswordEmail(String email);
     void resetPassword(SensitiveDTO token, ResetPasswordDTO resetPasswordDTO);
-    Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, Pageable pageable);
+    Page<AccountWithRolesDTO> getAllAccounts(Boolean active, Boolean verified, String searchPhrase, Pageable pageable);
     void changeOwnEmail(String newEmail);
     void changeUserEmail(UUID accountId, String newEmail);
     void confirmEmail(SensitiveDTO token);

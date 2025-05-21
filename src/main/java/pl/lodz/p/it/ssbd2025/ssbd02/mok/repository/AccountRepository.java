@@ -115,4 +115,18 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.userRoles WHERE a.login = :login")
     Optional<Account> findByLoginWithRoles(@Param("login") String login);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("SELECT a FROM Account a WHERE " +
+            "(:active IS NULL OR a.active = :active) AND " +
+            "(:verified IS NULL OR a.verified = :verified) AND " +
+            "(:searchPhrase IS NULL OR " +
+            "LOWER(a.firstName) LIKE LOWER(CONCAT('%', :searchPhrase, '%')) OR " +
+            "LOWER(a.lastName) LIKE LOWER(CONCAT('%', :searchPhrase, '%')))"
+    )
+    Page<Account> findByActiveAndVerifiedAndNameContaining(
+            @Param("active") Boolean active,
+            @Param("verified") Boolean verified,
+            @Param("searchPhrase") String searchPhrase,
+            Pageable pageable);
 }

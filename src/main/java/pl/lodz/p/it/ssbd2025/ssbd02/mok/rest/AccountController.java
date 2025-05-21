@@ -181,9 +181,10 @@ public class AccountController {
     public Page<AccountWithRolesDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) Boolean verified,
+            @RequestParam(required = false) String searchPhrase,
             Pageable pageable
     ) {
-        return accountService.getAllAccounts(active, verified, pageable);
+        return accountService.getAllAccounts(active, verified, searchPhrase, pageable);
     }
 
     @GetMapping("/{id}")
