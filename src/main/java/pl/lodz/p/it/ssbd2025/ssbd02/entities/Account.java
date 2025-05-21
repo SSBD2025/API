@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.TokenConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.UserRoleConsts;
 
 import java.sql.Timestamp;
@@ -90,4 +91,14 @@ public class Account extends AbstractEntity {
 
     @Column(name = AccountConsts.COLUMN_AUTO_LOCKED)
     private boolean autoLocked;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = AccountConsts.TABLE_NAME_PASSWORD_HISTORY,
+            joinColumns = @JoinColumn(name = TokenConsts.COLUMN_ACCOUNT_ID),
+            uniqueConstraints = @UniqueConstraint(columnNames = {TokenConsts.COLUMN_ACCOUNT_ID, AccountConsts.COLUMN_OLD_PASSWORD})
+    )
+    @Column(name = AccountConsts.COLUMN_OLD_PASSWORD, nullable = false)
+    @ToString.Exclude
+    private Collection<String> previousPasswords = new ArrayList<>();
 }

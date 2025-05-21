@@ -29,6 +29,8 @@ public class AccountConsts {
     public static final String COLUMN_LOGIN_ATTEMPTS = "login_attempts";
     public static final String COLUMN_LOCKED_UNTIL = "locked_until";
     public static final String COLUMN_AUTO_LOCKED = "auto_locked";
+    public static final String TABLE_NAME_PASSWORD_HISTORY = "account_password_history";
+    public static final String COLUMN_OLD_PASSWORD = "old_password";
 
     public static final String LOGIN_INDEX = "login_index";
     public static final String EMAIL_INDEX = "email_index";
