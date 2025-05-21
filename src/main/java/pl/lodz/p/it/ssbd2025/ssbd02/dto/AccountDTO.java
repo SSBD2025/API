@@ -33,6 +33,7 @@ public class AccountDTO {
         String login;
 
         @Null(groups = {OnUpdate.class, OnRead.class})
+        @NotNull(groups = OnCreate.class)
         @Size(min = AccountConsts.PASSWORD_MIN, max = AccountConsts.PASSWORD_MAX, groups = OnCreate.class)
         @Pattern(regexp = AccountConsts.PASSWORD_REGEX, message = AccountConsts.PASSWORD_MESSAGE, groups = {OnCreate.class})
         String password;
@@ -56,6 +57,7 @@ public class AccountDTO {
         @NotBlank(groups = OnCreate.class)
         @Email(groups = OnCreate.class)
         @Size(max = AccountConsts.EMAIL_MAX, groups = {OnCreate.class, OnUpdate.class})
+        @Pattern(regexp = AccountConsts.EMAIL_REGEX, message = AccountConsts.EMAIL_MESSAGE, groups = {OnCreate.class, OnUpdate.class})
         String email;
 
         @NotNull(groups = OnRead.class)

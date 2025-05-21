@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.I18n;
@@ -31,7 +32,6 @@ import java.util.Objects;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper.extractTextFromMimeMessage;
 
@@ -57,10 +57,12 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
 
     String adminToken;
 
-    //todo counter tests
-
     @BeforeEach
     void setup() throws Exception {
+        MimeMessage realMimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
+
         String loginRequestJson = """
         {
           "login": "jcheddar",
@@ -76,10 +78,6 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
 
         String responseJson = loginResult.getResponse().getContentAsString();
         adminToken = objectMapper.readTree(responseJson).get("value").asText();
-
-        MimeMessage realMimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
-        doNothing().when(mailSender).send(any(MimeMessage.class));
     }
 
     @AfterEach
@@ -151,6 +149,9 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                     JSONObject json = new JSONObject(result.getResponse().getContentAsString());
                     Assertions.assertTrue(tokenProvider.getRoles(new SensitiveDTO(json.getString("value"))).contains("CLIENT"));
                 });
+
+        Account account = accountTestHelper.getClientByLogin("clientLoginTest");
+        Assertions.assertNotNull(account.getLastSuccessfulLogin());
     }
 
     @Test
@@ -416,6 +417,10 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestJson))
                 .andExpect(status().isUnauthorized());
+
+        Account account = accountTestHelper.getClientByLogin("agorgonzola");
+        Assertions.assertEquals(1, account.getLoginAttempts());
+        Assertions.assertNotNull(account.getLastFailedLoginIp());
     }
 
     @Test
@@ -432,8 +437,6 @@ public class MOK2Test extends BaseIntegrationTest { //LOGIN
                         .content(loginRequestJson))
                 .andExpect(status().isNotFound());
     }
-
-
 
     // MALFORMATION TESTS //
     // MALFORMATION TESTS //

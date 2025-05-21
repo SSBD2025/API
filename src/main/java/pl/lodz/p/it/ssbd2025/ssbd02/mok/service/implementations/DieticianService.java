@@ -81,8 +81,8 @@ public class DieticianService implements IDieticianService {
         ChangePasswordEntity changePasswordEntity = new ChangePasswordEntity(createdAccount, true);
         changePasswordRepository.saveAndFlush(changePasswordEntity);
         String token = UUID.randomUUID().toString();
-        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), new SensitiveDTO(token));
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
+        emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), new SensitiveDTO(token));
         return dieticianRepository.saveAndFlush(newDietician);
     }
 
