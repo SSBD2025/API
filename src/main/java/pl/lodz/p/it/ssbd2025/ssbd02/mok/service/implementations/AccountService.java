@@ -362,6 +362,9 @@ public class AccountService implements IAccountService {
                 throw new PreviousPasswordUsedException();
             }
         }
+        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account);
+        changePasswordEntity.setPasswordToChange(false);
+        changePasswordRepository.saveAndFlush(changePasswordEntity);
         account.getPreviousPasswords().add(account.getPassword());
         account.setPassword(BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
         accountRepository.saveAndFlush(account);
@@ -418,7 +421,7 @@ public class AccountService implements IAccountService {
         String confirmationURL = confirmURL + emailChangeToken.getValue();
 
         TokenEntity jwt = new TokenEntity(emailChangeToken.getValue(), jwtTokenProvider.getExpiration(emailChangeToken), account, TokenType.EMAIL_CHANGE);
-        tokenRepository.save(jwt);
+        tokenRepository.saveAndFlush(jwt);
 
         emailService.sendChangeEmail(account.getLogin(), newEmail, new SensitiveDTO(confirmationURL), account.getLanguage());
     }
@@ -451,7 +454,7 @@ public class AccountService implements IAccountService {
         String revertChangeURL = revertURL + revertToken.getValue();
 
         TokenEntity tokenEntity = new TokenEntity(revertToken.getValue(), jwtTokenProvider.getExpiration(revertToken), account, TokenType.EMAIL_REVERT);
-        tokenRepository.save(tokenEntity);
+        tokenRepository.saveAndFlush(tokenEntity);
 
         emailService.sendRevertChangeEmail(account.getLogin(), oldEmail, new SensitiveDTO(revertChangeURL), account.getLanguage());
     }

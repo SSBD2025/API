@@ -59,6 +59,11 @@ public interface AccountRepository extends AbstractRepository<Account> {
     @Query("UPDATE Account a SET a.password = :newPassword WHERE a.login = :login")
     void updatePassword(@Param("login") String login, @Param("newPassword") String newPassword);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("permitAll()")
+    @Override
+    Optional<Account> findById(UUID id);
+
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     Account saveAndFlush(Account account);
@@ -133,4 +138,9 @@ public interface AccountRepository extends AbstractRepository<Account> {
             Pageable pageable);
 
     List<Account> findAccountsByLastSuccessfulLoginBefore(Timestamp lastSuccessfulLoginBefore);
+
+    @Override
+    @PreAuthorize("permitAll()")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    void delete(Account account);
 }
