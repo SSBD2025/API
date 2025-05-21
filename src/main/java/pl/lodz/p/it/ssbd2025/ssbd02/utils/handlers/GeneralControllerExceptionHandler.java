@@ -27,8 +27,11 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidExcept
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.LoginLoggerInterceptor;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GeneralControllerExceptionHandler {
@@ -149,7 +152,18 @@ public class GeneralControllerExceptionHandler {
             TokenBaseException ex,
             WebRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization exception: "+ex.getMessage());
+        String fullMessage = ex.getMessage();
+        String simpleMessage = fullMessage.substring(
+                fullMessage.indexOf('"') + 1,
+                fullMessage.lastIndexOf('"')
+        );
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Authorization exception");
+        body.put("message", simpleMessage);
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
     @ExceptionHandler(UnknownFilterException.class)
