@@ -129,4 +129,6 @@ public interface AccountRepository extends AbstractRepository<Account> {
             @Param("verified") Boolean verified,
             @Param("searchPhrase") String searchPhrase,
             Pageable pageable);
+
+    List<Account> findAccountsByLastSuccessfulLoginBefore(Timestamp lastSuccessfulLoginBefore);
 }

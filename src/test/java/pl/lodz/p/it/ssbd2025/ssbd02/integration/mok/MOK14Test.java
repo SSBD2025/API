@@ -111,7 +111,8 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
 
@@ -177,7 +178,8 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """
@@ -262,7 +264,8 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
                 false,
                 false,
                 0,
-                null
+                null,
+                false
         );
 
         String loginRequestJson = """

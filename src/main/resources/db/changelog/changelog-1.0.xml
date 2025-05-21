@@ -18,6 +18,7 @@
             <column name="locked_until" value="null"/>
             <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -59,6 +60,7 @@
             <column name="locked_until" value="null"/>
             <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -100,6 +102,7 @@
             <column name="locked_until" value="null"/>
             <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -141,6 +144,7 @@
             <column name="locked_until" value="null"/>
             <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">
@@ -194,6 +198,7 @@
             <column name="locked_until" value="null"/>
             <column name="login_attempts" valueNumeric="0"/>
             <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
         </insert>
 
         <insert tableName="user_data">

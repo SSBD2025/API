@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 "/api/account/reset/password/**",
                                 "/api/account/reset/password/request",
                                 "/api/account/login/2fa",
-                                "/api/account/force/changePassword"
+                                "/api/account/force/changePassword",
+                                "/api/account/unlock/request"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/swagger-ui/**",
@@ -57,6 +58,7 @@ public class SecurityConfig {
                                         "/api/account/revert-email-change/**",
                                         "/api/account/verify/**",
                                         "/api/account/verify/",
+                                        "/api/account/unlock/**",
                                         "/favicon.ico"
                                 ).permitAll()
 //                                .requestMatchers(HttpMethod.GET,
