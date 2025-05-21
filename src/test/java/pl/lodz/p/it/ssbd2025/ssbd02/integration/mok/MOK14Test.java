@@ -58,12 +58,16 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
 
     @BeforeEach
     void setup() throws Exception {
+        MimeMessage realMimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
+
         String loginRequestJson = """
-        {
-          "login": "jcheddar",
-          "password": "P@ssw0rd!"
-        }
-        """;
+                {
+                  "login": "jcheddar",
+                  "password": "P@ssw0rd!"
+                }
+                """;
 
         MvcResult loginResult = mockMvc.perform(post("/api/account/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,10 +77,6 @@ public class MOK14Test extends BaseIntegrationTest { //LOGOUT
 
         String responseJson = loginResult.getResponse().getContentAsString();
         adminToken = objectMapper.readTree(responseJson).get("value").asText();
-
-        MimeMessage realMimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
-        doNothing().when(mailSender).send(any(MimeMessage.class));
     }
 
     @AfterEach
