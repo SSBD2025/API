@@ -117,6 +117,12 @@ public class AccountService implements IAccountService {
         if(!BCrypt.checkpw(changePasswordDTO.getOldPassword(), account.getPassword())) {
             throw new InvalidCredentialsException();
         }
+        for (String prevPassword : account.getPreviousPasswords()) {
+            if (BCrypt.checkpw(changePasswordDTO.getNewPassword(), prevPassword)) {
+                throw new PreviousPasswordUsedException();
+            }
+        }
+        account.getPreviousPasswords().add(account.getPassword());
         account.setPassword(BCrypt.hashpw(changePasswordDTO.getNewPassword(), BCrypt.gensalt()));
 //        accountRepository.updatePassword(account.getLogin(), BCrypt.hashpw(changePasswordDTO.getNewPassword(), BCrypt.gensalt()));
         accountRepository.saveAndFlush(account);
