@@ -164,7 +164,7 @@ public class AccountService implements IAccountService {
 
     @PreAuthorize("permitAll()")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}",
-            noRollbackFor = {InvalidCredentialsException.class, ExcessiveLoginAttemptsException.class})
+            noRollbackFor = {InvalidCredentialsException.class, ExcessiveLoginAttemptsException.class, AccountIsAutolockedException.class})
     @Retryable(retryFor = {
             JpaSystemException.class,
             ConcurrentUpdateException.class,
@@ -189,6 +189,11 @@ public class AccountService implements IAccountService {
         }
         if (!account.isVerified()) {
             throw new AccountNotVerifiedException();
+        }
+        if (account.isAutoLocked()) {
+            SensitiveDTO dto = tokenUtil.generateAutoLockUnlockCode(account);
+            emailService.sendAutolockUnlockLink(account.getLogin(), account.getEmail(), new SensitiveDTO(unlockURL+dto.getValue()), account.getLanguage());
+            throw new AccountIsAutolockedException();
         }
         Date currentTime = new Date(System.currentTimeMillis());
         if (tokenUtil.checkPassword(password, account.getPassword())) {
@@ -711,17 +716,17 @@ public class AccountService implements IAccountService {
         accountRepository.saveAndFlush(account);
     }
 
-    @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void unlockAccountRequest(ChangeEmailDTO changeEmailDTO) {
-        Account account = accountRepository.findByEmail(changeEmailDTO.getEmail()).orElseThrow(AccountNotFoundException::new);
-        if(account.isAutoLocked() && !account.isActive()) {
-            SensitiveDTO dto = tokenUtil.generateAutoLockUnlockCode(account);
-            emailService.sendAutolockUnlockLink(account.getLogin(), account.getEmail(), new SensitiveDTO(unlockURL+dto.getValue()), account.getLanguage());
-        } else {
-            throw new AccountAutolockUnlockAttemptException();
-        }
-    }
+//    @PreAuthorize("permitAll()")
+//    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+//    public void unlockAccountRequest(ChangeEmailDTO changeEmailDTO) {
+//        Account account = accountRepository.findByEmail(changeEmailDTO.getEmail()).orElseThrow(AccountNotFoundException::new);
+//        if(account.isAutoLocked() && !account.isActive()) {
+//            SensitiveDTO dto = tokenUtil.generateAutoLockUnlockCode(account);
+//            emailService.sendAutolockUnlockLink(account.getLogin(), account.getEmail(), new SensitiveDTO(unlockURL+dto.getValue()), account.getLanguage());
+//        } else {
+//            throw new AccountAutolockUnlockAttemptException();
+//        }
+//    }
 
     @PreAuthorize("permitAll()")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")

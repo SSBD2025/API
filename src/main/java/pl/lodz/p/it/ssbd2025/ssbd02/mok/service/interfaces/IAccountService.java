@@ -41,7 +41,7 @@ public interface IAccountService {
     void disableTwoFactor();
     void logUserRoleChange(String login, String previousRole, String newRole);
     void unlockAccount(SensitiveDTO token);
-    void unlockAccountRequest(ChangeEmailDTO changeEmailDTO);
+//    void unlockAccountRequest(ChangeEmailDTO changeEmailDTO);
     void authWithEmailRequest(ChangeEmailDTO changeEmailDTO);
     SensitiveDTO authWithEmail(SensitiveDTO token, String ipAddress, HttpServletResponse response);
 }

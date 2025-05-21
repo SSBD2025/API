@@ -240,13 +240,13 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/unlock/request")
-    @PreAuthorize("permitAll()")
-    @MethodCallLogged
-    public ResponseEntity<?> unlockRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-        accountService.unlockAccountRequest(changeEmailDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
+//    @PostMapping("/unlock/request")
+//    @PreAuthorize("permitAll()")
+//    @MethodCallLogged
+//    public ResponseEntity<?> unlockRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+//        accountService.unlockAccountRequest(changeEmailDTO);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
 
     @GetMapping("/unlock")
     @PreAuthorize("permitAll()")
