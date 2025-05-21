@@ -239,4 +239,20 @@ public class AccountController {
         accountService.logUserRoleChange(login, roleChangeLogDTO.getPreviousRole(), roleChangeLogDTO.getNewRole());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/unlock/request")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
+    public ResponseEntity<?> unlockRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
+        accountService.unlockAccountRequest(changeEmailDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/unlock")
+    @PreAuthorize("permitAll()")
+    @MethodCallLogged
+    public ResponseEntity<?> unlockRequest(@RequestParam SensitiveDTO token) {
+        accountService.unlockAccount(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

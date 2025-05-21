@@ -40,4 +40,6 @@ public interface IAccountService {
     void enableTwoFactor();
     void disableTwoFactor();
     void logUserRoleChange(String login, String previousRole, String newRole);
+    void unlockAccount(SensitiveDTO token);
+    void unlockAccountRequest(ChangeEmailDTO changeEmailDTO);
 }
