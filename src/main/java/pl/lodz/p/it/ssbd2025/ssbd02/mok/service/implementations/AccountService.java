@@ -361,10 +361,13 @@ public class AccountService implements IAccountService {
         if(account == null) {
             throw new AccountNotFoundException();
         }
+        for (String prevPassword : account.getPreviousPasswords()) {
+            if (BCrypt.checkpw(resetPasswordDTO.getPassword(), prevPassword)) {
+                throw new PreviousPasswordUsedException();
+            }
+        }
+        account.getPreviousPasswords().add(account.getPassword());
         account.setPassword(BCrypt.hashpw(resetPasswordDTO.getPassword(), BCrypt.gensalt()));
-        ChangePasswordEntity changePasswordEntity = changePasswordRepository.findByAccount(account);
-        changePasswordEntity.setPasswordToChange(false);
-        changePasswordRepository.saveAndFlush(changePasswordEntity);
         accountRepository.saveAndFlush(account);
     }
 
