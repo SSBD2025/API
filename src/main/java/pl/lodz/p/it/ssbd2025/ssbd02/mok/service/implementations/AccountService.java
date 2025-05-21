@@ -230,7 +230,7 @@ public class AccountService implements IAccountService {
             return new SensitiveDTO(access);
         } else {
             if(account.getLoginAttempts() + 1 >= maxLoginAttempts) {
-                lockTemporarily(username, Timestamp.from(tokenUtil.generateMinuteExpiration(lockedFor).toInstant()));
+                accountRepository.lockTemporarily(username, Timestamp.from(tokenUtil.generateMinuteExpiration(lockedFor).toInstant()));
                 accountRepository.updateFailedLogin(username, currentTime, ipAddress, 0);
                 throw new ExcessiveLoginAttemptsException();
             }
@@ -238,15 +238,6 @@ public class AccountService implements IAccountService {
             throw new InvalidCredentialsException();
         }
     }
-
-    @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression
-            = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
-    protected void lockTemporarily(String username, Timestamp until){
-        accountRepository.lockTemporarily(username, until);
-    }
-
 
     @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
