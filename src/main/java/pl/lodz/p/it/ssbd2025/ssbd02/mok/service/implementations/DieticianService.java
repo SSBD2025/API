@@ -69,9 +69,9 @@ public class DieticianService implements IDieticianService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
     public Dietician createDietician(Dietician newDietician, Account newAccount) {
-        if(!isLoginUnique(newAccount.getLogin())) {
+        if(accountRepository.findByLogin(newAccount.getLogin()).isPresent()) {
             throw new AccountConstraintViolationException(ExceptionConsts.ACCOUNT_CONSTRAINT_VIOLATION + ": login already in use");
-        } else if(!isEmailUnique(newAccount.getEmail())) {
+        } else if(accountRepository.findByEmail(newAccount.getEmail()).isPresent()) {
             throw new AccountConstraintViolationException(ExceptionConsts.ACCOUNT_CONSTRAINT_VIOLATION + ": email already in use");
         }
         newAccount.setPassword(BCrypt.hashpw(newAccount.getPassword(), BCrypt.gensalt()));
@@ -84,17 +84,5 @@ public class DieticianService implements IDieticianService {
         tokenRepository.saveAndFlush(new TokenEntity(token, tokenUtil.generateHourExpiration(accountVerificationThreshold), createdAccount, TokenType.VERIFICATION));
         emailService.sendActivationMail(newAccount.getEmail(), newAccount.getLogin(), verificationURL, newAccount.getLanguage(), new SensitiveDTO(token));
         return dieticianRepository.saveAndFlush(newDietician);
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = true)
-    @PreAuthorize("permitAll()")
-    public boolean isLoginUnique(String login) {
-        return accountRepository.findByLogin(login).isEmpty();
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = true)
-    @PreAuthorize("permitAll()")
-    public boolean isEmailUnique(String email) {
-        return accountRepository.findByEmail(email).isEmpty();
     }
 }
