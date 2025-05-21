@@ -410,7 +410,7 @@ public class AccountService implements IAccountService {
         }
 
         SensitiveDTO emailChangeToken = jwtTokenProvider.generateEmailChangeToken(account, newEmail);
-        String confirmationURL = confirmURL + emailChangeToken;
+        String confirmationURL = confirmURL + emailChangeToken.getValue();
 
         TokenEntity jwt = new TokenEntity(emailChangeToken.getValue(), jwtTokenProvider.getExpiration(emailChangeToken), account, TokenType.EMAIL_CHANGE);
         tokenRepository.save(jwt);
@@ -443,7 +443,7 @@ public class AccountService implements IAccountService {
         tokenRepository.delete(jwt);
 
         SensitiveDTO revertToken = jwtTokenProvider.generateEmailRevertToken(account, oldEmail);
-        String revertChangeURL = revertURL + revertToken;
+        String revertChangeURL = revertURL + revertToken.getValue();
 
         TokenEntity tokenEntity = new TokenEntity(revertToken.getValue(), jwtTokenProvider.getExpiration(revertToken), account, TokenType.EMAIL_REVERT);
         tokenRepository.save(tokenEntity);

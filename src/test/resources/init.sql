@@ -11,6 +11,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE user_data TO ssbd02mok;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE user_role TO ssbd02mok;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE token_entity TO ssbd02mok;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE change_password TO ssbd02mok;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE account_password_history TO ssbd02mok;
 GRANT SELECT ON TABLE dietary_restrictions TO ssbd02mok;
 GRANT SELECT ON TABLE survey TO ssbd02mok;
 
