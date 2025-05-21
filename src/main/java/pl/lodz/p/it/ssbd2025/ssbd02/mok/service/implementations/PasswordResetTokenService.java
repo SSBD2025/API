@@ -30,7 +30,7 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
     private final TokenRepository tokenRepository;
     private final TokenUtil tokenUtil;
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = false)
     @PreAuthorize("permitAll()")
     public void createPasswordResetToken(Account account, SensitiveDTO token) {
         if(tokenRepository.existsByAccountWithType(account, TokenType.PASSWORD_RESET)) {
@@ -39,7 +39,7 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
         tokenRepository.saveAndFlush(new TokenEntity(token.getValue(), tokenUtil.generateMinuteExpiration(5), account, TokenType.PASSWORD_RESET));
     }
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "mokTransactionManager", readOnly = false)
     @PreAuthorize("permitAll()")
     public void validatePasswordResetToken(SensitiveDTO passwordResetToken) {
         TokenEntity passwordToken = tokenRepository.findByToken(passwordResetToken.getValue()).orElseThrow(TokenNotFoundException::new);
