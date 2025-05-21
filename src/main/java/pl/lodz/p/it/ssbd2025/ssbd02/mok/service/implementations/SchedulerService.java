@@ -119,8 +119,7 @@ public class SchedulerService implements ISchedulerService {
         List<Account> accountsToAutolock = accountRepository.findAccountsByLastSuccessfulLoginBefore(Timestamp.from(then));
         if(!accountsToAutolock.isEmpty()) {
             for (Account account : accountsToAutolock) {
-                if(account.isActive() && account.isVerified()) {
-                    account.setActive(false);
+                if(account.isActive() && account.isVerified() && !account.isAutoLocked()) {
                     account.setAutoLocked(true);
                     accountRepository.saveAndFlush(account);
                 }

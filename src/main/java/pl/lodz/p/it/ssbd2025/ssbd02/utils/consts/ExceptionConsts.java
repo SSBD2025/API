@@ -35,5 +35,6 @@ public final class ExceptionConsts {
     public static final String TWO_FACTOR_TOKEN_INVALID = "two_factor_token_invalid";
     public static final String MISSING_HTTP_REQUEST = "no_active_HTTP_request_context";
     public static final String ACCOUNT_UNLOCK_ATTEMPT = "account_unlock_attempt";
+    public static final String ACCOUNT_IS_AUTOLOCKED = "account_is_autolocked";
     public static final String PREVIOUS_PASSWORD_USED = "previous_password_used";
 }
