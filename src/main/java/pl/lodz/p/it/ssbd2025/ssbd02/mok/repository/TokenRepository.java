@@ -61,7 +61,7 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
     @PreAuthorize("permitAll()")
     Optional<TokenEntity> findByToken(String token);
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     TokenEntity saveAndFlush(TokenEntity entity);
 

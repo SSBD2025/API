@@ -344,7 +344,7 @@ public class AccountService implements IAccountService {
         emailService.sendUnblockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("permitAll()")
     public void sendResetPasswordEmail(String email) {
         if(accountRepository.findByEmail(email).isPresent()) {

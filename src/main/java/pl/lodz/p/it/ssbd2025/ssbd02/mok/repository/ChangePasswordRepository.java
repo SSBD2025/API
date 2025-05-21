@@ -19,7 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface ChangePasswordRepository extends AbstractRepository<ChangePasswordEntity> {
 
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("permitAll()")
     ChangePasswordEntity saveAndFlush(ChangePasswordEntity entity);
 
