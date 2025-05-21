@@ -42,4 +42,5 @@ public interface IAccountService {
     void logUserRoleChange(String login, String previousRole, String newRole);
     void unlockAccount(SensitiveDTO token);
     void unlockAccountRequest(ChangeEmailDTO changeEmailDTO);
+    void authWithEmailRequest(ChangeEmailDTO changeEmailDTO);
 }
