@@ -48,7 +48,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Scheduled(fixedRateString = "${scheduler.deleteUnverifiedAccounts.fixedRate}")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void deleteNotVerifiedAccounts() {
+    protected void deleteNotVerifiedAccounts() {
         Date date = new Date();
         List<TokenEntity> verificationTokens = new ArrayList<TokenEntity>();
         verificationTokens = tokenRepository.findAllByType(TokenType.VERIFICATION);
@@ -67,7 +67,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Scheduled(fixedRateString = "${scheduler.remindUnverifiedAccounts.fixedRate}")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void remindUnverifiedAccounts() {
+    protected void remindUnverifiedAccounts() {
         Date currentDate = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
@@ -90,7 +90,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Scheduled(fixedRateString = "${scheduler.unlock.accounts}")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void unlockAccounts() {
+    protected void unlockAccounts() {
         Date currentDate = new Date();
         List<Account> accounts = accountRepository.findByHasLockedUntil();
         if(!accounts.isEmpty()) {
@@ -106,14 +106,14 @@ public class SchedulerService implements ISchedulerService {
 
     @Scheduled(fixedRateString = "${scheduler.deleteUnverifiedAccounts.fixedRate}")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void deleteExpiredTokens() {
+    protected void deleteExpiredTokens() {
         Date currentDate = new Date();
         tokenRepository.deleteTokenEntitiesExceptVerification(currentDate);
     }
 
     @Scheduled(fixedRateString = "${scheduler.autolockAccounts.fixedRate}")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
-    public void autolockAccounts() {
+    protected void autolockAccounts() {
         Instant now = Instant.now();
         Instant then = now.minusMillis(accountAutolockThreshold);
         List<Account> accountsToAutolock = accountRepository.findAccountsByLastSuccessfulLoginBefore(Timestamp.from(then));
