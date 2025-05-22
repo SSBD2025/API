@@ -100,7 +100,8 @@ public class EmailService {
     public void sendResetPasswordEmail(String to, String username, Language language, SensitiveDTO token) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
+//            String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
+            String resetUrl = EmailConsts.RESET_PASSWORD_URL_PROD;
             String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
