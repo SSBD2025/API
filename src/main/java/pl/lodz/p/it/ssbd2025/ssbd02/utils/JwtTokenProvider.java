@@ -9,8 +9,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.*;
@@ -271,7 +269,7 @@ public class JwtTokenProvider {
         return UUID.fromString(id);
     }
 
-    @PreAuthorize("permitAll()") //TODO sprawdzic
+    @PreAuthorize("permitAll()")
     public void cookieSetter(SensitiveDTO refresh, int jwtRefreshExpiration, HttpServletResponse response) {
         Cookie cookie = new Cookie(JwtConsts.REFRESH_TOKEN_COOKIE, refresh.getValue());
         cookie.setHttpOnly(true);

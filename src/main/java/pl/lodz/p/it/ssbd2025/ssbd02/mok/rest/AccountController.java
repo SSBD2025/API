@@ -66,7 +66,6 @@ public class AccountController {
         return jwtService.refresh(request, response);
     }
 
-    @MethodCallLogged
     @PostMapping("/changePassword")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
@@ -74,7 +73,6 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @MethodCallLogged
     @PostMapping("/force/changePassword")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Object> forceChangePassword(@RequestBody @Valid ForceChangePasswordDTO forceChangePasswordDTO) {
@@ -82,7 +80,6 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @MethodCallLogged
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> changeUserPassword(@PathVariable UUID id) {
@@ -167,17 +164,15 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @MethodCallLogged
+    @PostMapping("/reset/password/request")
     @PreAuthorize("permitAll()")
-    @PostMapping("reset/password/request")
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @MethodCallLogged
+    @PostMapping("/reset/password/{token}")
     @PreAuthorize("permitAll()")
-    @PostMapping("reset/password/{token}")
     public ResponseEntity<Void> resetPassword(@PathVariable SensitiveDTO token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -239,14 +234,6 @@ public class AccountController {
         accountService.logUserRoleChange(login, roleChangeLogDTO.getPreviousRole(), roleChangeLogDTO.getNewRole());
         return ResponseEntity.ok().build();
     }
-
-//    @PostMapping("/unlock/request")
-//    @PreAuthorize("permitAll()")
-//    @MethodCallLogged
-//    public ResponseEntity<?> unlockRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
-//        accountService.unlockAccountRequest(changeEmailDTO);
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
 
     @GetMapping("/unlock")
     @PreAuthorize("permitAll()")

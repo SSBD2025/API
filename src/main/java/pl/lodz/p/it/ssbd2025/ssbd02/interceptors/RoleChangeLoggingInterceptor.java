@@ -3,15 +3,11 @@ package pl.lodz.p.it.ssbd2025.ssbd02.interceptors;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.AccessRole;
 
 import java.util.UUID;
@@ -35,7 +31,7 @@ public class RoleChangeLoggingInterceptor {
             String methodName = joinPoint.getSignature().getName();
             String operation = methodName.equals("assignRole") ? "assigned to" : "unassigned from";
 
-            log.info("Role {} {} user with ID {} by administrator {}",
+            log.info("[ROLE ASSIGNMENT LOGGER] Role {} {} user with ID {} by administrator {}",
                     accessRole.name(), operation, accountId, adminLogin);
         }
     }
