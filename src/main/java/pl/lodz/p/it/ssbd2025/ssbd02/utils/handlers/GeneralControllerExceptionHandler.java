@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.utils.handlers;
 
+import jakarta.persistence.PersistenceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -174,5 +175,15 @@ public class GeneralControllerExceptionHandler {
             WebRequest request
     ) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unknown authorization exception: "+ex.getMessage());
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ResponseEntity<Object> handlePersistenceException(
+            PersistenceException ex,
+            WebRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Persistence exception: "+ex.getMessage());
     }
 }
