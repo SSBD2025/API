@@ -25,7 +25,7 @@ public class UserRoleChangeLoggingInterceptor {
             String previousRole = (String) args[1];
             String newRole = (String) args[2];
 
-            log.info("User {} changed active role from {} to {}",
+            log.info("[ROLE CHANGE LOGGER] User {} changed active role from {} to {}",
                     login,
                     previousRole != null ? previousRole.toUpperCase() : "NONE",
                     newRole.toUpperCase());

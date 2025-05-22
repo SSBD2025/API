@@ -53,7 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     return;
                 }
                 if (Objects.equals(jwtTokenProvider.getIssuer(new SensitiveDTO(token)), issuer)) {
-                    // makes sure it doesnt accidentally check oauth2 before its own dedicated filter, skips altogether
                     filterChain.doFilter(request, response);
                     return;
                 }
