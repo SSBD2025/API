@@ -151,14 +151,14 @@ public class EmailService {
         try {
 //            String resetUrl = "prod".equals(environment) ? EmailConsts.RESET_PASSWORD_URL_PROD : EmailConsts.RESET_PASSWORD_URL_LOCAL;
             String resetUrl = EmailConsts.RESET_PASSWORD_URL_PROD;
-            String emailBody = loadTemplate(EmailConsts.TEMPLATE_ADMIN_CHANGED_PASSWORD)
+//            String emailBody = loadTemplate(EmailConsts.TEMPLATE_ADMIN_CHANGED_PASSWORD)
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_CHANGE_EMAIL)
                     .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
                     .replace(EmailConsts.PLACEHOLDER_NAME, username)
                     .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.reset.password.body", language))
                     .replace(EmailConsts.PLACEHOLDER_URL, resetUrl + token.getValue())
-                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.reset.link", language))
-                    .replace(EmailConsts.PLACEHOLDER_MANUALLY, I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
-
+                    .replace(EmailConsts.PLACEHOLDER_LINK_TEXT, I18n.getMessage("email.reset.link", language));
+//                    .replace(EmailConsts.PLACEHOLDER_MANUALLY, I18n.getMessage("email.reset.manually", language) + " <b>" + password + "</b>");
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(senderEmail);
             helper.setTo(to);
