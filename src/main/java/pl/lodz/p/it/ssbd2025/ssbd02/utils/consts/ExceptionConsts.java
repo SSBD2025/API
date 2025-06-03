@@ -39,4 +39,5 @@ public final class ExceptionConsts {
     public static final String PREVIOUS_PASSWORD_USED = "previous_password_used";
     public static final String CLIENT_NOT_FOUND = "client_not_found";
     public static final String PERMANENT_SURVEY_ALREADY_EXISTS = "permanent_survey_already_exists";
+    public static final String DIETICIAN_NOT_FOUND = "dietician_not_found";
 }

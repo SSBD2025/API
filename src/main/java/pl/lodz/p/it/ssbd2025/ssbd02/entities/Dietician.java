@@ -19,5 +19,6 @@ import java.util.List;
 public class Dietician extends UserRole {
 
     @OneToMany(mappedBy = ClientConsts.FIELD_DIETICIAN, cascade = CascadeType.REFRESH)
+    @ToString.Exclude
     private List<Client> clients = new ArrayList<>();
 }

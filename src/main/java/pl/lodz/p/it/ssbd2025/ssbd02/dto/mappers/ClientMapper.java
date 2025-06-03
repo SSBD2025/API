@@ -7,6 +7,8 @@ import org.mapstruct.factory.Mappers;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {UserRoleMapper.class,AccountMapper.class})
 public interface ClientMapper {
 
@@ -17,4 +19,6 @@ public interface ClientMapper {
             @Mapping(target = "account", source = "account"),
     })
     ClientDTO toClientDTO(Client client);
+
+    List<ClientDTO> toClientListDTO(List<Client> clients);
 }

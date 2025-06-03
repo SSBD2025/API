@@ -121,6 +121,7 @@
 
         <insert tableName="client">
             <column name="id" value="00000000-0000-0000-0000-000000000006"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
         </insert>
 
         <insert tableName="change_password">
