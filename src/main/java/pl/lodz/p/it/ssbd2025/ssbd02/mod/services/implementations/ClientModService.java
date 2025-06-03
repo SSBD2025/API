@@ -12,13 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.DieticianNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.PermanentSurveyAlreadyExistsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.SurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 
@@ -36,6 +39,7 @@ public class ClientModService implements IClientService {
 
     private final SurveyRepository surveyRepository;
     private final ClientModRepository clientModRepository;
+    private final DieticianModRepository dieticianModRepository;
 
     @Override
     public Client getClientById(UUID id) {
@@ -43,8 +47,14 @@ public class ClientModService implements IClientService {
     }
 
     @Override
-    public List<Client> getClientsByDieticianId(UUID dieticianId) {
-        return List.of();
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = true,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public List<Client> getClientsByDietician() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Dietician dietician = dieticianModRepository.findByLogin(login).orElseThrow(DieticianNotFoundException::new);
+        return clientModRepository.findByDieticianId(dietician.getId());
     }
 
     @Override

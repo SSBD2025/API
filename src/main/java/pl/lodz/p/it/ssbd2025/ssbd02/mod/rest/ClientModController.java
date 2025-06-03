@@ -9,8 +9,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.SurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
@@ -26,6 +28,7 @@ import java.util.UUID;
 public class ClientModController {
     private final IClientService clientService;
     private final SurveyMapper surveyMapper;
+    private final ClientMapper clientMapper;
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable UUID id) {
@@ -33,10 +36,11 @@ public class ClientModController {
         return null;
     }
 
-    @GetMapping("/dietician/{dieticianId}")
-    public ResponseEntity<List<ClientDTO>> getClientsByDieticianId(@PathVariable UUID dieticianId) {
-        // Implementation will be added later
-        return null;
+    @GetMapping("/dietician")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<List<ClientDTO>> getClientsByDietician() {
+        List<Client> clients = clientService.getClientsByDietician();
+        return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientListDTO(clients));
     }
 
     @PostMapping("/{clientId}/dietician/{dieticianId}")
