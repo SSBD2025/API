@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
@@ -65,7 +67,8 @@ public class Survey extends AbstractEntity {
     @Column(nullable = false)
     private List<String> medications = new ArrayList<>();
 
-    @Size(min = SurveyConsts.MEALS_PER_DAY_MIN, max = SurveyConsts.MEALS_PER_DAY_MAX)
+    @Min(value = SurveyConsts.MEALS_PER_DAY_MIN)
+    @Max(value = SurveyConsts.MEALS_PER_DAY_MAX)
     @Column(name = SurveyConsts.COLUMN_MEALS_PER_DAY, nullable = false)
     private int mealsPerDay;
 
