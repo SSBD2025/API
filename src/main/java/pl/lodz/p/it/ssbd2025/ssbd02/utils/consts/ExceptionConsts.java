@@ -37,4 +37,6 @@ public final class ExceptionConsts {
     public static final String ACCOUNT_UNLOCK_ATTEMPT = "account_unlock_attempt";
     public static final String ACCOUNT_IS_AUTOLOCKED = "account_is_autolocked";
     public static final String PREVIOUS_PASSWORD_USED = "previous_password_used";
+    public static final String CLIENT_NOT_FOUND = "client_not_found";
+    public static final String PERMANENT_SURVEY_ALREADY_EXISTS = "permanent_survey_already_exists";
 }

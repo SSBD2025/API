@@ -27,6 +27,7 @@ public class Client extends UserRole {
     @OneToMany(mappedBy = PeriodicSurveyConsts.FIELD_CLIENT)
     private List<PeriodicSurvey> periodicSurveys = new ArrayList<>();
 
+    @ToString.Exclude
     @OneToOne(mappedBy = SurveyConsts.FIELD_CLIENT)
     private Survey survey;
 
