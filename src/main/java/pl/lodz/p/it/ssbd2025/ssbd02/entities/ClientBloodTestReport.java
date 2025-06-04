@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
@@ -17,9 +19,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"client", "results"})
 public class ClientBloodTestReport extends AbstractEntity {
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = BloodTestConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
     private Client client;
 

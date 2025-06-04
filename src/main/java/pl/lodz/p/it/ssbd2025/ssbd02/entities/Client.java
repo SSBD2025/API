@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.*;
@@ -31,7 +32,8 @@ public class Client extends UserRole {
     @OneToOne(mappedBy = SurveyConsts.FIELD_CLIENT)
     private Survey survey;
 
-    @OneToMany(mappedBy = BloodTestConsts.FIELD_CLIENT)
+    @JsonManagedReference
+    @OneToMany(mappedBy = BloodTestConsts.FIELD_CLIENT, fetch = FetchType.LAZY)
     private List<ClientBloodTestReport> bloodTestReports = new ArrayList<>();
 
     @OneToMany(mappedBy = FoodPyramidConsts.FIELD_CLIENT)
