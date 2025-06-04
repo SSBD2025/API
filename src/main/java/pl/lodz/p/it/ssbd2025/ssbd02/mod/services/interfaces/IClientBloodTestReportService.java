@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateBloodTestReportDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface IClientBloodTestReportService {
     ClientBloodTestReport getById(UUID reportId);
     ClientBloodTestReport createReport(UUID clientId, ClientBloodTestReport report);
     void deleteReport(UUID reportId);
+    void updateReport(UpdateBloodTestReportDTO reportDTO);
 }

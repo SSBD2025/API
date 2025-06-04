@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.UUID;
 

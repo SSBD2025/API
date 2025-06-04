@@ -1,4 +1,4 @@
-package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
+package pl.lodz.p.it.ssbd2025.ssbd02.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;

@@ -1,7 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations.LockTokenService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.UUID;
 
