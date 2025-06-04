@@ -1,9 +1,14 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientBloodTestReportDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateBloodTestReportDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientBloodTestReportService;
 
@@ -12,8 +17,12 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled = true)
 @RequestMapping("/api/mod/blood-test-reports")
 public class ClientBloodTestReportController {
+
+    private final IClientBloodTestReportService clientBloodTestReportService;
 
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<ClientBloodTestReportDTO>> getAllByClientId(@PathVariable UUID clientId) {
@@ -38,4 +47,12 @@ public class ClientBloodTestReportController {
         // Implementation will be added later
         return null;
     }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<?> editBloodTestReport(@RequestBody UpdateBloodTestReportDTO result) {
+        clientBloodTestReportService.updateReport(result);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -40,4 +40,5 @@ public final class ExceptionConsts {
     public static final String CLIENT_NOT_FOUND = "client_not_found";
     public static final String PERMANENT_SURVEY_ALREADY_EXISTS = "permanent_survey_already_exists";
     public static final String DIETICIAN_NOT_FOUND = "dietician_not_found";
+    public static final String CLIENT_BLOOD_TEST_REPORT_NOT_FOUND = "client_blood_test_report_not_found";
 }

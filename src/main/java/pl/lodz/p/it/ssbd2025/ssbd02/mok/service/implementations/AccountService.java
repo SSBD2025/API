@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.service.implementations;
 
-import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.AccountMapper;
@@ -47,8 +45,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IPasswordResetTokenService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.*;
-
-import java.security.SecureRandom;
 
 import java.sql.Timestamp;
 import java.util.*;
