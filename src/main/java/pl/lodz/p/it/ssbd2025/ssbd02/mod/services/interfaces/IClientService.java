@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface IClientService {
     Client getClientById(UUID id);
-    List<Client> getClientsByDietician();
+    List<Client> getClientsByDietician(String searchPhrase);
     void assignDietician(UUID clientId, UUID dieticianId);
     Survey submitPermanentSurvey(Survey newSurvey);
 }

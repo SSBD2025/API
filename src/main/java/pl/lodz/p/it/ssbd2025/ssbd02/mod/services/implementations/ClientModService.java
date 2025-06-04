@@ -51,9 +51,12 @@ public class ClientModService implements IClientService {
             propagation = Propagation.REQUIRES_NEW, readOnly = true,
             transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('DIETICIAN')")
-    public List<Client> getClientsByDietician() {
+    public List<Client> getClientsByDietician(String searchPhrase) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Dietician dietician = dieticianModRepository.findByLogin(login).orElseThrow(DieticianNotFoundException::new);
+        if (searchPhrase != null && !searchPhrase.isEmpty()) {
+            return clientModRepository.findByDieticianIdAndSearchPhrase(dietician.getId(), searchPhrase);
+        }
         return clientModRepository.findByDieticianId(dietician.getId());
     }
 
