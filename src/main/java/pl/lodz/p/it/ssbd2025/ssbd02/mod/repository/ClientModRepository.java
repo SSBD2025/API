@@ -29,4 +29,18 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     List<Client> findByDieticianId(@Param("dieticianId") UUID dieticianId);
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("""
+        SELECT c FROM Client c WHERE c.dietician.id = :dieticianId
+        AND (
+            LOWER(c.account.firstName) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+            OR LOWER(c.account.lastName) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+            OR LOWER(c.account.email) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+        )
+    """)
+    List<Client> findByDieticianIdAndSearchPhrase(
+            @Param("dieticianId") UUID dieticianId,
+            @Param("searchPhrase") String searchPhrase);
 }

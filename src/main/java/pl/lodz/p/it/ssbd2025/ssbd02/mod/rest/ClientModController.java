@@ -38,8 +38,10 @@ public class ClientModController {
 
     @GetMapping("/dietician")
     @PreAuthorize("hasRole('DIETICIAN')")
-    public ResponseEntity<List<ClientDTO>> getClientsByDietician() {
-        List<Client> clients = clientService.getClientsByDietician();
+    public ResponseEntity<List<ClientDTO>> getClientsByDietician(
+            @RequestParam(required = false) String searchPhrase
+    ) {
+        List<Client> clients = clientService.getClientsByDietician(searchPhrase);
         return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientListDTO(clients));
     }
 
