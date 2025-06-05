@@ -1,0 +1,45 @@
+package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.FoodPyramidNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientFoodPyramidRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IDieticianService;
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.UUID;
+
+@TransactionLogged
+@Component
+@RequiredArgsConstructor
+@Service
+@MethodCallLogged
+@EnableMethodSecurity(prePostEnabled=true)
+@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+public class DieticianModService implements IDieticianService {
+
+    @Override
+    public Dietician getById(UUID id) {
+        return null;
+    }
+
+    @Override
+    public List<Client> getClients(UUID dieticianId) {
+        return List.of();
+    }
+}
