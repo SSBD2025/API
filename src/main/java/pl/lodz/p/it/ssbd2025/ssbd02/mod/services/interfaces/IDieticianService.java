@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 

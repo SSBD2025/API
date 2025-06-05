@@ -41,4 +41,11 @@ public class ClientFoodPyramid {
     @Version
     @Column(name = ClientFoodPyramidConsts.COLUMN_VERSION, nullable = false)
     private Long version;
+
+    public ClientFoodPyramid(Client client, FoodPyramid foodPyramid, Timestamp timestamp) {
+        this.client = client;
+        this.foodPyramid = foodPyramid;
+        this.timestamp = timestamp;
+        this.id = new ClientFoodPyramidId(client.getId(), foodPyramid.getId());
+    }
 }
