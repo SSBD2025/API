@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface IClientService {
     Client getClientById(UUID id);
+    UUID getClientByAccountId(UUID id);
     Client getClientByLogin(SensitiveDTO login);
     List<Client> getClientsByDietician(String searchPhrase);
     void assignDietician(UUID clientId, UUID dieticianId);

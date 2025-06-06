@@ -43,4 +43,7 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     List<Client> findByDieticianIdAndSearchPhrase(
             @Param("dieticianId") UUID dieticianId,
             @Param("searchPhrase") String searchPhrase);
+
+    @Query("SELECT c.id FROM Client c WHERE c.account.id = :clientId")
+    Optional<UUID> findUserIdByClientId(@Param("clientId") UUID clientId);
 }
