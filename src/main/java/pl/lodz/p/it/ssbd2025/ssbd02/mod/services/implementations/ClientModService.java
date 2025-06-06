@@ -15,6 +15,10 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.NoAssignedDieticianException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.PermanentSurveyAlreadyExistsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
@@ -56,20 +60,6 @@ public class ClientModService implements IClientService {
     }
 
     @Override
-    @Transactional(
-            propagation = Propagation.REQUIRES_NEW, readOnly = true,
-            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
-    @PreAuthorize("hasRole('DIETICIAN')")
-    public List<Client> getClientsByDietician(String searchPhrase) {
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Dietician dietician = dieticianModRepository.findByLogin(login).orElseThrow(DieticianNotFoundException::new);
-        if (searchPhrase != null && !searchPhrase.isEmpty()) {
-            return clientModRepository.findByDieticianIdAndSearchPhrase(dietician.getId(), searchPhrase);
-        }
-        return clientModRepository.findByDieticianId(dietician.getId());
-    }
-
-    @Override
     public void assignDietician(UUID clientId, UUID dieticianId) {
 
     }
@@ -91,11 +81,27 @@ public class ClientModService implements IClientService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
 
+        if (client.getDietician() == null) {
+            throw new NoAssignedDieticianException();
+        }
+
         if (surveyRepository.existsByClientId(client.getId())) {
             throw new PermanentSurveyAlreadyExistsException();
         }
 
         newSurvey.setClient(client);
         return surveyRepository.saveAndFlush(newSurvey);
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = true,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public List<Dietician> getAvailableDieticians(String searchPhrase) {
+        if (searchPhrase != null && !searchPhrase.isEmpty()) {
+            return dieticianModRepository.getAllAvailableDieticiansBySearchPhrase(searchPhrase);
+        }
+        return dieticianModRepository.getAllAvailableDietians();
     }
 }

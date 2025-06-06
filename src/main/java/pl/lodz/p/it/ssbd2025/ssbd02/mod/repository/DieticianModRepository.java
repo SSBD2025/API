@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,4 +24,21 @@ public interface DieticianModRepository extends AbstractRepository<Dietician> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT d FROM Dietician d WHERE d.account.login = :login")
     Optional<Dietician> findByLogin(@Param("login") String login);
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("SELECT d FROM Dietician d WHERE SIZE(d.clients) < 10")
+    List<Dietician> getAllAvailableDietians();
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("""
+        SELECT d FROM Dietician d WHERE SIZE(d.clients) < 10
+        AND (
+            LOWER(d.account.firstName) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+            OR LOWER(d.account.lastName) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+            OR LOWER(d.account.email) LIKE LOWER(CONCAT('%', :searchPhrase, '%'))
+        )
+    """)
+    List<Dietician> getAllAvailableDieticiansBySearchPhrase(@Param("searchPhrase") String searchPhrase);
 }

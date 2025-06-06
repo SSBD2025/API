@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface IDieticianService {
     Dietician getById(UUID id);
     List<Client> getClients(UUID dieticianId);
+    List<Client> getClientsByDietician(String searchPhrase);
 }
