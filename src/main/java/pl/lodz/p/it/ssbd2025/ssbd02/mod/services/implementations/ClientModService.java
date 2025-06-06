@@ -45,6 +45,12 @@ public class ClientModService implements IClientService {
     }
 
     @Override
+    public UUID getClientByAccountId(UUID id) {
+        return clientModRepository.findUserIdByClientId(id).orElseThrow(AccountNotFoundException::new);
+    }
+
+
+    @Override
     public Client getClientByLogin(SensitiveDTO login) {
         return clientModRepository.findByLogin(login.getValue()).orElseThrow(AccountNotFoundException::new);
     }

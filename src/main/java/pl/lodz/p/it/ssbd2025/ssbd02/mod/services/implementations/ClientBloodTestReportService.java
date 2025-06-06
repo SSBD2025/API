@@ -50,7 +50,7 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Override
     public List<ClientBloodTestReportDTO> getAllByClientId(SensitiveDTO clientId) {
-        UUID uuid = UUID.fromString(clientId.getValue());
+        UUID uuid = clientModService.getClientByAccountId(UUID.fromString(clientId.getValue()));
         return getClientBloodTestReportDTOS(uuid);
     }
 
