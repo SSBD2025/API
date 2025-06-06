@@ -44,4 +44,5 @@ public final class ExceptionConsts {
     public static final String BLOOD_TEST_RESULT_NOT_FOUND = "blood_test_result_not_found";
     public static final String FOOD_PYRAMID_NOT_FOUND = "food_pyramid_not_found";
     public static final String FOOD_PYRAMID_ALREADY_ASSIGNED = "food_pyramid_already_assigned";
+    public static final String NO_ASSIGNED_DIETICAN = "no_assigned_dietican";
 }

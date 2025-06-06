@@ -7,6 +7,8 @@ import org.mapstruct.factory.Mappers;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {UserRoleMapper.class,AccountMapper.class})
 public interface DieticianMapper {
 
@@ -17,5 +19,7 @@ public interface DieticianMapper {
             @Mapping(target = "account", source = "account"),
     })
     DieticianDTO toDieticianDTO(Dietician dietician);
+
+    List<DieticianDTO> toDieticianListDTO(List<Dietician> dieticianList);
 }
 

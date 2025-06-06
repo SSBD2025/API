@@ -2,11 +2,15 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.DieticianModService;
 
 import java.util.List;
@@ -18,6 +22,16 @@ import java.util.UUID;
 public class DieticianModController {
 
     private final DieticianModService dieticianModService;
+    private final ClientMapper clientMapper;
+
+    @GetMapping("/get-clients-by-dietician")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<List<ClientDTO>> getClientsByDietician(
+            @RequestParam(required = false) String searchPhrase
+    ) {
+        List<Client> clients = dieticianModService.getClientsByDietician(searchPhrase);
+        return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientListDTO(clients));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<DieticianDTO> getById(@PathVariable UUID id) {
