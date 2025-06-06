@@ -11,13 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.DieticianNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.PermanentSurveyAlreadyExistsException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
@@ -44,6 +42,11 @@ public class ClientModService implements IClientService {
     @Override
     public Client getClientById(UUID id) {
         return null;
+    }
+
+    @Override
+    public Client getClientByLogin(SensitiveDTO login) {
+        return clientModRepository.findByLogin(login.getValue()).orElseThrow(AccountNotFoundException::new);
     }
 
     @Override

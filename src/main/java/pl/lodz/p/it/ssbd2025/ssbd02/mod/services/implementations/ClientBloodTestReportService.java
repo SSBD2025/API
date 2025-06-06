@@ -7,19 +7,18 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestResultDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientBloodTestReportDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.BloodTestResultNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateBloodTestReportDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientBloodTestReportNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
@@ -44,20 +43,38 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     private final ClientBloodTestReportRepository clientBloodTestReportRepository;
     @NotNull
     private final LockTokenService lockTokenService;
+    @NotNull
+    private final ClientModService clientModService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = true, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Override
     public List<ClientBloodTestReportDTO> getAllByClientId(SensitiveDTO clientId) {
         UUID uuid = UUID.fromString(clientId.getValue());
+        return getClientBloodTestReportDTOS(uuid);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = true, timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Override
+    public List<ClientBloodTestReportDTO> getAllByClientLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+        UUID uuid = clientModService.getClientByLogin(new SensitiveDTO(login)).getId();
+        return getClientBloodTestReportDTOS(uuid);
+    }
+
+    @NotNull
+    private List<ClientBloodTestReportDTO> getClientBloodTestReportDTOS(UUID uuid) {
         List<ClientBloodTestReport> reports = clientBloodTestReportRepository.findAllByClientId(uuid);
         List<ClientBloodTestReportDTO> dtos = new ArrayList<>();
         for (ClientBloodTestReport report : reports) {
             List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
             for (BloodTestResult result : report.getResults()) {
-                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), result.getBloodParameter()));
+//                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(uuid).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
+                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
             }
-            dtos.add(new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, null));
+            dtos.add(new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, report.getTimestamp(), null));
         }
         return dtos;
     }
@@ -67,9 +84,10 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         ClientBloodTestReport report = clientBloodTestReportRepository.findById(UUID.fromString(reportId.getValue())).orElseThrow(ClientBloodTestReportNotFoundException::new);
         List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
         for (BloodTestResult result : report.getResults()) {
-            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), result.getBloodParameter()));
+//            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
+            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
         }
-        return new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, null);
+        return new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, report.getTimestamp(), null);
     }
 
     @Override

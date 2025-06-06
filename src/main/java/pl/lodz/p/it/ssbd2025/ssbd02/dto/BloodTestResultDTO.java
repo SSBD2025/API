@@ -15,7 +15,7 @@ public class BloodTestResultDTO {
     @NotNull
     String result;
     @NotNull
-    BloodParameter bloodParameter;
+    BloodParameterDTO bloodParameter;
 
     public BloodTestResultDTO() {}
 
