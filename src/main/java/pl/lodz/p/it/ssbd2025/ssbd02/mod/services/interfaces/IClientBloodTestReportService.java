@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public interface IClientBloodTestReportService {
     List<ClientBloodTestReportDTO> getAllByClientId(SensitiveDTO clientId);
+    List<ClientBloodTestReportDTO> getAllByClientLogin();
     ClientBloodTestReportDTO getById(SensitiveDTO reportId);
     ClientBloodTestReport createReport(UUID clientId, ClientBloodTestReport report);
     void deleteReport(UUID reportId);

@@ -27,10 +27,16 @@ public class ClientBloodTestReportController {
 
     private final IClientBloodTestReportService clientBloodTestReportService;
 
-    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<ClientBloodTestReportDTO>> getAllByClientId(@PathVariable UUID clientId) {
         return ResponseEntity.ok().body(clientBloodTestReportService.getAllByClientId(new SensitiveDTO(clientId.toString())));
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/client")
+    public ResponseEntity<List<ClientBloodTestReportDTO>> getAllByClientLogin() {
+        return ResponseEntity.ok().body(clientBloodTestReportService.getAllByClientLogin());
     }
 
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
