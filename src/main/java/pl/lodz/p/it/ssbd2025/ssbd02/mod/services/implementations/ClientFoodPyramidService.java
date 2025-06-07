@@ -51,7 +51,6 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         return clientFoodPyramidRepository.findAllByClientId(clientId);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @Override
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(
