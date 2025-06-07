@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
@@ -24,9 +25,12 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.PeriodicSurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.SurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +46,7 @@ public class ClientModService implements IClientService {
     private final SurveyRepository surveyRepository;
     private final ClientModRepository clientModRepository;
     private final DieticianModRepository dieticianModRepository;
+    private final PeriodicSurveyRepository periodicSurveyRepository;
 
     @Override
     public Client getClientById(UUID id) {
@@ -103,5 +108,31 @@ public class ClientModService implements IClientService {
             return dieticianModRepository.getAllAvailableDieticiansBySearchPhrase(searchPhrase);
         }
         return dieticianModRepository.getAllAvailableDietians();
+    }
+
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public PeriodicSurvey submitPeriodicSurvey(PeriodicSurvey periodicSurvey) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        periodicSurvey.setClient(client);
+
+        if (periodicSurveyRepository.existsByClientAndMeasurementDateAfter(periodicSurvey.getClient(),
+                Timestamp.valueOf(LocalDateTime.now().minusHours(24)))) {
+            throw new PeriodicSurveyTooSoonException();
+        }
+
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        periodicSurvey.setMeasurementDate(now);
+        return periodicSurveyRepository.saveAndFlush(periodicSurvey);
     }
 }

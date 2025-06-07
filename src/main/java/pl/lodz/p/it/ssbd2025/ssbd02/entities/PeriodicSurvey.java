@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -13,7 +15,6 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Table(name = PeriodicSurveyConsts.TABLE_NAME,
         indexes = {
                 @Index(name = PeriodicSurveyConsts.CLIENT_ID_INDEX, columnList = PeriodicSurveyConsts.COLUMN_CLIENT_ID)
@@ -22,10 +23,12 @@ import java.sql.Timestamp;
 public class PeriodicSurvey extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = PeriodicSurveyConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
+    @ToString.Exclude
     private Client client;
 
     @Column(name = PeriodicSurveyConsts.COLUMN_WEIGHT, nullable = false, updatable = false)
-    @Size(min = PeriodicSurveyConsts.WEIGHT_MIN, max = PeriodicSurveyConsts.WEIGHT_MAX)
+    @DecimalMin(value = PeriodicSurveyConsts.WEIGHT_MIN)
+    @DecimalMax(value = PeriodicSurveyConsts.WEIGHT_MAX)
     private double weight;
 
     @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_PRESSURE, nullable = false, updatable = false)
@@ -33,7 +36,8 @@ public class PeriodicSurvey extends AbstractEntity {
     private String bloodPressure;
 
     @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_SUGAR_LEVEL, nullable = false, updatable = false)
-    @Size(min = PeriodicSurveyConsts.BLOOD_SUGAR_MIN, max = PeriodicSurveyConsts.BLOOD_SUGAR_MAX)
+    @DecimalMin(value = PeriodicSurveyConsts.BLOOD_SUGAR_MIN)
+    @DecimalMax(value = PeriodicSurveyConsts.BLOOD_SUGAR_MAX)
     private double bloodSugarLevel;
 
     @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = false)
