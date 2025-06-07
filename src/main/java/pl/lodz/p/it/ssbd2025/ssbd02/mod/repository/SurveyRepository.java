@@ -28,6 +28,11 @@ public interface SurveyRepository extends AbstractRepository<Survey> {
     boolean existsByClientId(UUID clientId);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+<<<<<<< HEAD
+    @PreAuthorize("hasRole('CLIENT')")
+    Optional<Survey> findByClientId(UUID id);
+=======
     @PreAuthorize("hasAnyRole('CLIENT', 'DIETICIAN')")
     Optional<Survey> findByClientId(UUID clientId);
+>>>>>>> 2afdc3fa545d0aa78d0edee20540078f67346a39
 }

@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
@@ -18,4 +19,5 @@ public interface IClientService {
     public Survey getPermanentSurvey();
     List<Dietician> getAvailableDieticians(String searchPhrase);
     public PeriodicSurvey submitPeriodicSurvey(PeriodicSurvey periodicSurvey);
+    Survey editPermanentSurvey(SurveyDTO dto);
 }

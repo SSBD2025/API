@@ -10,6 +10,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.NutritionGoal;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class SurveyDTO {
+    @NotNull(groups = OnUpdate.class)
+    private String lockToken;
 
     @NotNull(groups = OnRead.class)
     private UUID clientId;
@@ -91,6 +94,7 @@ public class SurveyDTO {
                 ", nutritionGoal=" + nutritionGoal +
                 ", mealTimes=" + mealTimes +
                 ", eatingHabits='" + eatingHabits + '\'' +
+                ", lockToken='" + DTOConsts.PROTECTED + '\'' +
                 '}';
     }
 }

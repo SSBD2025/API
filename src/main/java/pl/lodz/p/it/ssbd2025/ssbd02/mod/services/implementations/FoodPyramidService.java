@@ -1,6 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -8,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.FoodPyramidMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFoodPyramidService;
@@ -33,7 +37,10 @@ public class FoodPyramidService implements IFoodPyramidService {
             propagation = Propagation.REQUIRES_NEW, readOnly = true,
             transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('DIETICIAN')")
-    @MethodCallLogged
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     public List<FoodPyramidDTO> getAllFoodPyramids() {
         return StreamSupport.stream(foodPyramidRepository.findAll().spliterator(), false)
                 .map(foodPyramidMapper::toDto)
