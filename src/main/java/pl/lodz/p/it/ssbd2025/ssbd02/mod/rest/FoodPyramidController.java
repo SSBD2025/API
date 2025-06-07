@@ -1,7 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDTO;
@@ -17,6 +19,8 @@ import java.util.UUID;
 @RequestMapping("/api/mod/food-pyramids")
 public class FoodPyramidController {
 
+    private final FoodPyramidService foodPyramidService;
+
     @GetMapping("/{id}")
     public ResponseEntity<FoodPyramidDTO> getById(@PathVariable UUID id) {
         // Implementation will be added later
@@ -24,8 +28,10 @@ public class FoodPyramidController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodPyramidDTO>> getAll() {
-        // Implementation will be added later
-        return null;
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @MethodCallLogged
+    public List<FoodPyramidDTO> getAllFoodPyramids() {
+        return foodPyramidService.getAllFoodPyramids();
     }
 }

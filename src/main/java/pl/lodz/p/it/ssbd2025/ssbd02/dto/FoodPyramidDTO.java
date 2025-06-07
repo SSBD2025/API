@@ -14,7 +14,35 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FoodPyramidDTO {
-    @NotNull(groups = OnCreate.class)
-    @Null(groups = OnUpdate.class)
-    private UUID foodPyramidId;
+    private UUID id;
+
+    private double averageRating;
+
+    private double A;
+    private double D;
+    private double E;
+    private double K;
+    private double B1;
+    private double B2;
+    private double B3;
+    private double B5;
+    private double B6;
+    private double B7;
+    private double B9;
+    private double B12;
+    private double C;
+
+    private double Potassium;
+    private double Calcium;
+    private double Phosphorus;
+    private double Magnesium;
+    private double Iron;
+    private double Zinc;
+    private double Fluorine;
+    private double Manganese;
+    private double Copper;
+    private double Iodine;
+    private double Selenium;
+    private double Molybdenum;
+    private double Chromium;
 }

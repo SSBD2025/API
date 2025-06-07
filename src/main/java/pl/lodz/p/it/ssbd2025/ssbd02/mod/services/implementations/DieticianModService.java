@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,8 +37,10 @@ import java.util.UUID;
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
 public class DieticianModService implements IDieticianService {
-    private final DieticianModRepository dieticianModRepository;
     private final ClientModRepository clientModRepository;
+    private final FoodPyramidRepository foodPyramidRepository;
+    private final ClientFoodPyramidRepository clientFoodPyramidRepository;
+    private final DieticianModRepository dieticianModRepository;
 
     @Override
     @Transactional(
@@ -62,4 +65,5 @@ public class DieticianModService implements IDieticianService {
     public List<Client> getClients(UUID dieticianId) {
         return List.of();
     }
+
 }

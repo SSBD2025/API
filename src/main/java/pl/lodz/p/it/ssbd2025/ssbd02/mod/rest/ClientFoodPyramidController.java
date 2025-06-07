@@ -2,10 +2,13 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientFoodPyramidDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientFoodPyramidService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientFoodPyramidService;
 
@@ -25,6 +28,9 @@ public class ClientFoodPyramidController {
     }
 
     @PostMapping
+    @MethodCallLogged
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('DIETICIAN')")
     public ResponseEntity<Void> assignFoodPyramidToClient(@Valid @RequestBody AssignDietPlanDTO dto) {
         clientFoodPyramidService.assignFoodPyramidToClient(dto);
         return ResponseEntity.noContent().build();
