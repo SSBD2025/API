@@ -30,7 +30,6 @@ public class FoodPyramidController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('DIETICIAN')")
-    @MethodCallLogged
     public List<FoodPyramidDTO> getAllFoodPyramids() {
         return foodPyramidService.getAllFoodPyramids();
     }

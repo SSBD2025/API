@@ -27,8 +27,6 @@ public class ClientFoodPyramidController {
     }
 
     @PostMapping
-    @MethodCallLogged
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('DIETICIAN')")
     public ResponseEntity<Void> assignFoodPyramidToClient(@Valid @RequestBody AssignDietPlanDTO dto) {
         clientFoodPyramidService.assignFoodPyramidToClient(dto);

@@ -7,15 +7,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.SurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
@@ -62,6 +60,16 @@ public class ClientModController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<SurveyDTO> getPermanentSurvey() {
         return ResponseEntity.status(HttpStatus.OK).body(surveyMapper.toSurveyDTO(clientService.getPermanentSurvey()));
+    }
+
+    @PutMapping("/permanent-survey")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<SurveyDTO> editPermanentSurvey(
+            @Validated(OnUpdate.class)
+            @RequestBody SurveyDTO surveyDTO) {
+
+        Survey updatedSurvey = clientService.editPermanentSurvey(surveyDTO);
+        return ResponseEntity.ok(surveyMapper.toSurveyDTO(updatedSurvey));
     }
 
     @GetMapping("/get-available-dieticians")

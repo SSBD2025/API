@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
@@ -28,6 +29,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.PeriodicSurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.SurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -47,6 +49,7 @@ public class ClientModService implements IClientService {
     private final ClientModRepository clientModRepository;
     private final DieticianModRepository dieticianModRepository;
     private final PeriodicSurveyRepository periodicSurveyRepository;
+    private final LockTokenService lockTokenService;
 
     @Override
     public Client getClientById(UUID id) {
@@ -153,5 +156,48 @@ public class ClientModService implements IClientService {
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
         periodicSurvey.setMeasurementDate(now);
         return periodicSurveyRepository.saveAndFlush(periodicSurvey);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public Survey editPermanentSurvey(SurveyDTO dto) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+
+        Survey existingSurvey = surveyRepository.findByClientId(client.getId())
+                .orElseThrow(PermanentSurveyNotFoundException::new);
+
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.getLockToken());
+
+        if (!existingSurvey.getId().equals(record.id())) {
+            throw new InvalidLockTokenException();
+        }
+
+        if (!existingSurvey.getVersion().equals(record.version())) {
+            throw new ConcurrentUpdateException();
+        }
+
+        existingSurvey.setDietPreferences(dto.getDietPreferences());
+        existingSurvey.setAllergies(dto.getAllergies());
+        existingSurvey.setActivityLevel(dto.getActivityLevel());
+        existingSurvey.setSmokes(dto.isSmokes());
+        existingSurvey.setDrinksAlcohol(dto.isDrinksAlcohol());
+        existingSurvey.setIllnesses(dto.getIllnesses());
+        existingSurvey.setMedications(dto.getMedications());
+        existingSurvey.setMealsPerDay(dto.getMealsPerDay());
+        existingSurvey.setNutritionGoal(dto.getNutritionGoal());
+        existingSurvey.setMealTimes(dto.getMealTimes());
+        existingSurvey.setEatingHabits(dto.getEatingHabits());
+
+        return surveyRepository.saveAndFlush(existingSurvey);
     }
 }
