@@ -12,35 +12,49 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Setter(AccessLevel.NONE)
 @Getter
 @AllArgsConstructor
 public class ClientBloodTestReportDTO {
-    @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
-    String lockToken;
+
+    @Setter
+    @Null(groups = {OnCreate.class, OnUpdate.class})
+    @NotNull(groups = OnRead.class)
+    UUID id;
+
+    @Null(groups = {OnCreate.class, OnRead.class})
+    @NotNull(groups = OnUpdate.class)
+    Long version;
+
+    @Null(groups = {OnRead.class, OnUpdate.class, OnCreate.class})
+    Client client;
+
+    @Setter
+    @NotNull(groups = {OnRead.class})
+    @Null(groups = {OnUpdate.class, OnCreate.class})
+    private Timestamp timestamp;
+
+    @Setter
     @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     List<BloodTestResultDTO> results;
 
-    @NotNull(groups = {OnCreate.class, OnRead.class})
-    @Null(groups = {OnUpdate.class})
-    Timestamp timestamp;
-
-
-    @NotNull(groups = OnCreate.class)
-    @Null(groups = {OnRead.class, OnUpdate.class})
-    Client client;
+    @Setter
+    @NotNull(groups = {OnRead.class, OnUpdate.class})
+    @Null(groups = {OnCreate.class})
+    String lockToken;
 
     public ClientBloodTestReportDTO() {}
 
     @Override
     public String toString() {
         return "ClientBloodTestReportDTO{" +
-                "lockToken='" + DTOConsts.PROTECTED + '\'' +
-                ", results=" + results +
+                "client=" + client +
                 ", timestamp=" + timestamp +
-                ", client=" + client +
+                ", results=" + DTOConsts.PROTECTED +
+                ", lockToken='" + DTOConsts.PROTECTED + '\'' +
                 '}';
     }
 }

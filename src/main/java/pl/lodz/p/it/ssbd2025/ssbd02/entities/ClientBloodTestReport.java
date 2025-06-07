@@ -30,6 +30,6 @@ public class ClientBloodTestReport extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
-    @OneToMany(mappedBy = "report", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "report", cascade = {CascadeType.PERSIST})
     private List<BloodTestResult> results;
 }

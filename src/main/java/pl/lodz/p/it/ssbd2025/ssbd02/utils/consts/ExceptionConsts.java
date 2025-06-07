@@ -44,6 +44,7 @@ public final class ExceptionConsts {
     public static final String BLOOD_TEST_RESULT_NOT_FOUND = "blood_test_result_not_found";
     public static final String FOOD_PYRAMID_NOT_FOUND = "food_pyramid_not_found";
     public static final String FOOD_PYRAMID_ALREADY_ASSIGNED = "food_pyramid_already_assigned";
+    public static final String INVALID_BLOOD_PARAMETER_NAME = "invalid_blood_parameter_name";
     public static final String NO_ASSIGNED_DIETICAN = "no_assigned_dietican";
     public static final String PERIODIC_SURVEY_TOO_SOON = "periodic_survey_too_soon";
     public static final String PERMANENT_SURVEY_NOT_FOUND = "permanent_survey_not_found";

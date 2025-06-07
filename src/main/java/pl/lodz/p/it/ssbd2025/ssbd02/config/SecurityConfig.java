@@ -77,6 +77,9 @@ public class SecurityConfig {
                                 "/api/account/{id}"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
+                                "/api/blood-test-reports/{clientId}"
+                        ).hasRole("DIETICIAN")
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/admin/register",
                                 "/api/account/{id}/changePassword",
                                 "/api/account/{id}/change-user-email"
