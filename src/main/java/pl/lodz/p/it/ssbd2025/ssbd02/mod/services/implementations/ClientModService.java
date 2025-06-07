@@ -100,6 +100,25 @@ public class ClientModService implements IClientService {
 
     @Override
     @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class},
+    backoff = @Backoff(
+            delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public Survey getPermanentSurvey() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        return surveyRepository.findByClientId(client.getId()).orElseThrow(SurveyNotFoundException::new);
+    }
+
+    @Override
+    @Transactional(
             propagation = Propagation.REQUIRES_NEW, readOnly = true,
             transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('CLIENT')")

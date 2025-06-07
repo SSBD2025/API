@@ -10,19 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.DieticianNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.FoodPyramidNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.SurveyNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientFoodPyramidRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IDieticianService;
 
 import java.sql.Timestamp;
@@ -41,6 +36,7 @@ public class DieticianModService implements IDieticianService {
     private final FoodPyramidRepository foodPyramidRepository;
     private final ClientFoodPyramidRepository clientFoodPyramidRepository;
     private final DieticianModRepository dieticianModRepository;
+    private final SurveyRepository surveyRepository;
 
     @Override
     @Transactional(
@@ -64,6 +60,17 @@ public class DieticianModService implements IDieticianService {
     @Override
     public List<Client> getClients(UUID dieticianId) {
         return List.of();
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            timeoutString = "${transaction.timeout}"
+    )
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public Survey getPermanentSurveyByClientId(UUID clientId) {
+        return surveyRepository.findByClientId(clientId).orElseThrow(SurveyNotFoundException::new);
     }
 
 }

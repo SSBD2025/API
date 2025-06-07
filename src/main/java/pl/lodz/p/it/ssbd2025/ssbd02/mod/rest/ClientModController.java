@@ -58,6 +58,12 @@ public class ClientModController {
         return ResponseEntity.status(HttpStatus.CREATED).body(surveyMapper.toSurveyDTO(savedSurvey));
     }
 
+    @GetMapping("/permanent-survey")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<SurveyDTO> getPermanentSurvey() {
+        return ResponseEntity.status(HttpStatus.OK).body(surveyMapper.toSurveyDTO(clientService.getPermanentSurvey()));
+    }
+
     @GetMapping("/get-available-dieticians")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<DieticianDTO>> getAvailableDieticians(
