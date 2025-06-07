@@ -36,7 +36,8 @@ public class Client extends UserRole {
     @OneToMany(mappedBy = BloodTestConsts.FIELD_CLIENT, fetch = FetchType.LAZY)
     private List<ClientBloodTestReport> bloodTestReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = FoodPyramidConsts.FIELD_CLIENT)
+    @JsonManagedReference
+    @OneToMany(mappedBy = FoodPyramidConsts.FIELD_CLIENT, fetch = FetchType.LAZY)
     private List<ClientFoodPyramid> foodPyramidIds = new ArrayList<>();
 
     @OneToOne(mappedBy = DietaryRestrictionsConsts.FIELD_CLIENT, cascade = CascadeType.PERSIST)

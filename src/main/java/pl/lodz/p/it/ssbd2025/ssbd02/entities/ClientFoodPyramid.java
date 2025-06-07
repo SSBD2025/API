@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ClientFoodPyramidConsts;
@@ -18,14 +19,15 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"client", "foodPyramid"})
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"client", "foodPyramid"})
 public class ClientFoodPyramid {
 
     @EmbeddedId
     private ClientFoodPyramidId id = new ClientFoodPyramidId();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("clientId")
+    @JsonBackReference
     @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_CLIENT_ID)
     private Client client;
 

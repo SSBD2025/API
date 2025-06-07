@@ -40,6 +40,11 @@ public class FoodPyramidService implements IFoodPyramidService {
                 .collect(Collectors.toList());
     }
 
+    public FoodPyramid createFoodPyramid(FoodPyramidDTO foodPyramidDTO) {
+        FoodPyramid foodPyramid = foodPyramidMapper.toEntity(foodPyramidDTO);
+        return foodPyramidRepository.saveAndFlush(foodPyramid);
+    }
+
     @Override
     public void updateAverageRating(UUID pyramidId) {
 
