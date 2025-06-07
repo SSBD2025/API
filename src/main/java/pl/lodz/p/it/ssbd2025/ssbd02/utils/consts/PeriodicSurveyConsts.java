@@ -10,10 +10,10 @@ public class PeriodicSurveyConsts {
 
     public static final String CLIENT_ID_INDEX = "ps_client_id_index";
 
-    public static final int WEIGHT_MIN = 20;
-    public static final int WEIGHT_MAX = 350;
-    public static final int BLOOD_SUGAR_MIN = 10;
-    public static final int BLOOD_SUGAR_MAX = 500;
+    public static final String WEIGHT_MIN = "20.0";
+    public static final String WEIGHT_MAX = "350.0";
+    public static final String BLOOD_SUGAR_MIN = "10.0";
+    public static final String BLOOD_SUGAR_MAX = "500.0";
     public static final String BLOOD_PRESSURE_PATTERN = "(\\d{2,3})/(\\d{2,3})";
     public static final String BLOOD_PRESSURE_MESSAGE = "Blood pressure must be in the format 'XX/XX'";
     public static final String FIELD_CLIENT = "client";

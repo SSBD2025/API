@@ -9,12 +9,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.DieticianMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.SurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
@@ -31,6 +34,7 @@ public class ClientModController {
     private final IClientService clientService;
     private final SurveyMapper surveyMapper;
     private final DieticianMapper dieticianMapper;
+    private final PeriodicSurveyMapper periodicSurveyMapper;
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable UUID id) {
@@ -61,5 +65,14 @@ public class ClientModController {
     ) {
         List<Dietician> dieticians = clientService.getAvailableDieticians(searchPhrase);
         return ResponseEntity.status(HttpStatus.OK).body(dieticianMapper.toDieticianListDTO(dieticians));
+    }
+
+    @PostMapping("/periodic-survey")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PeriodicSurveyDTO> submitPeriodicSurvey(@Validated(OnCreate.class)
+                                                                  @RequestBody PeriodicSurveyDTO periodicSurveyDTO) {
+
+        PeriodicSurvey periodicSurvey = clientService.submitPeriodicSurvey(periodicSurveyMapper.toPeriodicSurvey(periodicSurveyDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurvey));
     }
 }
