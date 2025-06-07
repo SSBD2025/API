@@ -22,6 +22,7 @@ import java.util.UUID;
 public class DieticianModController {
 
     private final DieticianModService dieticianModService;
+
     private final ClientMapper clientMapper;
 
     @GetMapping("/get-clients-by-dietician")

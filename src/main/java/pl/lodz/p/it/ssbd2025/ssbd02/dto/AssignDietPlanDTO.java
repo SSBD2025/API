@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Null;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
-
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 import java.util.UUID;
 
 @Data
