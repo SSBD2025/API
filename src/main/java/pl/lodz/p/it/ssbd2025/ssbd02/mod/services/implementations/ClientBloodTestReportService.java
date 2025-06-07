@@ -15,18 +15,26 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodParameterMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodTestResultMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientBloodTestReportMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.BloodTestResultNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientBloodTestReportNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientBloodTestReportRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -44,7 +52,13 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     @NotNull
     private final LockTokenService lockTokenService;
     @NotNull
+    private final ClientModRepository clientModRepository;
+    @NotNull
     private final ClientModService clientModService;
+    @NotNull
+    private final BloodParameterMapper bloodParameterMapper;
+    private final BloodTestResultMapper bloodTestResultMapper;
+    private final ClientBloodTestReportMapper clientBloodTestReportMapper;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = true, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
@@ -72,9 +86,13 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
             List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
             for (BloodTestResult result : report.getResults()) {
 //                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(uuid).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
-                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
+                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter());
+                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result);
+                bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
+                resultsDTO.add(bloodTestResultDTO);
             }
-            dtos.add(new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, report.getTimestamp(), null));
+//            dtos.add(clientBloodTestReportMapper.toClientBloodTestReportDTO(report));
+            dtos.add(new ClientBloodTestReportDTO(null, null, null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue()));
         }
         return dtos;
     }
@@ -85,14 +103,22 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
         for (BloodTestResult result : report.getResults()) {
 //            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
-            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
+//            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
         }
-        return new ClientBloodTestReportDTO(lockTokenService.generateToken(report.getId(), report.getVersion()).getValue(), resultsDTO, report.getTimestamp(), null);
+//        return new ClientBloodTestReportDTO(null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue());
+        return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('DIETICIAN')")
     @Override
-    public ClientBloodTestReport createReport(UUID clientId, ClientBloodTestReport report) {
-        return null;
+    public ClientBloodTestReport createReport(SensitiveDTO clientId, ClientBloodTestReport report) {
+        UUID uuid = UUID.fromString(clientId.getValue());
+        Client client = clientModRepository.findClientById(uuid).orElseThrow(ClientNotFoundException::new);
+        report.setClient(client);
+        report.setTimestamp(Timestamp.from(Instant.now()));
+        report.getResults().forEach(result -> result.setReport(report));
+        return clientBloodTestReportRepository.saveAndFlush(report);
     }
 
     @Override

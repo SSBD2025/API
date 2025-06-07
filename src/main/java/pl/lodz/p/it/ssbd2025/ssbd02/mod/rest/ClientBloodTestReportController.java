@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,10 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientBloodTestReportDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.UpdateBloodTestReportDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientBloodTestReportMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientBloodTestReportService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +31,17 @@ import java.util.UUID;
 public class ClientBloodTestReportController {
 
     private final IClientBloodTestReportService clientBloodTestReportService;
+    private final ClientBloodTestReportMapper clientBloodTestReportMapper;
+    private final LockTokenService lockTokenService;
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @PostMapping("/client/{clientId}")
+    public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
+        ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
+        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportService.createReport(clientId, newClientBloodTestResult));
+        dto.setLockToken(lockTokenService.generateToken(dto.getId(), dto.getVersion()).getValue());
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/client/{clientId}")
@@ -45,12 +61,6 @@ public class ClientBloodTestReportController {
         return ResponseEntity.ok().body(clientBloodTestReportService.getById(new SensitiveDTO(reportId.toString())));
     }
 
-    @PostMapping("/client/{clientId}")
-    public ResponseEntity<ClientBloodTestReportDTO> createReport(@PathVariable UUID clientId, @RequestBody ClientBloodTestReportDTO report) {
-        // Implementation will be added later
-        return null;
-    }
-
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable UUID reportId) {
         // Implementation will be added later
@@ -63,5 +73,4 @@ public class ClientBloodTestReportController {
         clientBloodTestReportService.updateReport(result);
         return ResponseEntity.ok().build();
     }
-
 }
