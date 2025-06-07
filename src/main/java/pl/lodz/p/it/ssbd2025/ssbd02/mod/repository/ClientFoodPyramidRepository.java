@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.util.List;
+import java.util.UUID;
+
 @Repository
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
@@ -25,4 +29,11 @@ public interface ClientFoodPyramidRepository extends AbstractRepository<ClientFo
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('DIETICIAN')")
     boolean existsByClientAndFoodPyramid(Client client, FoodPyramid foodPyramid);
+
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("""
+        select cfp from ClientFoodPyramid cfp where cfp.client.id=:clientId
+""")
+    List<ClientFoodPyramid> findAllByClientId(UUID clientId);
 }

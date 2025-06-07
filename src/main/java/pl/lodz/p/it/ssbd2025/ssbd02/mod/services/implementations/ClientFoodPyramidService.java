@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
@@ -21,6 +23,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientFoodPyramidService;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,16 +33,20 @@ import java.util.UUID;
 @Service
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")public class ClientFoodPyramidService implements IClientFoodPyramidService {
+@Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+public class ClientFoodPyramidService implements IClientFoodPyramidService {
     private final ClientModRepository clientModRepository;
     private final FoodPyramidRepository foodPyramidRepository;
     private final ClientFoodPyramidRepository clientFoodPyramidRepository;
+    private final FoodPyramidService foodPyramidService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     public List<ClientFoodPyramid> getByClientId(UUID clientId) {
-        return List.of();
+        return clientFoodPyramidRepository.findAllByClientId(clientId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @Override
     public void assignFoodPyramidToClient(AssignDietPlanDTO dto) {
         Client client = clientModRepository.findById(dto.getClientId()).orElseThrow(ClientNotFoundException::new);
@@ -52,6 +59,16 @@ import java.util.UUID;
         Timestamp now = Timestamp.valueOf(java.time.LocalDateTime.now());
         ClientFoodPyramid assignment = new ClientFoodPyramid(client, foodPyramid, now);
         clientFoodPyramidRepository.saveAndFlush(assignment);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @Override
+    public ClientFoodPyramid createAndAssignFoodPyramid(FoodPyramidDTO dto, SensitiveDTO clientId) {
+        FoodPyramid foodPyramid = foodPyramidService.createFoodPyramid(dto);
+        assignFoodPyramidToClient(new AssignDietPlanDTO(UUID.fromString(clientId.getValue()), foodPyramid.getId()));
+        return getByClientId(UUID.fromString(clientId.getValue())).stream()
+                .max(Comparator.comparing(ClientFoodPyramid::getTimestamp))
+                .orElseThrow(FoodPyramidNotFoundException::new);
     }
 
     @Override

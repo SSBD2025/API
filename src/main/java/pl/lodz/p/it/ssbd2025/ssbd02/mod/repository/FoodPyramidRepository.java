@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.UserRole;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
@@ -21,4 +22,7 @@ import java.util.UUID;
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.MANDATORY)
 public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    FoodPyramid saveAndFlush(FoodPyramid foodPyramid);
 }

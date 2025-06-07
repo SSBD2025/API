@@ -6,10 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientFoodPyramidDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientFoodPyramidService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientFoodPyramidService;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/mod/client-food-pyramids")
 public class ClientFoodPyramidController {
-    private final ClientFoodPyramidService clientFoodPyramidService;
+    private final IClientFoodPyramidService clientFoodPyramidService;
 
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<ClientFoodPyramidDTO>> getByClientId(@PathVariable UUID clientId) {
@@ -40,5 +39,13 @@ public class ClientFoodPyramidController {
     public ResponseEntity<Void> removeFoodPyramidFromClient(@PathVariable UUID clientId, @PathVariable UUID pyramidId) {
         // Implementation will be added later
         return null;
+    }
+
+    @PostMapping("/new/{clientId}")
+    @MethodCallLogged
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<ClientFoodPyramid> createAndAssignFoodPyramidToClient(@Valid @RequestBody FoodPyramidDTO dto, @PathVariable UUID clientId) {
+        return ResponseEntity.ok().body(clientFoodPyramidService.createAndAssignFoodPyramid(dto, new SensitiveDTO(clientId.toString())));
     }
 }
