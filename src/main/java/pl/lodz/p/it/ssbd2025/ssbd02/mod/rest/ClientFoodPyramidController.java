@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
@@ -17,6 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/mod/client-food-pyramids")
+@EnableMethodSecurity(prePostEnabled = true)
+@MethodCallLogged
 public class ClientFoodPyramidController {
     private final IClientFoodPyramidService clientFoodPyramidService;
 
@@ -45,5 +48,18 @@ public class ClientFoodPyramidController {
     @PreAuthorize("hasRole('DIETICIAN')")
     public ResponseEntity<ClientFoodPyramid> createAndAssignFoodPyramidToClient(@Valid @RequestBody FoodPyramidDTO dto, @PathVariable UUID clientId) {
         return ResponseEntity.ok().body(clientFoodPyramidService.createAndAssignFoodPyramid(dto, new SensitiveDTO(clientId.toString())));
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/client-pyramids")
+    public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramids() {
+        return ResponseEntity.ok(clientFoodPyramidService.getClientPyramids());
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @GetMapping("/dietician/{clientId}")
+    public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramidsAsDietician(
+            @PathVariable UUID clientId) {
+        return ResponseEntity.ok(clientFoodPyramidService.getClientPyramidsByDietician(clientId));
     }
 }

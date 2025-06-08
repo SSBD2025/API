@@ -468,5 +468,18 @@
             <column name="version" valueNumeric="0"/>
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
+        
+        <insert tableName="client_food_pyramid">
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
+            <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000011"/>
+            <column name="timestamp" valueDate="2024-06-07T10:00:00"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+        <insert tableName="client_food_pyramid">
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
+            <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000010"/>
+            <column name="timestamp" valueDate="2025-06-07T10:00:00"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>

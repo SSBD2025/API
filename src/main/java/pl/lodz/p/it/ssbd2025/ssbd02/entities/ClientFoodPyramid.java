@@ -34,6 +34,7 @@ public class ClientFoodPyramid {
     @ManyToOne
     @MapsId("foodPyramidId")
     @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_FOOD_PYRAMID_ID)
+    @JsonBackReference
     private FoodPyramid foodPyramid;
 
     @Column(name = ClientFoodPyramidConsts.COLUMN_TIMESTAMP, nullable = false)
