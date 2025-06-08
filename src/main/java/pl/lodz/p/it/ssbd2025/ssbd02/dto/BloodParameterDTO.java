@@ -12,32 +12,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BloodParameterDTO {
-//    String name;
-//    String description;
-//    String unit;
-//    BigDecimal standardMin;
-//    BigDecimal standardMax;
-//
-//    public BloodParameterDTO(BloodParameter parameter, boolean isMan) {
-//        this.name = parameter.name();
-//        this.description = parameter.getDescription();
-//        this.unit = parameter.getUnit().toString();
-//        if(isMan) {
-//            this.standardMin = parameter.getMenStandardMin();
-//            this.standardMax = parameter.getMenStandardMax();
-//        } else {
-//            this.standardMin = parameter.getWomanStandardMin();
-//            this.standardMax = parameter.getWomanStandardMax();
-//        }
-//    }
-//
-//    public BloodParameterDTO() {
-//    }
+
     String name;
     String description;
     String unit;
-    BigDecimal womanStandardMin;
-    BigDecimal womanStandardMax;
-    BigDecimal menStandardMin;
-    BigDecimal menStandardMax;
+    BigDecimal standardMin;
+    BigDecimal standardMax;
 }

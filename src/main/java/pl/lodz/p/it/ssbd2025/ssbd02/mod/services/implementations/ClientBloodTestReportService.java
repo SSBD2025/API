@@ -78,6 +78,7 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         return getClientBloodTestReportDTOS(uuid);
     }
 
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     @NotNull
     private List<ClientBloodTestReportDTO> getClientBloodTestReportDTOS(UUID uuid) {
         List<ClientBloodTestReport> reports = clientBloodTestReportRepository.findAllByClientId(uuid);
@@ -85,28 +86,29 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         for (ClientBloodTestReport report : reports) {
             List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
             for (BloodTestResult result : report.getResults()) {
-//                resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(uuid).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
-                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter());
-                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result);
+                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
                 bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
                 resultsDTO.add(bloodTestResultDTO);
             }
-//            dtos.add(clientBloodTestReportMapper.toClientBloodTestReportDTO(report));
             dtos.add(new ClientBloodTestReportDTO(null, null, null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue()));
         }
         return dtos;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = true, timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('DIETICIAN')")
     @Override
     public ClientBloodTestReportDTO getById(SensitiveDTO reportId) {
         ClientBloodTestReport report = clientBloodTestReportRepository.findById(UUID.fromString(reportId.getValue())).orElseThrow(ClientBloodTestReportNotFoundException::new);
         List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
         for (BloodTestResult result : report.getResults()) {
-//            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()))); //TODO odkomentować jak będzie Survey
-//            resultsDTO.add(new BloodTestResultDTO(lockTokenService.generateToken(result.getId(), result.getVersion()).getValue(), result.getResult(), new BloodParameterDTO(result.getBloodParameter(), true)));
+            BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+            BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+            bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
+            resultsDTO.add(bloodTestResultDTO);
         }
-//        return new ClientBloodTestReportDTO(null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue());
-        return null;
+        return new ClientBloodTestReportDTO(null, null, null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")

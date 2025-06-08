@@ -38,7 +38,7 @@ public class ClientBloodTestReportController {
     @PostMapping("/client/{clientId}")
     public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
         ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
-        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportService.createReport(clientId, newClientBloodTestResult));
+        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportService.createReport(clientId, newClientBloodTestResult), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
         dto.setLockToken(lockTokenService.generateToken(dto.getId(), dto.getVersion()).getValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
