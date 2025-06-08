@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
