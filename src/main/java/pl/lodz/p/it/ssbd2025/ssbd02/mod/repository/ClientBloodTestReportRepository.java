@@ -16,6 +16,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import java.util.List;
 import java.util.UUID;
 
+@Transactional(propagation = Propagation.MANDATORY)
 public interface ClientBloodTestReportRepository extends JpaRepository<ClientBloodTestReport, UUID> {
 
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")

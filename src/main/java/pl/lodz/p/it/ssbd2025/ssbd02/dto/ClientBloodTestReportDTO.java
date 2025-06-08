@@ -25,8 +25,7 @@ public class ClientBloodTestReportDTO {
     @NotNull(groups = OnRead.class)
     UUID id;
 
-    @Null(groups = {OnCreate.class, OnRead.class})
-    @NotNull(groups = OnUpdate.class)
+    @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     Long version;
 
     @Null(groups = {OnRead.class, OnUpdate.class, OnCreate.class})
