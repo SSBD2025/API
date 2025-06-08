@@ -11,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeedbackDTO {
+    private UUID id;
     private int rating;
     private String description;
     private Timestamp timestamp;
