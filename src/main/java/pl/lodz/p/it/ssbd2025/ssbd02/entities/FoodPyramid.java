@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -18,6 +19,7 @@ import java.util.List;
 public class FoodPyramid extends AbstractEntity {
 
     @OneToMany(mappedBy = FoodPyramidConsts.FIELD_FOOD_PYRAMID)
+    @JsonManagedReference
     private List<ClientFoodPyramid> clientFoodPyramids = new ArrayList<>();
 
     @OneToMany(mappedBy = FoodPyramidConsts.FIELD_FOOD_PYRAMID, cascade = CascadeType.REFRESH)

@@ -48,4 +48,6 @@ public final class ExceptionConsts {
     public static final String NO_ASSIGNED_DIETICAN = "no_assigned_dietican";
     public static final String PERIODIC_SURVEY_TOO_SOON = "periodic_survey_too_soon";
     public static final String PERMANENT_SURVEY_NOT_FOUND = "permanent_survey_not_found";
+    public static final String CLIENT_FOOD_PYRAMID_NOT_FOUND = "client_food_pyramid_not_found";
+    public static final String CLIENT_NOT_ASSIGNED = "client_not_assigned";
 }
