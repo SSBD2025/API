@@ -29,7 +29,7 @@ public interface ClientFoodPyramidRepository extends AbstractRepository<ClientFo
     ClientFoodPyramid saveAndFlush(ClientFoodPyramid clientFoodPyramid);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN') || hasRole('CLIENT')")
     boolean existsByClientAndFoodPyramid(Client client, FoodPyramid foodPyramid);
 
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")

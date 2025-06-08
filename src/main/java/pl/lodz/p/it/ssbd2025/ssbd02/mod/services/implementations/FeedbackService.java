@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientFoodPyramidRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FeedbackRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
@@ -37,6 +38,7 @@ public class FeedbackService implements IFeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final ClientModRepository clientRepository;
     private final FoodPyramidRepository foodPyramidRepository;
+    private final ClientFoodPyramidRepository  clientFoodPyramidRepository;
 
     @Override
     public List<Feedback> getFeedbacksByClientId(UUID clientId) {
@@ -64,6 +66,14 @@ public class FeedbackService implements IFeedbackService {
 
         Client client = clientRepository.findById(clientId).orElseThrow(ClientNotFoundException::new);
         FoodPyramid pyramid = foodPyramidRepository.findById(pyramidId).orElseThrow(FoodPyramidNotFoundException::new);
+
+        if (!clientFoodPyramidRepository.existsByClientAndFoodPyramid(client, pyramid)) {
+            throw new NotYourFoodPyramidException();
+        }
+
+        if (feedbackRepository.existsByClientIdAndFoodPyramidId(clientId, pyramidId)) {
+            throw new AlreadyRatedPyramidException();
+        }
 
         feedback.setClient(client);
         feedback.setFoodPyramid(pyramid);
