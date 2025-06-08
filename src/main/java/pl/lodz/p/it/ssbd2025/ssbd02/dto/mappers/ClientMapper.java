@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.MinimalClientDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 
 import java.util.List;
@@ -21,4 +22,18 @@ public interface ClientMapper {
     ClientDTO toClientDTO(Client client);
 
     List<ClientDTO> toClientListDTO(List<Client> clients);
+
+    @Mappings({
+            @Mapping(target = "firstName", source = "account.firstName"),
+            @Mapping(target = "lastName", source = "account.lastName"),
+            @Mapping(target = "email", source = "account.email")
+    })
+    MinimalClientDTO toMinimalClientDTO(Client client);
+
+    @Mappings({
+            @Mapping(target = "firstName", source = "account.firstName"),
+            @Mapping(target = "lastName", source = "account.lastName"),
+            @Mapping(target = "email", source = "account.email")
+    })
+    List<MinimalClientDTO> toMinimalClientListDTO(List<Client> clients);
 }

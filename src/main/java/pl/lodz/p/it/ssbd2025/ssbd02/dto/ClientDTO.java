@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data

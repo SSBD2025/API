@@ -7,6 +7,8 @@ import org.mapstruct.factory.Mappers;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface FeedbackMapper {
     FeedbackMapper INSTANCE = Mappers.getMapper(FeedbackMapper.class);
@@ -18,4 +20,8 @@ public interface FeedbackMapper {
     FeedbackDTO toFeedbackDTO(Feedback feedback);
 
     Feedback toFeedback(FeedbackDTO feedbackDTO);
+
+    List<FeedbackDTO> toFeedbackDTOs(List<Feedback> feedbacks);
+
+    List<Feedback>  toFeedbackList(List<FeedbackDTO> feedbackDTOs);
 }
