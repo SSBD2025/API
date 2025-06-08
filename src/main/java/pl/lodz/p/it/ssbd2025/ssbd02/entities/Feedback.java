@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -21,7 +23,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.FeedbackConsts;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class Feedback extends AbstractEntity {
-    @Size(min = FeedbackConsts.RATING_MIN, max = FeedbackConsts.RATING_MAX)
+    @Min(FeedbackConsts.RATING_MIN)
+    @Max(FeedbackConsts.RATING_MAX)
     @Column(name = FeedbackConsts.COLUMN_RATING)
     private int rating;
 
@@ -35,9 +38,11 @@ public class Feedback extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = FeedbackConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
+    @ToString.Exclude
     private Client client;
 
     @ManyToOne
     @JoinColumn(name = FeedbackConsts.COLUMN_FOOD_PYRAMID_ID, nullable = false, updatable = false)
+    @ToString.Exclude
     private FoodPyramid foodPyramid;
 }

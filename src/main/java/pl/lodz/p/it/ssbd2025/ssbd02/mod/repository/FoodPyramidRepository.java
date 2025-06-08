@@ -23,6 +23,6 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
-    @PreAuthorize("hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN') || hasRole('CLIENT')")
     FoodPyramid saveAndFlush(FoodPyramid foodPyramid);
 }
