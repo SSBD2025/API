@@ -43,9 +43,10 @@ public class FeedbackController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @DeleteMapping("/{feedbackId}")
     public ResponseEntity<Void> deleteFeedback(@PathVariable UUID feedbackId) {
-        // Implementation will be added later
-        return null;
+        feedbackService.deleteFeedback(feedbackId);
+        return ResponseEntity.noContent().build();
     }
 }

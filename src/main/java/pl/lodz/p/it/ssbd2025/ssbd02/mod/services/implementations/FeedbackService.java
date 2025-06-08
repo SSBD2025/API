@@ -6,17 +6,15 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.FoodPyramidNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
@@ -79,8 +77,34 @@ public class FeedbackService implements IFeedbackService {
     }
 
     @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     public void deleteFeedback(UUID feedbackId) {
+        Feedback feedback = feedbackRepository.findById(feedbackId).orElseThrow(FeedbackNotFoundException::new);
 
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Client client = clientRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+
+        if (!feedback.getClient().getId().equals(client.getId())) {
+            throw new NotYourFeedbackException();
+        }
+
+        FoodPyramid pyramid = feedback.getFoodPyramid();
+
+        feedbackRepository.delete(feedback);
+
+        Double avg = feedbackRepository.calculateAverageRating(pyramid.getId());
+        pyramid.setAverageRating(avg != null ? avg: 0.0);
+        foodPyramidRepository.saveAndFlush(pyramid);
     }
 }
 

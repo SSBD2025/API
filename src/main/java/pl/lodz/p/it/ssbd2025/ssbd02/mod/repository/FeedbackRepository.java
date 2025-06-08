@@ -26,5 +26,9 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     @PreAuthorize("hasRole('CLIENT')")
     @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.foodPyramid.id = :pyramidId")
     Double calculateAverageRating(@Param("pyramidId") UUID pyramidId);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("hasRole('CLIENT')")
+    void delete(Feedback feedback);
 }
 
