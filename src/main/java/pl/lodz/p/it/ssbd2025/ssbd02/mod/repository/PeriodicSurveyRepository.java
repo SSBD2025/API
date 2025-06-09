@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Repository;
@@ -11,6 +13,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -27,4 +30,8 @@ public interface PeriodicSurveyRepository extends AbstractRepository<PeriodicSur
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     boolean existsByClientAndMeasurementDateAfter(Client client, Timestamp measurementDate);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    Page<PeriodicSurvey> findByClientId(UUID clientId, Pageable pageable);
 }

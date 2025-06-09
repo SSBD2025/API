@@ -481,5 +481,25 @@
             <column name="timestamp" valueDate="2025-06-07T10:00:00"/>
             <column name="version" valueNumeric="0"/>
         </insert>
+
+        <insert tableName="feedback" >
+            <column name="id" value="00000000-0000-0000-0000-000000000021" />
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006" />
+            <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000011" />
+            <column name="description" value="Świetny profil żywieniowy" />
+            <column name="rating" valueNumeric="5" />
+            <column name="timestamp" valueDate="2025-06-07T10:00:00" />
+            <column name="version" valueNumeric="0" />
+        </insert>
+
+        <insert tableName="feedback" >
+            <column name="id" value="00000000-0000-0000-0000-000000000023" />
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006" />
+            <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000010" />
+            <column name="description" value="Średnio widze efekty po tym profilu żywieniowym" />
+            <column name="rating" valueNumeric="2" />
+            <column name="timestamp" valueDate="2025-06-07T10:00:00" />
+            <column name="version" valueNumeric="0" />
+        </insert>
     </changeSet>
 </databaseChangeLog>

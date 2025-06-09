@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
@@ -20,4 +23,5 @@ public interface IClientService {
     List<Dietician> getAvailableDieticians(String searchPhrase);
     public PeriodicSurvey submitPeriodicSurvey(PeriodicSurvey periodicSurvey);
     Survey editPermanentSurvey(SurveyDTO dto);
+    Page<PeriodicSurveyDTO> getPeriodicSurveys(UUID clientId, Pageable pageable);
 }
