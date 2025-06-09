@@ -1,6 +1,10 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -88,5 +92,15 @@ public class ClientModController {
 
         PeriodicSurvey periodicSurvey = clientService.submitPeriodicSurvey(periodicSurveyMapper.toPeriodicSurvey(periodicSurveyDTO));
         return ResponseEntity.status(HttpStatus.CREATED).body(periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurvey));
+    }
+
+    @GetMapping("/{clientId}/periodic-survey")
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    public ResponseEntity<Page<PeriodicSurveyDTO>> getPeriodicSurveysByClientId(
+            @PathVariable UUID clientId,
+            Pageable pageable) {
+
+        Page<PeriodicSurveyDTO> dtoPage = clientService.getPeriodicSurveys(clientId, pageable);
+        return ResponseEntity.ok(dtoPage);
     }
 }

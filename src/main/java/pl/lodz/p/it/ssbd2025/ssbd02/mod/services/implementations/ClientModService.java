@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
@@ -50,6 +54,7 @@ public class ClientModService implements IClientService {
     private final DieticianModRepository dieticianModRepository;
     private final PeriodicSurveyRepository periodicSurveyRepository;
     private final LockTokenService lockTokenService;
+    private final PeriodicSurveyMapper periodicSurveyMapper;
 
     @Override
     public Client getClientById(UUID id) {
@@ -199,5 +204,21 @@ public class ClientModService implements IClientService {
         existingSurvey.setEatingHabits(dto.getEatingHabits());
 
         return surveyRepository.saveAndFlush(existingSurvey);
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public Page<PeriodicSurveyDTO> getPeriodicSurveys(UUID clientId, Pageable pageable) {
+        Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(clientId, pageable);
+        return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
     }
 }
