@@ -103,4 +103,13 @@ public class ClientModController {
         Page<PeriodicSurveyDTO> dtoPage = clientService.getPeriodicSurveys(clientId, pageable);
         return ResponseEntity.ok(dtoPage);
     }
+
+    @GetMapping("/periodic-survey/{surveyId}")
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    public ResponseEntity<PeriodicSurveyDTO> getPeriodicSurveyByClientIdAndSurveyId(
+            @PathVariable UUID surveyId
+    ) {
+        PeriodicSurveyDTO periodicSurveyDTO = clientService.getPeriodicSurvey(surveyId);
+        return ResponseEntity.ok(periodicSurveyDTO);
+    }
 }
