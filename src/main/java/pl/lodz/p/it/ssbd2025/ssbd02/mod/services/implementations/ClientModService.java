@@ -221,4 +221,20 @@ public class ClientModService implements IClientService {
         Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(clientId, pageable);
         return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
     }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    public PeriodicSurveyDTO getPeriodicSurvey(UUID periodicSurveyId) {
+        return periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurveyRepository.findById(periodicSurveyId)
+                .orElseThrow(PeriodicSurveyNotFound::new));
+    }
 }

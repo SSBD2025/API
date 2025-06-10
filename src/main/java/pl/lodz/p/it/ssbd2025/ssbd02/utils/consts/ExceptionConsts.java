@@ -54,4 +54,5 @@ public final class ExceptionConsts {
     public static final String PYRAMID_ALREADY_RATED = "pyramid_already_rated";
     public static final String FEEDBACK_NOT_FOUND = "feedback_not_found";
     public static final String NOT_YOUR_FEEDBACK = "not_your_feedback";
+    public static final String PERIODIC_SURVEY_NOT_FOUND = "periodic_survey_not_found";
 }

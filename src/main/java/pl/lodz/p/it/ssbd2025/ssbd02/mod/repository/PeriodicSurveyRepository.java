@@ -13,7 +13,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -34,4 +34,8 @@ public interface PeriodicSurveyRepository extends AbstractRepository<PeriodicSur
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
     Page<PeriodicSurvey> findByClientId(UUID clientId, Pageable pageable);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("permitAll()")
+    Optional<PeriodicSurvey> findById(UUID id);
 }
