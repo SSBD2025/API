@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,4 +56,17 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT c FROM Client c WHERE c.account.id = :clientId")
     Optional<Client> findClientByAccountId(@Param("clientId") UUID clientId);
+
+    @PreAuthorize("permitAll()")
+    @Query("""
+        SELECT c
+        FROM Client c
+        JOIN c.periodicSurveys ps
+        GROUP BY c
+        HAVING MAX(ps.measurementDate) < :thresholdDate
+    """)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    List<Client> findClientsWithLastPeriodicSurveyBefore(@Param("thresholdDate") Timestamp thresholdDate);
+
+
 }
