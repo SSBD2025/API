@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.FeedbackMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFeedbackService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class FeedbackController {
     private final IFeedbackService feedbackService;
 
     private final FeedbackMapper feedbackMapper;
+    private final LockTokenService lockTokenService;
 
 
     @PreAuthorize("hasRole('DIETICIAN')")
@@ -68,5 +71,15 @@ public class FeedbackController {
     public ResponseEntity<Void> deleteFeedback(@PathVariable UUID feedbackId) {
         feedbackService.deleteFeedback(feedbackId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PutMapping()
+    public ResponseEntity<FeedbackDTO> updateFeedback(@Validated(OnUpdate.class) @RequestBody FeedbackDTO feedbackDTO) {
+        Feedback feedback = feedbackService.updateFeedback(feedbackMapper.toFeedback(feedbackDTO), feedbackDTO.getLockToken());
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+        FeedbackDTO responseDTO = feedbackMapper.toFeedbackDTO(feedback);
+        responseDTO.setLockToken(lockToken);
+        return ResponseEntity.ok(responseDTO);
     }
 }

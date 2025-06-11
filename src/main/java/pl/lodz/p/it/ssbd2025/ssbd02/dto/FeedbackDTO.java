@@ -17,4 +17,5 @@ public class FeedbackDTO {
     private Timestamp timestamp;
     private UUID clientId;
     private UUID foodPyramidId;
+    private String lockToken;
 }

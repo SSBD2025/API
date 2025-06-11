@@ -14,6 +14,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -45,5 +46,8 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("hasRole('DIETICIAN')")
     List<Feedback> findAllByFoodPyramid(FoodPyramid pyramid);
-}
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')")
+    Optional<Feedback> findById(UUID id);
+}
