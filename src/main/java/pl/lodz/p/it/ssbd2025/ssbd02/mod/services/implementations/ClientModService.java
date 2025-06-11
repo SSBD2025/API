@@ -70,8 +70,34 @@ public class ClientModService implements IClientService {
     }
 
     @Override
-    public void assignDietician(UUID clientId, UUID dieticianId) {
-
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public void assignDietician(UUID dieticianId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        Dietician dietician = dieticianModRepository.findByAccountId(dieticianId)
+                .orElseThrow(DieticianNotFoundException::new);
+        if (client.getDietician() != null) {
+            if (client.getDietician().equals(dietician)) {
+                throw new SameDieticianAlreadyAssignedException();
+            }
+            throw new DieticianAlreadyAssignedException();
+        }
+        if (dietician.getClients().size() >= 10) {
+            throw new DieticianClientLimitExceededException();
+        }
+        client.setDietician(dietician);
+        clientModRepository.saveAndFlush(client);
     }
 
     @Override

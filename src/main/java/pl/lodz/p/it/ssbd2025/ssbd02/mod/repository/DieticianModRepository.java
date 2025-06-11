@@ -13,6 +13,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @MethodCallLogged
@@ -41,4 +42,9 @@ public interface DieticianModRepository extends AbstractRepository<Dietician> {
         )
     """)
     List<Dietician> getAllAvailableDieticiansBySearchPhrase(@Param("searchPhrase") String searchPhrase);
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Query("SELECT d FROM Dietician d WHERE d.account.id = :accountId")
+    Optional<Dietician> findByAccountId(@Param("accountId") UUID accountId);
 }

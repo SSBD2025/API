@@ -17,7 +17,7 @@ public interface IClientService {
     Client getClientById(UUID id);
     UUID getClientByAccountId(UUID id);
     Client getClientByLogin(SensitiveDTO login);
-    void assignDietician(UUID clientId, UUID dieticianId);
+    void assignDietician(UUID dieticianId);
     Survey submitPermanentSurvey(Survey newSurvey);
     public Survey getPermanentSurvey();
     List<Dietician> getAvailableDieticians(String searchPhrase);

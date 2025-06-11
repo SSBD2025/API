@@ -55,4 +55,7 @@ public final class ExceptionConsts {
     public static final String FEEDBACK_NOT_FOUND = "feedback_not_found";
     public static final String NOT_YOUR_FEEDBACK = "not_your_feedback";
     public static final String PERIODIC_SURVEY_NOT_FOUND = "periodic_survey_not_found";
+    public static final String SAME_DIETICIAN_ALREADY_ASSIGNED = "same_dietician_already_assigned";
+    public static final String DIETICIAN_ALREADY_ASSIGNED = "dietician_already_assigned";
+    public static final String DIETICIAN_CLIENT_LIMIT_EXCEEDED = "dietician_client_limit_exceeded";
 }
