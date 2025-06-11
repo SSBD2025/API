@@ -8,9 +8,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -34,5 +37,13 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("hasRole('CLIENT')")
     void delete(Feedback feedback);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    List<Feedback> findAllByClient(Client client);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    List<Feedback> findAllByFoodPyramid(FoodPyramid pyramid);
 }
 

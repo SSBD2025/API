@@ -41,14 +41,56 @@ public class FeedbackService implements IFeedbackService {
     private final ClientFoodPyramidRepository  clientFoodPyramidRepository;
 
     @Override
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     public List<Feedback> getFeedbacksByClientId(UUID clientId) {
-        return List.of();
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(ClientNotFoundException::new);
+        return feedbackRepository.findAllByClient(client);
     }
 
     @Override
-    public List<Feedback> getFeedbacksByFoodPyramidId(UUID pyramidId) {
-        return List.of();
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public List<Feedback> getFeedbacksByClientLogin(String login) {
+        Client client = clientRepository.findByLogin(login)
+                .orElseThrow(ClientNotFoundException::new);
+        return feedbackRepository.findAllByClient(client);
     }
+
+    @Override
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public List<Feedback> getFeedbacksByFoodPyramidId(UUID pyramidId) {
+        FoodPyramid pyramid = foodPyramidRepository.findById(pyramidId)
+                .orElseThrow(FoodPyramidNotFoundException::new);
+        return feedbackRepository.findAllByFoodPyramid(pyramid);
+    }
+
 
     @Override
     @PreAuthorize("hasRole('CLIENT')")
