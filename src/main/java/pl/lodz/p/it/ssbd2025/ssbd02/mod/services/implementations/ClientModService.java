@@ -213,7 +213,7 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     public Page<PeriodicSurveyDTO> getPeriodicSurveys(UUID clientId, Pageable pageable) {
         Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(clientId, pageable);
         return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
