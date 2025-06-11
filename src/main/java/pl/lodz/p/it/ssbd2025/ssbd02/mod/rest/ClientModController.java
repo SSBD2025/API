@@ -112,4 +112,20 @@ public class ClientModController {
         PeriodicSurveyDTO periodicSurveyDTO = clientService.getPeriodicSurvey(surveyId);
         return ResponseEntity.ok(periodicSurveyDTO);
     }
+
+    @GetMapping("/periodic-survey")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Object> getMyPeriodicSurveys(Pageable pageable) {
+        Page<PeriodicSurveyDTO> periodicSurveyDTO = clientService.getPeriodicSurveys(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
+    }
+
+    @GetMapping("/dietician/{clientId}/periodic-survey")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<Object> getPeriodicSurveysByAccountId(
+            @PathVariable UUID clientId,
+            Pageable pageable) {
+        Page<PeriodicSurveyDTO> dtoPage = clientService.getPeriodicSurveysByAccountId(clientId, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(dtoPage);
+    }
 }
