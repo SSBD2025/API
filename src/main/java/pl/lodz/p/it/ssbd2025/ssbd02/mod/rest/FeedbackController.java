@@ -55,9 +55,9 @@ public class FeedbackController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/client/{clientId}/pyramid/{pyramidId}")
-    public ResponseEntity<FeedbackDTO> addFeedback(@PathVariable UUID clientId, @PathVariable UUID pyramidId, @Validated @RequestBody FeedbackDTO feedbackDTO) {
-        Feedback feedback = feedbackService.addFeedback(clientId, pyramidId, feedbackMapper.toFeedback(feedbackDTO));
+    @PostMapping("/pyramid/{pyramidId}")
+    public ResponseEntity<FeedbackDTO> addFeedback(@PathVariable UUID pyramidId, @Validated @RequestBody FeedbackDTO feedbackDTO) {
+        Feedback feedback = feedbackService.addFeedback(pyramidId, feedbackMapper.toFeedback(feedbackDTO));
         FeedbackDTO responseDTO = feedbackMapper.toFeedbackDTO(feedback);
 
         return ResponseEntity.ok(responseDTO);

@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface IFeedbackService {
     List<Feedback> getFeedbacksByClientId(UUID clientId);
     List<Feedback> getFeedbacksByFoodPyramidId(UUID pyramidId);
-    Feedback addFeedback(UUID clientId, UUID pyramidId, Feedback feedback);
+    Feedback addFeedback(UUID pyramidId, Feedback feedback);
     void deleteFeedback(UUID feedbackId);
     List<Feedback> getFeedbacksByClientLogin(String login);
 }
