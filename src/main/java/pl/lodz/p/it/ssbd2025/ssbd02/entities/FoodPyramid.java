@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = FoodPyramidConsts.TABLE_NAME)
+@Table(name = FoodPyramidConsts.TABLE_NAME,
+        indexes = {@Index(name = FoodPyramidConsts.NAME_INDEX, columnList = FoodPyramidConsts.COLUMN_NAME)}
+)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,6 +29,27 @@ public class FoodPyramid extends AbstractEntity {
 
     @Column(name = FoodPyramidConsts.COLUMN_AVERAGE_RATING, nullable = false, updatable = true)
     private double averageRating = FoodPyramidConsts.DEFAULT_AVERAGE_RATING;
+
+    @Column(name = FoodPyramidConsts.COLUMN_NAME, nullable = false, updatable = false, unique = true)
+    private String name;
+
+    @Column(name = FoodPyramidConsts.COLUMN_KCAL, nullable = false, updatable = false)
+    private int kcal;
+
+    @Column(name = FoodPyramidConsts.COLUMN_FAT, nullable = false, updatable = false)
+    private double fat;
+
+    @Column(name = FoodPyramidConsts.COLUMN_SFA, nullable = false, updatable = false)
+    private double saturatedFattyAcids;
+
+    @Column(name = FoodPyramidConsts.COLUMN_CARBO, nullable = false, updatable = false)
+    private double carbohydrates;
+
+    @Column(name = FoodPyramidConsts.COLUMN_SUGAR, nullable = false, updatable = false)
+    private double sugar;
+
+    @Column(name = FoodPyramidConsts.COLUMN_PROTEIN, nullable = false, updatable = false)
+    private double protein;
 
     @Min(0)
     @Column(name = FoodPyramidConsts.COLUMN_A, nullable = false, updatable = false)

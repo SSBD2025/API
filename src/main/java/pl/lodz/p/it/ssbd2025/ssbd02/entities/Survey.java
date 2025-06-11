@@ -81,7 +81,7 @@ public class Survey extends AbstractEntity {
     @Column(name = SurveyConsts.COLUMN_MEAL_TIMES, nullable = false)
     private List<Timestamp> mealTimes = new ArrayList<>();
 
-    @Lob
-    @Column(name = SurveyConsts.COLUMN_EATING_HABITS, nullable = false)
+//    @Lob
+    @Column(name = SurveyConsts.COLUMN_EATING_HABITS, nullable = false, columnDefinition = "TEXT")
     private String eatingHabits;
 }

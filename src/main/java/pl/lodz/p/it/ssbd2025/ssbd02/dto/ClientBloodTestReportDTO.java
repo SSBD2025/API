@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.*;
@@ -28,6 +30,7 @@ public class ClientBloodTestReportDTO {
     @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     Long version;
 
+    @JsonIgnore
     @Null(groups = {OnRead.class, OnUpdate.class, OnCreate.class})
     Client client;
 
@@ -37,6 +40,7 @@ public class ClientBloodTestReportDTO {
     private Timestamp timestamp;
 
     @Setter
+    @NotEmpty(groups = {OnCreate.class})
     @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     List<BloodTestResultDTO> results;
 

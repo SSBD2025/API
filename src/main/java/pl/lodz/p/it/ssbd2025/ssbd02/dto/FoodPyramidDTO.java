@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.FoodPyramidConsts;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +22,16 @@ public class FoodPyramidDTO {
     private UUID id;
 
     private double averageRating;
+
+    private String name;
+
+    private int kcal;
+
+    private double fat;
+    private double saturatedFattyAcids;
+    private double carbohydrates;
+    private double sugar;
+    private double protein;
 
     private double A;
     private double D;

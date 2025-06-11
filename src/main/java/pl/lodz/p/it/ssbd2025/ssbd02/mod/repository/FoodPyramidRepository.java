@@ -25,4 +25,8 @@ public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("hasRole('DIETICIAN') || hasRole('CLIENT')")
     FoodPyramid saveAndFlush(FoodPyramid foodPyramid);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+//    @PreAuthorize() TODO dodac
+    FoodPyramid findByName(String name);
 }

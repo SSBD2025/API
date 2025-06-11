@@ -2,6 +2,8 @@ package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 
 import java.math.BigDecimal;
@@ -10,12 +12,21 @@ import java.math.BigDecimal;
 @Getter
 @Setter(AccessLevel.NONE)
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 public class BloodParameterDTO {
 
+    @NotNull(groups = {OnCreate.class, OnRead.class})
     String name;
+
+    @NotNull(groups = {OnCreate.class, OnRead.class})
     String description;
+
+    @NotNull(groups = {OnCreate.class, OnRead.class})
     String unit;
-    BigDecimal standardMin;
-    BigDecimal standardMax;
+
+    @NotNull(groups = {OnCreate.class, OnRead.class})
+    Double standardMin;
+
+    @NotNull(groups = {OnCreate.class, OnRead.class})
+    Double standardMax;
 }

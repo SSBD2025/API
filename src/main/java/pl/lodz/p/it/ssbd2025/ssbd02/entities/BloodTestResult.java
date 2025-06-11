@@ -18,7 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
 @ToString(callSuper = true)
 public class BloodTestResult extends AbstractEntity {
     @Column(name = BloodTestConsts.COLUMN_RESULT, nullable = false)
-    private String result;
+    private Double result;
 
     @Enumerated(EnumType.STRING)
     @Column(name = BloodTestConsts.COLUMN_BLOOD_MARKER, nullable = false)
