@@ -1,7 +1,10 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.enums;
 
+import lombok.Getter;
+
 import java.math.BigDecimal;
 
+@Getter
 public enum BloodParameter {
     HGB("Hemoglobin", Unit.G_DL, 12.0, 16.0, 13.5, 18.0),
     HCT("Hematocrit", Unit.PERCENT, 33.0, 51.0, 37.0, 53.0),
@@ -52,27 +55,4 @@ public enum BloodParameter {
         this.menStandardMax = menStandardMax;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public Double getWomanStandardMin() {
-        return womanStandardMin;
-    }
-
-    public Double getWomanStandardMax() {
-        return womanStandardMax;
-    }
-
-    public Double getMenStandardMin() {
-        return menStandardMin;
-    }
-
-    public Double getMenStandardMax() {
-        return menStandardMax;
-    }
 }

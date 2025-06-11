@@ -245,7 +245,7 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')")
     public Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
