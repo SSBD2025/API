@@ -68,5 +68,7 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     List<Client> findClientsWithLastPeriodicSurveyBefore(@Param("thresholdDate") Timestamp thresholdDate);
 
-
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    Client saveAndFlush(Client client);
 }

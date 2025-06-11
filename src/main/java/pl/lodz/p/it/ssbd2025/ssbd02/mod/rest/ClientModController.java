@@ -44,10 +44,11 @@ public class ClientModController {
         return null;
     }
 
-    @PostMapping("/{clientId}/dietician/{dieticianId}")
-    public ResponseEntity<Void> assignDietician(@PathVariable UUID clientId, @PathVariable UUID dieticianId) {
-        // Implementation will be added later
-        return null;
+    @PreAuthorize("hasRole('CLIENT')")
+    @PostMapping("/assign-dietician/{dieticianId}")
+    public ResponseEntity<Void> assignDietician(@PathVariable UUID dieticianId) {
+        clientService.assignDietician(dieticianId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/permanent-survey")
