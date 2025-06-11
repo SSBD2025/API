@@ -23,6 +23,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class ClientModController {
     private final SurveyMapper surveyMapper;
     private final DieticianMapper dieticianMapper;
     private final PeriodicSurveyMapper periodicSurveyMapper;
+    private final LockTokenService lockTokenService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable UUID id) {
@@ -64,7 +66,10 @@ public class ClientModController {
     @GetMapping("/permanent-survey")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<SurveyDTO> getPermanentSurvey() {
-        return ResponseEntity.status(HttpStatus.OK).body(surveyMapper.toSurveyDTO(clientService.getPermanentSurvey()));
+        Survey survey = clientService.getPermanentSurvey();
+        SurveyDTO responseDTO = surveyMapper.toSurveyDTO(survey);
+        responseDTO.setLockToken(lockTokenService.generateToken(survey.getId(), survey.getVersion()).getValue());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @PutMapping("/permanent-survey")

@@ -22,8 +22,11 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FeedbackRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFeedbackService;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +42,7 @@ public class FeedbackService implements IFeedbackService {
     private final ClientModRepository clientRepository;
     private final FoodPyramidRepository foodPyramidRepository;
     private final ClientFoodPyramidRepository  clientFoodPyramidRepository;
+    private final LockTokenService lockTokenService;
 
     @Override
     @PreAuthorize("hasRole('DIETICIAN')")
@@ -159,6 +163,40 @@ public class FeedbackService implements IFeedbackService {
         Double avg = feedbackRepository.calculateAverageRating(pyramid.getId());
         pyramid.setAverageRating(avg != null ? avg: 0.0);
         foodPyramidRepository.saveAndFlush(pyramid);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public Feedback updateFeedback(Feedback feedback, String lockToken) {
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(lockToken);
+
+        Feedback feedback1 = feedbackRepository.findById(record.id()).orElseThrow(FeedbackNotFoundException::new);
+
+        if (!feedback1.getVersion().equals(record.version())) {
+            throw new ConcurrentUpdateException();
+        }
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+
+        if (!feedback1.getClient().getId().equals(client.getId())) {
+            throw new NotYourFeedbackException();
+        }
+
+        feedback1.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        feedback1.setRating(feedback.getRating());
+        feedback1.setDescription(feedback.getDescription());
+
+        return feedbackRepository.saveAndFlush(feedback1);
     }
 }
 

@@ -11,4 +11,5 @@ public interface IFeedbackService {
     Feedback addFeedback(UUID pyramidId, Feedback feedback);
     void deleteFeedback(UUID feedbackId);
     List<Feedback> getFeedbacksByClientLogin(String login);
+    Feedback updateFeedback(Feedback feedback, String lockToken);
 }
