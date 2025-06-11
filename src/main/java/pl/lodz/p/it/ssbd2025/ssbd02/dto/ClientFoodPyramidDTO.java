@@ -1,11 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 
 import java.sql.Timestamp;
 
@@ -14,7 +12,7 @@ import java.sql.Timestamp;
 @Getter
 @AllArgsConstructor
 public class ClientFoodPyramidDTO {
-    @Valid FoodPyramid foodPyramid;
+    FoodPyramidDTO foodPyramid;
     boolean isActive;
     Timestamp timestamp;
 
