@@ -115,7 +115,7 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     @PreAuthorize("hasRole('DIETICIAN')")
     @Override
     public ClientBloodTestReport createReport(SensitiveDTO clientId, ClientBloodTestReport report) {
-        UUID uuid = UUID.fromString(clientId.getValue());
+        UUID uuid = clientModService.getClientByAccountId(UUID.fromString(clientId.getValue()));
         Client client = clientModRepository.findClientById(uuid).orElseThrow(ClientNotFoundException::new);
         report.setClient(client);
         report.setTimestamp(Timestamp.from(Instant.now()));

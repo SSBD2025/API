@@ -324,7 +324,53 @@
         <insert tableName="food_pyramid">
             <column name="id" value="00000000-0000-0000-0000-000000000010"/>
             <column name="version" valueNumeric="0"/>
-            <column name="average_rating" valueNumeric="3.2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="name" value="M20" />
+            <column name="kcal" valueNumeric="2000"/>
+            <column name="fat" valueNumeric="70"/>
+            <column name="sfa" valueNumeric="20"/>
+            <column name="carbo" valueNumeric="260"/>
+            <column name="sugar" valueNumeric="90"/>
+            <column name="protein" valueNumeric="50"/>
+            <column name="a" valueNumeric="0.8"/>
+            <column name="d" valueNumeric="0.005"/>
+            <column name="e" valueNumeric="12"/>
+            <column name="k" valueNumeric="0.075"/>
+            <column name="b1" valueNumeric="1.1"/>
+            <column name="b2" valueNumeric="1.4"/>
+            <column name="b3" valueNumeric="16"/>
+            <column name="b5" valueNumeric="6"/>
+            <column name="b6" valueNumeric="1.4"/>
+            <column name="b7" valueNumeric="0.05"/>
+            <column name="b9" valueNumeric="0.2"/>
+            <column name="b12" valueNumeric="0.0025"/>
+            <column name="c" valueNumeric="80"/>
+            <column name="potassium" valueNumeric="2000"/>
+            <column name="calcium" valueNumeric="800"/>
+            <column name="phosphorus" valueNumeric="700"/>
+            <column name="magnesium" valueNumeric="375"/>
+            <column name="iron" valueNumeric="14"/>
+            <column name="zinc" valueNumeric="10"/>
+            <column name="fluorine" valueNumeric="3.5"/>
+            <column name="manganese" valueNumeric="2"/>
+            <column name="copper" valueNumeric="1"/>
+            <column name="iodine" valueNumeric="0.15"/>
+            <column name="selenium" valueNumeric="0.055"/>
+            <column name="molybdenum" valueNumeric="0.05"/>
+            <column name="chromium" valueNumeric="0.04"/>
+        </insert>
+
+        <insert tableName="food_pyramid">
+            <column name="id" value="00000000-0000-0000-0000-000000000011"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="name" value="K20" />
+            <column name="kcal" valueNumeric="1800"/>
+            <column name="fat" valueNumeric="70"/>
+            <column name="sfa" valueNumeric="20"/>
+            <column name="carbo" valueNumeric="260"/>
+            <column name="sugar" valueNumeric="90"/>
+            <column name="protein" valueNumeric="50"/>
             <column name="a" valueNumeric="0.8"/>
             <column name="d" valueNumeric="0.005"/>
             <column name="e" valueNumeric="12"/>
@@ -354,9 +400,16 @@
         </insert>
 
         <insert tableName="food_pyramid">
-            <column name="id" value="00000000-0000-0000-0000-000000000011"/>
+            <column name="id" value="00000000-0000-0000-0000-000000000012"/>
             <column name="version" valueNumeric="0"/>
-            <column name="average_rating" valueNumeric="4.5"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="name" value="M40" />
+            <column name="kcal" valueNumeric="2000"/>
+            <column name="fat" valueNumeric="70"/>
+            <column name="sfa" valueNumeric="20"/>
+            <column name="carbo" valueNumeric="260"/>
+            <column name="sugar" valueNumeric="90"/>
+            <column name="protein" valueNumeric="50"/>
             <column name="a" valueNumeric="0.8"/>
             <column name="d" valueNumeric="0.005"/>
             <column name="e" valueNumeric="12"/>
@@ -383,6 +436,45 @@
             <column name="selenium" valueNumeric="0.055"/>
             <column name="molybdenum" valueNumeric="0.05"/>
             <column name="chromium" valueNumeric="0.04"/>
+        </insert>
+
+        <insert tableName="food_pyramid">
+            <column name="id" value="00000000-0000-0000-0000-000000000013"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="name" value="K40" />
+            <column name="kcal" valueNumeric="1800"/>
+            <column name="fat" valueNumeric="70"/>
+            <column name="sfa" valueNumeric="20"/>
+            <column name="carbo" valueNumeric="260"/>
+            <column name="sugar" valueNumeric="90"/>
+            <column name="protein" valueNumeric="50"/>
+            <column name="a" valueNumeric="0.8"/>
+            <column name="d" valueNumeric="0.005"/>
+            <column name="e" valueNumeric="12"/>
+            <column name="k" valueNumeric="0.075"/>
+            <column name="b1" valueNumeric="1.1"/>
+            <column name="b2" valueNumeric="1.4"/>
+            <column name="b3" valueNumeric="16"/>
+            <column name="b5" valueNumeric="6"/>
+            <column name="b6" valueNumeric="1.4"/>
+            <column name="b7" valueNumeric="0.05"/>
+            <column name="b9" valueNumeric="0.2"/>
+            <column name="b12" valueNumeric="0.0025"/>
+            <column name="c" valueNumeric="80"/>
+            <column name="potassium" valueNumeric="2000"/>
+            <column name="calcium" valueNumeric="1000"/>
+            <column name="phosphorus" valueNumeric="700"/>
+            <column name="magnesium" valueNumeric="375"/>
+            <column name="iron" valueNumeric="14"/>
+            <column name="zinc" valueNumeric="10"/>
+            <column name="fluorine" valueNumeric="3.5"/>
+            <column name="manganese" valueNumeric="2"/>
+            <column name="copper" valueNumeric="1"/>
+            <column name="iodine" valueNumeric="0.15"/>
+            <column name="selenium" valueNumeric="0.055"/>
+            <column name="molybdenum" valueNumeric="0.050"/>
+            <column name="chromium" valueNumeric="0.040"/>
         </insert>
 
         <insert tableName="account">
@@ -480,6 +572,76 @@
             <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000010"/>
             <column name="timestamp" valueDate="2025-06-07T10:00:00"/>
             <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="survey">
+            <column name="id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="height" value="180.0"/>
+            <column name="date_of_birth" value="1990-05-12T00:00:00Z"/>
+            <column name="gender" value="true"/>
+            <column name="meals_per_day" valueNumeric="4"/>
+            <column name="smokes" value="false"/>
+            <column name="drinks_alcohol" value="true"/>
+            <column name="activity_level" value="MODERATE"/>
+            <column name="nutrition_goal" value="REDUCTION"/>
+            <column name="eating_habits" value="I usually eat late at night, and sometimes skip breakfast."/>
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
+        </insert>
+
+        <insert tableName="survey_diet_preferences">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="diet_preferences" value="vegetarian"/>
+        </insert>
+        <insert tableName="survey_diet_preferences">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="diet_preferences" value="no pork"/>
+        </insert>
+
+        <insert tableName="survey_allergies">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="allergies" value="nuts"/>
+        </insert>
+        <insert tableName="survey_allergies">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="allergies" value="lactose"/>
+        </insert>
+
+        <insert tableName="survey_illnesses">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="illnesses" value="hypertension"/>
+        </insert>
+
+        <insert tableName="survey_medications">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="medications" value="aspirin"/>
+        </insert>
+
+        <insert tableName="survey_meal_times">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="meal_times" value="2024-01-01T08:00:00Z"/>
+        </insert>
+        <insert tableName="survey_meal_times">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="meal_times" value="2024-01-01T12:00:00Z"/>
+        </insert>
+        <insert tableName="survey_meal_times">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="meal_times" value="2024-01-01T16:00:00Z"/>
+        </insert>
+        <insert tableName="survey_meal_times">
+            <column name="survey_id" value="00000000-0000-0000-0000-000000000007"/>
+            <column name="meal_times" value="2024-01-01T20:00:00Z"/>
+        </insert>
+
+        <insert tableName="periodic_survey">
+            <column name="id" value="00000000-0000-0000-0000-000000000006"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="weight" valueNumeric="80"/>
+            <column name="blood_pressure" value="120/90"/>
+            <column name="blood_sugar_level" valueNumeric="30"/>
+            <column name="measurement_date" valueDate="2025-06-08T00:00:00"/>
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
         </insert>
 
         <insert tableName="periodic_survey">

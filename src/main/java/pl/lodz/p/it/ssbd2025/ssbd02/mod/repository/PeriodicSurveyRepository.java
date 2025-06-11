@@ -16,7 +16,6 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Repository
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
@@ -30,6 +29,10 @@ public interface PeriodicSurveyRepository extends AbstractRepository<PeriodicSur
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     boolean existsByClientAndMeasurementDateAfter(Client client, Timestamp measurementDate);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+//    @PreAuthorize()//TODO dodac
+    Optional<PeriodicSurvey> findFirstByClientOrderByMeasurementDateDesc(Client client);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")

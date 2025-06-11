@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @Transactional(propagation = Propagation.MANDATORY)
 public interface ClientBloodTestReportRepository extends JpaRepository<ClientBloodTestReport, UUID> {
@@ -30,4 +31,6 @@ public interface ClientBloodTestReportRepository extends JpaRepository<ClientBlo
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     <S extends ClientBloodTestReport> S saveAndFlush(S entity);
+
+    Optional <ClientBloodTestReport> findFirstByClientOrderByTimestampDesc (Client client);
 }

@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/api/account/confirm-email",
                                 "/api/account/revert-email-change",
                                 "/api/account/verify",
-                                "/api/account/unlock"
+                                "/api/account/unlock",
+                                "/test"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/account/login/2fa"
@@ -78,6 +79,9 @@ public class SecurityConfig {
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/blood-test-reports/{clientId}"
+                        ).hasRole("DIETICIAN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/mod/blood-parameters/{male}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/admin/register",

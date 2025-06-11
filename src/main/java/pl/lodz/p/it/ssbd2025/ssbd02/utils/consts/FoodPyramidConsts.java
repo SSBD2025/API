@@ -3,6 +3,15 @@ package pl.lodz.p.it.ssbd2025.ssbd02.utils.consts;
 public class FoodPyramidConsts {
     public static final String TABLE_NAME = "food_pyramid";
 
+    public static final String NAME_INDEX = "name_index";
+
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_KCAL = "kcal";
+    public static final String COLUMN_FAT = "fat";
+    public static final String COLUMN_SFA = "sfa";
+    public static final String COLUMN_CARBO = "carbo";
+    public static final String COLUMN_SUGAR = "sugar";
+    public static final String COLUMN_PROTEIN = "protein";
     public static final String COLUMN_AVERAGE_RATING = "average_rating";
     public static final String COLUMN_A = "a";
     public static final String COLUMN_D = "d";

@@ -24,21 +24,12 @@ public class BloodParameterMapperImpl implements BloodParameterMapper {
     @Named("toBloodParameterDTO")
     @Override
     public BloodParameterDTO toBloodParameterDTO(BloodParameter parameter, boolean isMan) {
-        if (isMan) {
-            return new BloodParameterDTO(
-                    parameter.name(),
-                    parameter.getDescription(),
-                    parameter.getUnit().toString(),
-                    parameter.getMenStandardMin(),
-                    parameter.getMenStandardMax()
-            );
-        }
         return new BloodParameterDTO(
                 parameter.name(),
                 parameter.getDescription(),
                 parameter.getUnit().toString(),
-                parameter.getWomanStandardMin(),
-                parameter.getWomanStandardMax()
+                isMan ? parameter.getMenStandardMin() : parameter.getWomanStandardMin(),
+                isMan ? parameter.getMenStandardMax() : parameter.getWomanStandardMax()
         );
     }
 }

@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.*;
@@ -34,12 +35,13 @@ public class BloodTestResultDTO {
 
     @Setter
     @NotNull
-    String result;
+    Double result;
 
     @Setter
     @NotNull
     BloodParameterDTO bloodParameter;
 
+    @JsonIgnore
     @Setter(AccessLevel.NONE)
     @Null(groups = {OnCreate.class, OnUpdate.class, OnRead.class})
     ClientBloodTestReport report;
