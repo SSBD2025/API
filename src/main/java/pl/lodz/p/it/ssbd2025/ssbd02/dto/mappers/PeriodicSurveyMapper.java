@@ -21,7 +21,8 @@ public interface PeriodicSurveyMapper {
     public PeriodicSurvey toPeriodicSurvey(PeriodicSurveyDTO periodicSurveyDTO);
 
     @Mappings({
-            @Mapping(target = "clientId", source = "client.id")
+            @Mapping(target = "clientId", source = "client.id"),
+            @Mapping(target = "version", ignore = true),
     })
     public PeriodicSurveyDTO toPeriodicSurveyDTO(PeriodicSurvey periodicSurvey);
 }

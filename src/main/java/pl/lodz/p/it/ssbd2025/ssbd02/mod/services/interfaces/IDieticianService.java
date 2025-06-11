@@ -13,4 +13,5 @@ public interface IDieticianService {
     List<Client> getClients(UUID dieticianId);
     List<Client> getClientsByDietician(String searchPhrase);
     Survey getPermanentSurveyByClientId(UUID clientId);
+    Client getClientDetails(UUID clientId);
 }

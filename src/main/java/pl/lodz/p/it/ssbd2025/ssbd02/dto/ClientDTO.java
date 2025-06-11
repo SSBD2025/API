@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Setter(AccessLevel.NONE)
 @Getter
@@ -14,11 +16,11 @@ public class ClientDTO {
 
         private ClientDTO() {}
 
-    @Override
-    public String toString() {
-        return "ClientDTO{" +
-                "client=" + client +
-                ", account=" + account +
-                '}';
-    }
+        @Override
+        public String toString() {
+            return "ClientDTO{" +
+                    "client=" + client +
+                    ", account=" + account +
+                    '}';
+        }
 }
