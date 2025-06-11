@@ -24,8 +24,8 @@ public class AssignDietPlanDTO {
     @Override
     public String toString() {
         return "AssignDietPlanDTO{" +
-                "clientId=" + clientId +
-                ", foodPyramidId=" + foodPyramidId +
+                "clientId=" + DTOConsts.PROTECTED +
+                ", foodPyramidId=" + DTOConsts.PROTECTED +
                 '}';
     }
 }

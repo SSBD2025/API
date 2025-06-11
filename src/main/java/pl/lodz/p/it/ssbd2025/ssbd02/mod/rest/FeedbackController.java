@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.FeedbackMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFeedbackService;
@@ -22,16 +23,35 @@ public class FeedbackController {
 
     private final FeedbackMapper feedbackMapper;
 
-    @GetMapping("/client/{clientId}")
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @GetMapping("/client/id/{clientId}")
     public ResponseEntity<List<FeedbackDTO>> getFeedbacksByClientId(@PathVariable UUID clientId) {
-        // Implementation will be added later
-        return null;
+        return ResponseEntity.ok().body(
+                feedbackMapper.toFeedbackDTOs(
+                        feedbackService.getFeedbacksByClientId(clientId)
+                )
+        );
     }
 
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @GetMapping("/client/login/{login}")
+    public ResponseEntity<List<FeedbackDTO>> getFeedbacksByClientLogin(@PathVariable String login) {
+        return ResponseEntity.ok().body(
+                feedbackMapper.toFeedbackDTOs(
+                        feedbackService.getFeedbacksByClientLogin(login)
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/pyramid/{pyramidId}")
     public ResponseEntity<List<FeedbackDTO>> getFeedbacksByFoodPyramidId(@PathVariable UUID pyramidId) {
-        // Implementation will be added later
-        return null;
+        return ResponseEntity.ok().body(
+                feedbackMapper.toFeedbackDTOs(
+                        feedbackService.getFeedbacksByFoodPyramidId(pyramidId)
+                )
+        );
     }
 
     @PreAuthorize("hasRole('CLIENT')")
