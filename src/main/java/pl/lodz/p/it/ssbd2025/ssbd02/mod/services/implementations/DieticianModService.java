@@ -73,4 +73,22 @@ public class DieticianModService implements IDieticianService {
         return surveyRepository.findByClientId(clientId).orElseThrow(SurveyNotFoundException::new);
     }
 
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            timeoutString = "${transaction.timeout}"
+    )
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public Client getClientDetails(UUID clientId) {
+        Client client = clientModRepository.findClientById(clientId).orElseThrow(ClientNotFoundException::new);
+        if (client.getSurvey() != null) {
+            client.getSurvey().getDietPreferences().size();
+            client.getSurvey().getAllergies().size();
+            client.getSurvey().getIllnesses().size();
+            client.getSurvey().getMedications().size();
+            client.getSurvey().getMealTimes().size();
+        }
+        return client;
+    }
 }

@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.DieticianDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.SurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
@@ -56,5 +53,12 @@ public class DieticianModController {
     public ResponseEntity<SurveyDTO> getSurveyByClientId(@PathVariable UUID clientId) {
         Survey survey = dieticianModService.getPermanentSurveyByClientId(clientId);
         return ResponseEntity.status(HttpStatus.OK).body(surveyMapper.toSurveyDTO(survey));
+    }
+
+    @GetMapping("/{clientId}/details")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<ClientDetailsDTO> getClientDetails(@PathVariable UUID clientId) {
+        Client client = dieticianModService.getClientDetails(clientId);
+        return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toDetailsDto(client));
     }
 }
