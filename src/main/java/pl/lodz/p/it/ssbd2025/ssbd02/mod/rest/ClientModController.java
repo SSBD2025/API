@@ -96,7 +96,7 @@ public class ClientModController {
     }
 
     @GetMapping("/{clientId}/periodic-survey")
-    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Page<PeriodicSurveyDTO>> getPeriodicSurveysByClientId(
             @PathVariable UUID clientId,
             Pageable pageable) {
