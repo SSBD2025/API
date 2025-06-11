@@ -103,17 +103,19 @@ public class FeedbackService implements IFeedbackService {
             retryFor = {JpaSystemException.class},
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    public Feedback addFeedback(UUID clientId, UUID pyramidId, Feedback feedback) {
+    public Feedback addFeedback(UUID pyramidId, Feedback feedback) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+
         feedback.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
-        Client client = clientRepository.findById(clientId).orElseThrow(ClientNotFoundException::new);
         FoodPyramid pyramid = foodPyramidRepository.findById(pyramidId).orElseThrow(FoodPyramidNotFoundException::new);
 
         if (!clientFoodPyramidRepository.existsByClientAndFoodPyramid(client, pyramid)) {
             throw new NotYourFoodPyramidException();
         }
 
-        if (feedbackRepository.existsByClientIdAndFoodPyramidId(clientId, pyramidId)) {
+        if (feedbackRepository.existsByClientIdAndFoodPyramidId(client.getId(), pyramidId)) {
             throw new AlreadyRatedPyramidException();
         }
 
