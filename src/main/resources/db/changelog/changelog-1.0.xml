@@ -653,6 +653,15 @@
             <column name="measurement_date" valueDate="2025-06-01T10:00:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
         </insert>
+        <insert tableName="periodic_survey">
+            <column name="id" value="00000000-0000-0000-0000-000000000013"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="blood_sugar_level" valueNumeric="33"/>
+            <column name="blood_pressure" value="150-120"/>
+            <column name="weight" valueNumeric="123.4"/>
+            <column name="measurement_date" valueDate="2025-06-01T21:37:00"/>
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
+        </insert>
         <insert tableName="feedback" >
             <column name="id" value="00000000-0000-0000-0000-000000000021" />
             <column name="client_id" value="00000000-0000-0000-0000-000000000006" />

@@ -17,10 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.NoAssignedDieticianException;
@@ -236,5 +233,40 @@ public class ClientModService implements IClientService {
     public PeriodicSurveyDTO getPeriodicSurvey(UUID periodicSurveyId) {
         return periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurveyRepository.findById(periodicSurveyId)
                 .orElseThrow(PeriodicSurveyNotFound::new));
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
+        return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID accountId, Pageable pageable) {
+        Client client = clientModRepository.findClientByAccountId(accountId).orElseThrow(ClientNotFoundException::new);
+        Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
+        return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
     }
 }

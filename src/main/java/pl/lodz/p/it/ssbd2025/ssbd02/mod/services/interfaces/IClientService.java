@@ -24,5 +24,7 @@ public interface IClientService {
     public PeriodicSurvey submitPeriodicSurvey(PeriodicSurvey periodicSurvey);
     Survey editPermanentSurvey(SurveyDTO dto);
     Page<PeriodicSurveyDTO> getPeriodicSurveys(UUID clientId, Pageable pageable);
+    Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable);
+    Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID accountId, Pageable pageable);
     PeriodicSurveyDTO getPeriodicSurvey(UUID periodicSurveyId);
 }
