@@ -15,6 +15,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientFoodPyramidDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.FoodPyramidMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
@@ -44,6 +45,7 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
     private final ClientFoodPyramidRepository clientFoodPyramidRepository;
     private final FoodPyramidService foodPyramidService;
     private final DieticianModRepository dieticianModRepository;
+    private final FoodPyramidMapper foodPyramidMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
@@ -107,11 +109,14 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         List<ClientFoodPyramid> clientFoodPyramids = clientFoodPyramidRepository.findByClientIdOrderByTimestampDesc(client.getId());
         UUID latestPyramidId = clientFoodPyramids.getFirst().getFoodPyramid().getId();
         return clientFoodPyramids.stream()
-                .map(p -> new ClientFoodPyramidDTO(
-                        p.getFoodPyramid(),
-                        p.getFoodPyramid().getId().equals(latestPyramidId),
-                        p.getTimestamp()
-                ))
+                .map(p -> {
+                    FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
+                    return new ClientFoodPyramidDTO(
+                            dto,
+                            p.getFoodPyramid().getId().equals(latestPyramidId),
+                            p.getTimestamp()
+                    );
+                })
                 .toList();
     }
 
@@ -132,7 +137,6 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
                 .orElseThrow(DieticianNotFoundException::new);
         Client client = clientModRepository.findClientByAccountId(clientId)
                 .orElseThrow(ClientNotFoundException::new);
-        System.out.println(client.getAccount().getLogin());
         if (!dietician.getClients().contains(client)) {
             throw new ClientNotAssignedException();
         }
@@ -143,11 +147,14 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         }
         UUID latestId = pyramids.getFirst().getFoodPyramid().getId();
         return pyramids.stream()
-                .map(p -> new ClientFoodPyramidDTO(
-                        p.getFoodPyramid(),
-                        p.getFoodPyramid().getId().equals(latestId),
-                        p.getTimestamp()
-                ))
+                .map(p -> {
+                    FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
+                    return new ClientFoodPyramidDTO(
+                            dto,
+                            dto.getId().equals(latestId),
+                            p.getTimestamp()
+                    );
+                })
                 .toList();
     }
 }
