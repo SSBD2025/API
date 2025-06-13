@@ -219,27 +219,35 @@ public class FeedbackService implements IFeedbackService {
             retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    public Feedback updateFeedback(Feedback feedback, String lockToken) {
+    public Feedback updateFeedback(Feedback updatedFeedback, String lockToken) {
         LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(lockToken);
 
-        Feedback feedback1 = feedbackRepository.findById(record.id()).orElseThrow(FeedbackNotFoundException::new);
+        Feedback feedback = feedbackRepository.findById(record.id()).orElseThrow(FeedbackNotFoundException::new);
 
-        if (!feedback1.getVersion().equals(record.version())) {
+        if (!feedback.getVersion().equals(record.version())) {
             throw new ConcurrentUpdateException();
         }
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
 
-        if (!feedback1.getClient().getId().equals(client.getId())) {
+        if (!feedback.getClient().getId().equals(client.getId())) {
             throw new NotYourFeedbackException();
         }
 
-        feedback1.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
-        feedback1.setRating(feedback.getRating());
-        feedback1.setDescription(feedback.getDescription());
+        feedback.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        feedback.setRating(updatedFeedback.getRating());
+        feedback.setDescription(updatedFeedback.getDescription());
 
-        return feedbackRepository.saveAndFlush(feedback1);
+        feedback = feedbackRepository.saveAndFlush(feedback);
+
+        FoodPyramid pyramid = foodPyramidRepository.findById(feedback.getFoodPyramid().getId()).orElseThrow(FoodPyramidNotFoundException::new);
+        Double avg = feedbackRepository.calculateAverageRating(pyramid.getId());
+        pyramid.setAverageRating(avg != null ? avg: 0.0);
+        foodPyramidRepository.saveAndFlush(pyramid);
+
+
+        return feedback;
     }
 }
 
