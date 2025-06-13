@@ -473,4 +473,26 @@ public class EmailService {
             log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
         }
     }
+
+    @Async
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public void sendBloodTestOrderNotificationEmail(String username, String receiver, Language language) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            String emailBody = loadTemplate(EmailConsts.TEMPLATE_EMAIL)
+                    .replace(EmailConsts.PLACEHOLDER_WELCOME, I18n.getMessage("email.welcome", language))
+                    .replace(EmailConsts.PLACEHOLDER_NAME, username)
+                    .replace(EmailConsts.PLACEHOLDER_BODY, I18n.getMessage("email.blood.test.order", language));
+
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(receiver);
+            helper.setSubject(I18n.getMessage("email.blood.test.order.subject", language));
+            helper.setText(emailBody, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException | MailSendException | MailAuthenticationException | EmailTemplateLoadingException e) {
+            log.warn("An error occurred while sending the email. Cause {}, {}", e.getClass(), e.getMessage());
+        }
+    }
 }

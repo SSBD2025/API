@@ -32,3 +32,5 @@ GRANT SELECT, INSERT, UPDATE ON TABLE survey_meal_times TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE ON TABLE survey_medications TO ssbd02mod;
 GRANT SELECT ON TABLE user_data TO ssbd02mod;
 GRANT SELECT, UPDATE ON TABLE user_role TO ssbd02mod;
+GRANT SELECT, INSERT, UPDATE ON TABLE blood_test_order TO ssbd02mod;
+GRANT SELECT, INSERT, UPDATE ON TABLE blood_test_order_parameters TO ssbd02mod;

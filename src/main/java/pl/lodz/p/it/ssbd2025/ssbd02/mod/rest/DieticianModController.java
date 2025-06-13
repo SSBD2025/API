@@ -5,10 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodTestOrderMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.SurveyMapper;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.DieticianModService;
@@ -26,6 +30,7 @@ public class DieticianModController {
 
     private final ClientMapper clientMapper;
     private final SurveyMapper surveyMapper;
+    private final BloodTestOrderMapper bloodTestOrderMapper;
 
     @GetMapping("/get-clients-by-dietician")
     @PreAuthorize("hasRole('DIETICIAN')")
@@ -60,5 +65,22 @@ public class DieticianModController {
     public ResponseEntity<ClientDetailsDTO> getClientDetails(@PathVariable UUID clientId) {
         Client client = dieticianModService.getClientDetails(clientId);
         return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toDetailsDto(client));
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @PostMapping("/order-medical-examinations")
+    public ResponseEntity<BloodTestOrderDTO> orderMedicalExaminations(
+            @Validated(OnCreate.class)
+            @RequestBody BloodTestOrderDTO bloodTestOrderDTO
+    ) {
+        BloodTestOrder bloodTestOrder = dieticianModService.orderMedicalExaminations(bloodTestOrderDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(bloodTestOrderMapper.toBloodTestOrderDTO(bloodTestOrder));
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @PatchMapping("/{orderId}/confirm")
+    public ResponseEntity<Void> confirmBloodTestOrder(@PathVariable UUID orderId) {
+        dieticianModService.confirmBloodTestOrder(orderId);
+        return ResponseEntity.noContent().build();
     }
 }

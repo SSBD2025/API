@@ -58,4 +58,9 @@ public final class ExceptionConsts {
     public static final String SAME_DIETICIAN_ALREADY_ASSIGNED = "same_dietician_already_assigned";
     public static final String DIETICIAN_ALREADY_ASSIGNED = "dietician_already_assigned";
     public static final String DIETICIAN_CLIENT_LIMIT_EXCEEDED = "dietician_client_limit_exceeded";
+    public static final String CLIENT_HAS_NO_ASSIGNED_DIETICIAN = "client_has_no_assigned_dietician";
+    public static final String DIETICIAN_ACCESS_DENIED = "dietician_access_denied";
+    public static final String BLOOD_TEST_ALREADY_ORDERED = "blood_test_already_ordered";
+    public static final String BLOOD_TEST_ORDER_NOT_FOUND = "blood_test_order_not_found";
+    public static final String BLOOD_TEST_ALREADY_FULFILLED = "blood_test_already_fulfilled";
 }

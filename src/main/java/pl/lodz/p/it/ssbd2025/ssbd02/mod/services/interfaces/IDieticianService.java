@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
@@ -14,4 +16,6 @@ public interface IDieticianService {
     List<Client> getClientsByDietician(String searchPhrase);
     Survey getPermanentSurveyByClientId(UUID clientId);
     Client getClientDetails(UUID clientId);
+    BloodTestOrder orderMedicalExaminations(BloodTestOrderDTO bloodTestOrderDTO);
+    void confirmBloodTestOrder(UUID orderId);
 }
