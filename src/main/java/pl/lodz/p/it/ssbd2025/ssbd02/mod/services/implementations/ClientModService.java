@@ -310,7 +310,7 @@ public class ClientModService implements IClientService {
             retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    public PeriodicSurvey editPeriodicSurvey(PeriodicSurveyDTO dto) {
+    public PeriodicSurveyDTO editPeriodicSurvey(PeriodicSurveyDTO dto) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
         PeriodicSurvey existing = periodicSurveyRepository.findTopByClientOrderByMeasurementDateDesc(client).orElseThrow(PeriodicSurveyNotFound::new);
@@ -325,6 +325,24 @@ public class ClientModService implements IClientService {
         existing.setWeight(dto.getWeight());
         existing.setBloodSugarLevel(dto.getBloodSugarLevel());
         existing.setMeasurementDate(Timestamp.from(Instant.now()));
-        return periodicSurveyRepository.saveAndFlush(existing);
+        return periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurveyRepository.saveAndFlush(existing));
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')")
+    public PeriodicSurveyDTO getMyLatestPeriodicSurvey() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        PeriodicSurvey survey = periodicSurveyRepository.findTopByClientOrderByMeasurementDateDesc(client).orElseThrow(PeriodicSurveyNotFound::new);
+        return periodicSurveyMapper.toPeriodicSurveyDTO(survey);
     }
 }

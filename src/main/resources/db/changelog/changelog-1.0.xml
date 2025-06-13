@@ -647,7 +647,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000012"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="80"/>
-            <column name="blood_pressure" value="120-80"/>
+            <column name="blood_pressure" value="120/80"/>
             <column name="weight" valueNumeric="88.8"/>
             <column name="measurement_date" valueDate="2025-06-01T10:00:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -656,7 +656,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000013"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="33"/>
-            <column name="blood_pressure" value="150-120"/>
+            <column name="blood_pressure" value="150/120"/>
             <column name="weight" valueNumeric="123.4"/>
             <column name="measurement_date" valueDate="2025-06-01T21:37:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -665,7 +665,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000024"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="80"/>
-            <column name="blood_pressure" value="122-85"/>
+            <column name="blood_pressure" value="122/85"/>
             <column name="weight" valueNumeric="88.2"/>
             <column name="measurement_date" valueDate="2025-06-04T21:37:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -675,7 +675,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000014"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="78"/>
-            <column name="blood_pressure" value="119-79"/>
+            <column name="blood_pressure" value="119/79"/>
             <column name="weight" valueNumeric="88.4"/>
             <column name="measurement_date" valueDate="2025-06-07T08:15:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -685,7 +685,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000021"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="83"/>
-            <column name="blood_pressure" value="121-78"/>
+            <column name="blood_pressure" value="121/78"/>
             <column name="weight" valueNumeric="88.0"/>
             <column name="measurement_date" valueDate="2025-06-09T07:55:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -695,7 +695,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000022"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="79"/>
-            <column name="blood_pressure" value="117-75"/>
+            <column name="blood_pressure" value="117/75"/>
             <column name="weight" valueNumeric="87.7"/>
             <column name="measurement_date" valueDate="2025-06-11T06:45:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
@@ -705,7 +705,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000015"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="90"/>
-            <column name="blood_pressure" value="125-82"/>
+            <column name="blood_pressure" value="125/82"/>
             <column name="weight" valueNumeric="77.0"/>
             <column name="measurement_date" valueDate="2025-06-01T07:45:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000011"/>
@@ -715,7 +715,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000016"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="85"/>
-            <column name="blood_pressure" value="118-76"/>
+            <column name="blood_pressure" value="118/76"/>
             <column name="weight" valueNumeric="76.5"/>
             <column name="measurement_date" valueDate="2025-06-05T14:30:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000011"/>
@@ -725,7 +725,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000017"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="110"/>
-            <column name="blood_pressure" value="130-90"/>
+            <column name="blood_pressure" value="130/90"/>
             <column name="weight" valueNumeric="70.2"/>
             <column name="measurement_date" valueDate="2025-06-02T10:00:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000013"/>
@@ -735,7 +735,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000018"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="105"/>
-            <column name="blood_pressure" value="128-88"/>
+            <column name="blood_pressure" value="128/88"/>
             <column name="weight" valueNumeric="70.0"/>
             <column name="measurement_date" valueDate="2025-06-06T10:30:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000013"/>
@@ -745,7 +745,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000019"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="95"/>
-            <column name="blood_pressure" value="120-84"/>
+            <column name="blood_pressure" value="120/84"/>
             <column name="weight" valueNumeric="82.0"/>
             <column name="measurement_date" valueDate="2025-06-03T09:00:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000015"/>
@@ -755,7 +755,7 @@
             <column name="id" value="00000000-0000-0000-0000-000000000020"/>
             <column name="version" valueNumeric="0"/>
             <column name="blood_sugar_level" valueNumeric="93"/>
-            <column name="blood_pressure" value="121-80"/>
+            <column name="blood_pressure" value="121/80"/>
             <column name="weight" valueNumeric="81.5"/>
             <column name="measurement_date" valueDate="2025-06-05T18:10:00"/>
             <column name="client_id" value="00000000-0000-0000-0000-000000000015"/>
