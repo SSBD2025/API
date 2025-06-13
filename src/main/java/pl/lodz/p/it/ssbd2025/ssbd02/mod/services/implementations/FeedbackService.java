@@ -95,6 +95,49 @@ public class FeedbackService implements IFeedbackService {
         return feedbackRepository.findAllByFoodPyramid(pyramid);
     }
 
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public Feedback getFeedbackByClientAndPyramid(UUID clientId, UUID pyramidId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(ClientNotFoundException::new);
+
+        FoodPyramid pyramid = foodPyramidRepository.findById(pyramidId)
+                .orElseThrow(FoodPyramidNotFoundException::new);
+
+        return feedbackRepository.findByClientIdAndFoodPyramidId(client.getId(), pyramid.getId())
+                .orElseThrow(FeedbackNotFoundException::new);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public Feedback getFeedbackByClientLoginAndPyramid(String login, UUID pyramidId) {
+        Client client = clientRepository.findByLogin(login)
+                .orElseThrow(ClientNotFoundException::new);
+
+        FoodPyramid pyramid = foodPyramidRepository.findById(pyramidId)
+                .orElseThrow(FoodPyramidNotFoundException::new);
+
+        return feedbackRepository.findByClientIdAndFoodPyramidId(client.getId(), pyramid.getId())
+                .orElseThrow(FeedbackNotFoundException::new);
+    }
 
     @Override
     @PreAuthorize("hasRole('CLIENT')")

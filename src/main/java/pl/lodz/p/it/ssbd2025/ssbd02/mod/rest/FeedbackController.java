@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
@@ -33,6 +34,32 @@ public class FeedbackController {
         return ResponseEntity.ok().body(
                 feedbackMapper.toFeedbackDTOs(
                         feedbackService.getFeedbacksByClientId(clientId)
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/client/{clientId}/pyramid/{pyramidId}")
+    public ResponseEntity<FeedbackDTO> getFeedbackByClientAndPyramid(
+            @PathVariable UUID clientId,
+            @PathVariable UUID pyramidId
+    ) {
+        return ResponseEntity.ok().body(
+                feedbackMapper.toFeedbackDTO(
+                        feedbackService.getFeedbackByClientAndPyramid(clientId, pyramidId)
+                )
+        );
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/my-pyramid/{pyramidId}")
+    public ResponseEntity<FeedbackDTO> getMyFeedbackForPyramid(
+            @PathVariable UUID pyramidId
+    ) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok().body(
+                feedbackMapper.toFeedbackDTO(
+                        feedbackService.getFeedbackByClientLoginAndPyramid(login, pyramidId)
                 )
         );
     }
