@@ -49,5 +49,9 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
+    Optional<Feedback> findByClientIdAndFoodPyramidId(UUID clientId, UUID pyramidId);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')")
     Optional<Feedback> findById(UUID id);
 }

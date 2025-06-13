@@ -34,16 +34,12 @@ public interface ClientMapper {
     List<ClientDTO> toClientListDTO(List<Client> clients);
 
     @Mappings({
+            @Mapping(target = "id", source = "id"),
             @Mapping(target = "firstName", source = "account.firstName"),
             @Mapping(target = "lastName", source = "account.lastName"),
             @Mapping(target = "email", source = "account.email")
     })
     MinimalClientDTO toMinimalClientDTO(Client client);
 
-    @Mappings({
-            @Mapping(target = "firstName", source = "account.firstName"),
-            @Mapping(target = "lastName", source = "account.lastName"),
-            @Mapping(target = "email", source = "account.email")
-    })
     List<MinimalClientDTO> toMinimalClientListDTO(List<Client> clients);
 }
