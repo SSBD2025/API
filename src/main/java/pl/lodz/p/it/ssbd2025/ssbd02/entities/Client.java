@@ -45,4 +45,7 @@ public class Client extends UserRole {
 
     @OneToMany(mappedBy = FeedbackConsts.FIELD_CLIENT)
     private List<Feedback> feedbacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = BloodTestOrderConsts.FIELD_CLIENT)
+    private List<BloodTestOrder> bloodTestOrders;
 }

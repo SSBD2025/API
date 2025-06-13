@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestOrderConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ClientConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DieticianConsts;
 
@@ -21,4 +22,7 @@ public class Dietician extends UserRole {
     @OneToMany(mappedBy = ClientConsts.FIELD_DIETICIAN, cascade = CascadeType.REFRESH)
     @ToString.Exclude
     private List<Client> clients = new ArrayList<>();
+
+    @OneToMany(mappedBy = BloodTestOrderConsts.FIELD_DIETICIAN)
+    private List<BloodTestOrder> bloodTestOrders;
 }
