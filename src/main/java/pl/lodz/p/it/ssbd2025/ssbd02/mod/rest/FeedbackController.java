@@ -57,11 +57,11 @@ public class FeedbackController {
             @PathVariable UUID pyramidId
     ) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok().body(
-                feedbackMapper.toFeedbackDTO(
-                        feedbackService.getFeedbackByClientLoginAndPyramid(login, pyramidId)
-                )
-        );
+        Feedback feedback = feedbackService.getFeedbackByClientLoginAndPyramid(login, pyramidId);
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+        FeedbackDTO feedbackDTO = feedbackMapper.toFeedbackDTO(feedback);
+        feedbackDTO.setLockToken(lockToken);
+        return ResponseEntity.ok().body(feedbackDTO);
     }
 
     @PreAuthorize("hasRole('DIETICIAN')")
