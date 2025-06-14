@@ -217,6 +217,7 @@ public class ClientModService implements IClientService {
             throw new ConcurrentUpdateException();
         }
 
+        existingSurvey.setHeight(dto.getHeight());
         existingSurvey.setDietPreferences(dto.getDietPreferences());
         existingSurvey.setAllergies(dto.getAllergies());
         existingSurvey.setActivityLevel(dto.getActivityLevel());
