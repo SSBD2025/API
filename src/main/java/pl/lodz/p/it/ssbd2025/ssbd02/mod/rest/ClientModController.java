@@ -126,6 +126,21 @@ public class ClientModController {
         return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
     }
 
+    @PutMapping("/periodic-survey")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Object> editPeriodicSurvey(
+            @Validated(OnUpdate.class) @RequestBody PeriodicSurveyDTO periodicSurveyDTO) {
+        PeriodicSurveyDTO dto = clientService.editPeriodicSurvey(periodicSurveyDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
+
+    @GetMapping("/periodic-survey/latest")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Object> getMyLatestPeriodicSurvey() {
+        PeriodicSurveyDTO periodicSurveyDTO = clientService.getMyLatestPeriodicSurvey();
+        return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
+    }
+
     @GetMapping("/dietician/{clientId}/periodic-survey")
     @PreAuthorize("hasRole('DIETICIAN')")
     public ResponseEntity<Object> getPeriodicSurveysByAccountId(

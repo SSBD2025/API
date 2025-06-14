@@ -1,5 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -294,5 +297,52 @@ public class ClientModService implements IClientService {
         Client client = clientModRepository.findClientByAccountId(accountId).orElseThrow(ClientNotFoundException::new);
         Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
         return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public PeriodicSurveyDTO editPeriodicSurvey(PeriodicSurveyDTO dto) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        PeriodicSurvey existing = periodicSurveyRepository.findTopByClientOrderByMeasurementDateDesc(client).orElseThrow(PeriodicSurveyNotFound::new);
+        LockTokenService.Record<UUID, Long> record = lockTokenService.verifyToken(dto.getLockToken());
+        if (!existing.getId().equals(record.id())) {
+            throw new InvalidLockTokenException();
+        }
+        if (!existing.getVersion().equals(record.version())) {
+            throw new ConcurrentUpdateException();
+        }
+        existing.setBloodPressure(dto.getBloodPressure());
+        existing.setWeight(dto.getWeight());
+        existing.setBloodSugarLevel(dto.getBloodSugarLevel());
+        existing.setMeasurementDate(Timestamp.from(Instant.now()));
+        return periodicSurveyMapper.toPeriodicSurveyDTO(periodicSurveyRepository.saveAndFlush(existing));
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')")
+    public PeriodicSurveyDTO getMyLatestPeriodicSurvey() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        PeriodicSurvey survey = periodicSurveyRepository.findTopByClientOrderByMeasurementDateDesc(client).orElseThrow(PeriodicSurveyNotFound::new);
+        return periodicSurveyMapper.toPeriodicSurveyDTO(survey);
     }
 }

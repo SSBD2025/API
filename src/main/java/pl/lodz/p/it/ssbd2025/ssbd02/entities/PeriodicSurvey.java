@@ -26,21 +26,21 @@ public class PeriodicSurvey extends AbstractEntity {
     @ToString.Exclude
     private Client client;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_WEIGHT, nullable = false, updatable = false)
+    @Column(name = PeriodicSurveyConsts.COLUMN_WEIGHT, nullable = false, updatable = true)
     @DecimalMin(value = PeriodicSurveyConsts.WEIGHT_MIN)
     @DecimalMax(value = PeriodicSurveyConsts.WEIGHT_MAX)
     private double weight;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_PRESSURE, nullable = false, updatable = false)
+    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_PRESSURE, nullable = false, updatable = true)
     @Pattern(regexp = PeriodicSurveyConsts.BLOOD_PRESSURE_PATTERN, message = PeriodicSurveyConsts.BLOOD_PRESSURE_MESSAGE)
     private String bloodPressure;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_SUGAR_LEVEL, nullable = false, updatable = false)
+    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_SUGAR_LEVEL, nullable = false, updatable = true)
     @DecimalMin(value = PeriodicSurveyConsts.BLOOD_SUGAR_MIN)
     @DecimalMax(value = PeriodicSurveyConsts.BLOOD_SUGAR_MAX)
     private double bloodSugarLevel;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = false)
+    @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp measurementDate;
 }
