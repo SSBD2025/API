@@ -8,7 +8,7 @@ public enum ActivityLevel {
     LIGHT(1.375),
     MODERATE(1.55),
     ACTIVE(1.725),
-    VERT_ACTIVE(1.9);
+    VERY_ACTIVE(1.9);
 
     private final double calorieModifier;
 

@@ -107,6 +107,9 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
         List<ClientFoodPyramid> clientFoodPyramids = clientFoodPyramidRepository.findByClientIdOrderByTimestampDesc(client.getId());
+        if (clientFoodPyramids.isEmpty()) {
+            return List.of();
+        }
         UUID latestPyramidId = clientFoodPyramids.getFirst().getFoodPyramid().getId();
         return clientFoodPyramids.stream()
                 .map(p -> {
@@ -135,7 +138,7 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Dietician dietician = dieticianModRepository.findByLogin(login)
                 .orElseThrow(DieticianNotFoundException::new);
-        Client client = clientModRepository.findClientByAccountId(clientId)
+        Client client = clientModRepository.findClientById(clientId)
                 .orElseThrow(ClientNotFoundException::new);
         if (!dietician.getClients().contains(client)) {
             throw new ClientNotAssignedException();

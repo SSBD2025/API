@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.NutritionGoal;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.SurveyConsts;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -38,11 +39,11 @@ public class SurveyDTO {
     private Boolean gender;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 0)
+    @Size(min = SurveyConsts.DIET_PREFERENCES_MIN, max = SurveyConsts.DIET_PREFERENCES_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<String> dietPreferences;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 0)
+    @Size(min = SurveyConsts.ALLERGIES_MIN, max = SurveyConsts.ALLERGIES_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<String> allergies;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
@@ -53,25 +54,26 @@ public class SurveyDTO {
     private boolean drinksAlcohol;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 0)
+    @Size(min = SurveyConsts.ILLNESSES_MIN, max = SurveyConsts.ILLNESSES_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<String> illnesses;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 0)
+    @Size(min = SurveyConsts.MEDICATIONS_MIN, max = SurveyConsts.MEDICATIONS_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<String> medications;
 
-    @Min(value = 1, groups = {OnCreate.class, OnUpdate.class})
-    @Max(value = 10, groups = {OnCreate.class, OnUpdate.class})
+    @Min(value = SurveyConsts.MEALS_PER_DAY_MIN, groups = {OnCreate.class, OnUpdate.class})
+    @Max(value = SurveyConsts.MEALS_PER_DAY_MAX, groups = {OnCreate.class, OnUpdate.class})
     private int mealsPerDay;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
     private NutritionGoal nutritionGoal;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 1, groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = SurveyConsts.MEAL_TIMES_MIN, groups = {OnCreate.class, OnUpdate.class})
     private List<Timestamp> mealTimes;
 
     @NotBlank(groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = SurveyConsts.EATING_HABITS_MIN, max = SurveyConsts.EATING_HABITS_MAX, groups = {OnCreate.class, OnUpdate.class})
     private String eatingHabits;
 
     private SurveyDTO() {}

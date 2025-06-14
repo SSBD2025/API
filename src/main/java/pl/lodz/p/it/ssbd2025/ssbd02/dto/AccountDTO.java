@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Setter(AccessLevel.NONE)
 @Getter
 @AllArgsConstructor
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountDTO {
 
         @Null(groups = {OnCreate.class, OnUpdate.class})

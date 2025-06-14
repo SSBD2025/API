@@ -15,6 +15,7 @@ public interface UserRoleMapper {
     @Mappings({
             @Mapping(target = "roleName", ignore = true),
             @Mapping(target = "active", ignore = true),
+            @Mapping(target = "version", ignore = true)
     })
     UserRoleDTO.AdminDTO toAdminDTO(Admin admin);
 
