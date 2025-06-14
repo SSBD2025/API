@@ -45,6 +45,5 @@ public interface DieticianModRepository extends AbstractRepository<Dietician> {
 
     @PreAuthorize("hasRole('CLIENT')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @Query("SELECT d FROM Dietician d WHERE d.account.id = :accountId")
-    Optional<Dietician> findByAccountId(@Param("accountId") UUID accountId);
+    Optional<Dietician> findDieticianById(UUID dieticianId);
 }

@@ -14,7 +14,22 @@ public interface AdminMapper {
 
     @Mappings({
             @Mapping(target = "admin", source = "admin"),
-            @Mapping(target = "account", source = "account"),
+            @Mapping(target = "account.id", ignore = true),
+            @Mapping(target = "account.version", ignore = true),
+            @Mapping(target = "account.verified", ignore = true),
+            @Mapping(target = "account.login", ignore = true),
+            @Mapping(target = "account.active", ignore = true),
+            @Mapping(target = "account.lastSuccessfulLogin", ignore = true),
+            @Mapping(target = "account.lastFailedLogin", ignore = true),
+            @Mapping(target = "account.language", ignore = true),
+            @Mapping(target = "account.lastSuccessfulLoginIp", ignore = true),
+            @Mapping(target = "account.lastFailedLoginIp", ignore = true),
+            @Mapping(target = "account.reminded", ignore = true),
+            @Mapping(target = "account.loginAttempts", ignore = true),
+            @Mapping(target = "account.lockedUntil", ignore = true),
+            @Mapping(target = "account.password", ignore = true),
+            @Mapping(target = "account.twoFactorAuth", ignore = true),
+            @Mapping(target = "account.autoLocked", ignore = true),
     })
     AdminDTO toAdminDTO(Admin admin);
 }

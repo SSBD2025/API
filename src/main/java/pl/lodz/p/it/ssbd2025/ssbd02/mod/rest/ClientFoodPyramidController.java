@@ -53,13 +53,21 @@ public class ClientFoodPyramidController {
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client-pyramids")
     public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramids() {
-        return ResponseEntity.ok(clientFoodPyramidService.getClientPyramids());
+        List<ClientFoodPyramidDTO> pyramids = clientFoodPyramidService.getClientPyramids();
+        if (pyramids.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(pyramids);
     }
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/dietician/{clientId}")
     public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramidsAsDietician(
             @PathVariable UUID clientId) {
-        return ResponseEntity.ok(clientFoodPyramidService.getClientPyramidsByDietician(clientId));
+        List<ClientFoodPyramidDTO> pyramids = clientFoodPyramidService.getClientPyramidsByDietician(clientId);
+        if (pyramids.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(pyramids);
     }
 }

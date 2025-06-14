@@ -12,7 +12,18 @@ public class SurveyConsts {
     public static final String COLUMN_EATING_HABITS = "eating_habits";
 
     public static final int MEALS_PER_DAY_MIN = 1;
-    public static final int MEALS_PER_DAY_MAX = 10;
+    public static final int MEALS_PER_DAY_MAX = 5;
+    public static final int DIET_PREFERENCES_MIN = 0;
+    public static final int DIET_PREFERENCES_MAX = 5;
+    public static final int ALLERGIES_MIN = 0;
+    public static final int ALLERGIES_MAX = 5;
+    public static final int ILLNESSES_MIN = 0;
+    public static final int ILLNESSES_MAX = 5;
+    public static final int MEDICATIONS_MIN = 0;
+    public static final int MEDICATIONS_MAX = 5;
+    public static final int MEAL_TIMES_MIN = 1;
+    public static final int EATING_HABITS_MIN = 10;
+    public static final int EATING_HABITS_MAX = 500;
 
     public static final String FIELD_CLIENT = "client";
 }

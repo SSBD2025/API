@@ -88,7 +88,7 @@ public class ClientModService implements IClientService {
     public void assignDietician(UUID dieticianId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
-        Dietician dietician = dieticianModRepository.findByAccountId(dieticianId)
+        Dietician dietician = dieticianModRepository.findDieticianById(dieticianId)
                 .orElseThrow(DieticianNotFoundException::new);
         if (client.getDietician() != null) {
             if (client.getDietician().equals(dietician)) {

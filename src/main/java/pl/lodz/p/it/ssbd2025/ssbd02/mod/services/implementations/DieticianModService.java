@@ -105,7 +105,7 @@ public class DieticianModService implements IDieticianService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Dietician dietician = dieticianModRepository.findByLogin(login)
                 .orElseThrow(DieticianNotFoundException::new);
-        Client client = clientModRepository.findClientByAccountId(bloodTestOrderDTO.getClientId())
+        Client client = clientModRepository.findClientById(bloodTestOrderDTO.getClientId())
                 .orElseThrow(ClientNotFoundException::new);
         if (client.getDietician() == null) {
             throw new ClientHasNoAssignedDieticianException();
