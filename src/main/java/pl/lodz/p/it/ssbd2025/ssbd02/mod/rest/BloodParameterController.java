@@ -9,11 +9,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodParameterDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.SurveyNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientModService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -22,9 +30,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/mod/blood-parameters")
 public class BloodParameterController {
 
+    private final ClientModService clientModService;
+
     @PreAuthorize("hasRole('DIETICIAN')")
-    @GetMapping("/{male}")
-    public List<BloodParameterDTO> getAllBloodParameters(@PathVariable Boolean male) {
+    @GetMapping("/{clientId}")
+    public List<BloodParameterDTO> getAllBloodParameters(@PathVariable SensitiveDTO clientId) {
+        Survey survey = clientModService.getClientById(UUID.fromString(clientId.getValue())).getSurvey();
+        if (survey == null) {
+            throw new SurveyNotFoundException();
+        }
+        boolean male = survey.isGender();
         return Arrays.stream(BloodParameter.values())
                 .map(param -> new BloodParameterDTO(
                         param.name(),
