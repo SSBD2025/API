@@ -1,10 +1,12 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -121,8 +125,18 @@ public class ClientModController {
 
     @GetMapping("/periodic-survey")
     @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Object> getMyPeriodicSurveys(Pageable pageable) {
-        Page<PeriodicSurveyDTO> periodicSurveyDTO = clientService.getPeriodicSurveys(pageable);
+    public ResponseEntity<Object> getMyPeriodicSurveys(
+            Pageable pageable,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime since,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime before
+    ) {
+        Page<PeriodicSurveyDTO> periodicSurveyDTO = clientService.getPeriodicSurveys(pageable,
+                since != null ? Timestamp.valueOf(since) : null,
+                before != null ? Timestamp.valueOf(before) : null);
         return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
     }
 
@@ -139,14 +153,5 @@ public class ClientModController {
     public ResponseEntity<Object> getMyLatestPeriodicSurvey() {
         PeriodicSurveyDTO periodicSurveyDTO = clientService.getMyLatestPeriodicSurvey();
         return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
-    }
-
-    @GetMapping("/dietician/{clientId}/periodic-survey")
-    @PreAuthorize("hasRole('DIETICIAN')")
-    public ResponseEntity<Object> getPeriodicSurveysByAccountId(
-            @PathVariable UUID clientId,
-            Pageable pageable) {
-        Page<PeriodicSurveyDTO> dtoPage = clientService.getPeriodicSurveysByAccountId(clientId, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(dtoPage);
     }
 }

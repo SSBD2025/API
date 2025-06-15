@@ -2,6 +2,9 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +21,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.DieticianModService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IDieticianService;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,5 +87,24 @@ public class DieticianModController {
     public ResponseEntity<Void> confirmBloodTestOrder(@PathVariable UUID orderId) {
         dieticianModService.confirmBloodTestOrder(orderId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{clientId}/periodic-surveys")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<Object> getPeriodicSurveysByAccountId(
+            @PathVariable UUID clientId,
+            Pageable pageable,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime since,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime before
+            ) {
+
+        Page<PeriodicSurveyDTO> dtoPage = dieticianModService.getPeriodicSurveysByAccountId(clientId, pageable,
+                since != null ? Timestamp.valueOf(since) : null,
+                before != null ? Timestamp.valueOf(before) : null);
+        return ResponseEntity.status(HttpStatus.OK).body(dtoPage);
     }
 }
