@@ -57,6 +57,12 @@ public class ClientModController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/status")
+    public ResponseEntity<ClientStatusDTO> getClientStatus() {
+        return ResponseEntity.ok(clientService.getClientStatus());
+    }
+
     @PostMapping("/permanent-survey")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<SurveyDTO> submitPermanentSurvey(

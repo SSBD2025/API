@@ -111,16 +111,13 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
             return List.of();
         }
         UUID latestPyramidId = clientFoodPyramids.getFirst().getFoodPyramid().getId();
-        return clientFoodPyramids.stream()
-                .map(p -> {
-                    FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
-                    return new ClientFoodPyramidDTO(
-                            dto,
-                            p.getFoodPyramid().getId().equals(latestPyramidId),
-                            p.getTimestamp()
-                    );
-                })
-                .toList();
+        List<ClientFoodPyramidDTO> result = new ArrayList<>();
+        for (ClientFoodPyramid p : clientFoodPyramids) {
+            FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
+            boolean isLatest = p.getFoodPyramid().getId().equals(latestPyramidId);
+            result.add(new ClientFoodPyramidDTO(dto, isLatest, p.getTimestamp()));
+        }
+        return result;
     }
 
     @Override
@@ -149,16 +146,13 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
             return Collections.emptyList();
         }
         UUID latestId = pyramids.getFirst().getFoodPyramid().getId();
-        return pyramids.stream()
-                .map(p -> {
-                    FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
-                    return new ClientFoodPyramidDTO(
-                            dto,
-                            dto.getId().equals(latestId),
-                            p.getTimestamp()
-                    );
-                })
-                .toList();
+        List<ClientFoodPyramidDTO> result = new ArrayList<>();
+        for (ClientFoodPyramid p : pyramids) {
+            FoodPyramidDTO dto = foodPyramidMapper.toDto(p.getFoodPyramid());
+            boolean isLatest = dto.getId().equals(latestId);
+            result.add(new ClientFoodPyramidDTO(dto, isLatest, p.getTimestamp()));
+        }
+        return result;
     }
 
     @Override

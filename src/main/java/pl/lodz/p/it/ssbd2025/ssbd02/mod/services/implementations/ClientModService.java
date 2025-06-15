@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientStatusDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
@@ -114,6 +115,20 @@ public class ClientModService implements IClientService {
         }
         client.setDietician(dietician);
         clientModRepository.saveAndFlush(client);
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = true,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ClientStatusDTO getClientStatus() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        if (client.getDietician() == null) {
+            return new ClientStatusDTO(false);
+        }
+        return new ClientStatusDTO(true);
     }
 
     @Override
