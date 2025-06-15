@@ -154,4 +154,11 @@ public class ClientModController {
         PeriodicSurveyDTO periodicSurveyDTO = clientService.getMyLatestPeriodicSurvey();
         return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
     }
+
+    @GetMapping("/blood-test-order")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Object> getBloodTestOrders() {
+        BloodTestOrderDTO dto = clientService.getBloodTestOrder();
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
 }
