@@ -57,8 +57,20 @@ public class ClientModService implements IClientService {
     private final PeriodicSurveyMapper periodicSurveyMapper;
 
     @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class,
+            ConcurrentUpdateException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('DIETICIAN')")
     public Client getClientById(UUID id) {
-        return null;
+        return clientModRepository.findClientById(id).orElseThrow(ClientNotFoundException::new);
     }
 
     @Override

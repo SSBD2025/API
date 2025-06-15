@@ -17,6 +17,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientModService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
@@ -33,12 +34,15 @@ public class ClientBloodTestReportController {
     private final IClientBloodTestReportService clientBloodTestReportService;
     private final ClientBloodTestReportMapper clientBloodTestReportMapper;
     private final LockTokenService lockTokenService;
+    private final ClientModService clientModService;
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @PostMapping("/client/{clientId}")
     public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
         ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
-        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportService.createReport(clientId, newClientBloodTestResult), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(
+                clientBloodTestReportService.createReport(clientId, newClientBloodTestResult),
+                clientModService.getClientById(UUID.fromString(clientId.getValue())).getSurvey().isGender());
         dto.setLockToken(lockTokenService.generateToken(dto.getId(), dto.getVersion()).getValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
