@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
+import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
@@ -10,6 +11,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,8 +26,7 @@ public interface IClientService {
     public PeriodicSurvey submitPeriodicSurvey(PeriodicSurvey periodicSurvey);
     Survey editPermanentSurvey(SurveyDTO dto);
     Page<PeriodicSurveyDTO> getPeriodicSurveys(UUID clientId, Pageable pageable);
-    Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable);
-    Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID accountId, Pageable pageable);
+    Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
     PeriodicSurveyDTO getPeriodicSurvey(UUID periodicSurveyId);
     PeriodicSurveyDTO editPeriodicSurvey(PeriodicSurveyDTO dto);
     PeriodicSurveyDTO getMyLatestPeriodicSurvey();

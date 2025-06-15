@@ -1,7 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -275,33 +274,31 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')")
-    public Page<PeriodicSurveyDTO> getPeriodicSurveys(Pageable pageable) {
+    @PreAuthorize("hasRole('CLIENT')") // TO MA ZOSTAC CLIENT ONLY PRZESTAC MI TO ZMIENIAC !!!!!!!!!!!!!!!!!
+    public Page<PeriodicSurveyDTO> getPeriodicSurveys(
+            Pageable pageable,
+            @Nullable Timestamp since,
+            @Nullable Timestamp before
+    ) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
-        Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
+        Page<PeriodicSurvey> surveysPage;
+        if (since != null && before != null) {
+            surveysPage = periodicSurveyRepository.findByClientIdAndMeasurementDateBetween(
+                    client.getId(), since, before, pageable);
+        } else if (since != null) {
+            surveysPage = periodicSurveyRepository.findByClientIdAndMeasurementDateAfter(
+                    client.getId(), since, pageable);
+        } else if (before != null) {
+            surveysPage = periodicSurveyRepository.findByClientIdAndMeasurementDateBefore(
+                    client.getId(), before, pageable);
+        } else {
+            surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
+        }
+        if(surveysPage == null || surveysPage.isEmpty()) throw new PeriodicSurveyNotFound();
         return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
     }
 
-    @Transactional(
-            propagation = Propagation.REQUIRES_NEW,
-            transactionManager = "modTransactionManager",
-            readOnly = true,
-            timeoutString = "${transaction.timeout}")
-    @Retryable(retryFor = {
-            JpaSystemException.class},
-            backoff = @Backoff(
-                    delayExpression = "${app.retry.backoff}"),
-            maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('DIETICIAN')")
-    public Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID accountId, Pageable pageable) {
-        Client client = clientModRepository.findClientByAccountId(accountId).orElseThrow(ClientNotFoundException::new);
-        Page<PeriodicSurvey> surveysPage = periodicSurveyRepository.findByClientId(client.getId(), pageable);
-        return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
-    }
-
-    @Override
-    @PreAuthorize("hasRole('CLIENT')")
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             transactionManager = "modTransactionManager",
@@ -311,6 +308,7 @@ public class ClientModService implements IClientService {
             retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')")
     public PeriodicSurveyDTO editPeriodicSurvey(PeriodicSurveyDTO dto) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);

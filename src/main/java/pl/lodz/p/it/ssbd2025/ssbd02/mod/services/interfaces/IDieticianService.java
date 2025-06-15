@@ -1,12 +1,14 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 
+import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
+import org.springframework.data.domain.Pageable;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,4 +20,5 @@ public interface IDieticianService {
     Client getClientDetails(UUID clientId);
     BloodTestOrder orderMedicalExaminations(BloodTestOrderDTO bloodTestOrderDTO);
     void confirmBloodTestOrder(UUID orderId);
+    Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
 }
