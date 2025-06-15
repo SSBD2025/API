@@ -47,4 +47,8 @@ public interface ClientFoodPyramidRepository extends AbstractRepository<ClientFo
         ORDER BY cfp.timestamp DESC
     """)
     List<ClientFoodPyramid> findByClientIdOrderByTimestampDesc(@Param("clientId") UUID clientId);
+
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    Optional<ClientFoodPyramid> findTopByClientOrderByTimestampDesc(Client client);
 }

@@ -70,4 +70,16 @@ public class ClientFoodPyramidController {
         }
         return ResponseEntity.ok(pyramids);
     }
+
+    @GetMapping("/current")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ClientFoodPyramidDTO> getCurrentFoodPyramid() {
+        return ResponseEntity.ok(clientFoodPyramidService.getMyCurrentPyramid());
+    }
+
+    @GetMapping("/client/{clientId}/current")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public ResponseEntity<ClientFoodPyramidDTO> getCurrentFoodPyramid(@PathVariable UUID clientId) {
+        return ResponseEntity.ok(clientFoodPyramidService.getCurrentPyramid(clientId));
+    }
 }

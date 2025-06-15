@@ -160,4 +160,45 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
                 })
                 .toList();
     }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = true,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('CLIENT')")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public ClientFoodPyramidDTO getMyCurrentPyramid() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+
+        return getLatestClientFoodPyramidDto(client);
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = true,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    public ClientFoodPyramidDTO getCurrentPyramid(UUID clientId) {
+        Client client = clientModRepository.findClientById(clientId).orElseThrow(ClientNotFoundException::new);
+
+        return getLatestClientFoodPyramidDto(client);
+    }
+
+    private ClientFoodPyramidDTO getLatestClientFoodPyramidDto(Client client) {
+        ClientFoodPyramid clientFoodPyramid = clientFoodPyramidRepository
+                .findTopByClientOrderByTimestampDesc(client)
+                .orElseThrow(FoodPyramidNotFoundException::new);
+
+        FoodPyramidDTO foodPyramidDTO = foodPyramidMapper.toDto(clientFoodPyramid.getFoodPyramid());
+
+        return new ClientFoodPyramidDTO(foodPyramidDTO, true, clientFoodPyramid.getTimestamp());
+    }
 }

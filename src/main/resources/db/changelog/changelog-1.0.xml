@@ -324,7 +324,7 @@
         <insert tableName="food_pyramid">
             <column name="id" value="00000000-0000-0000-0000-000000000010"/>
             <column name="version" valueNumeric="0"/>
-            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="average_rating" valueNumeric="2.0"/>
             <column name="name" value="M20" />
             <column name="kcal" valueNumeric="2000"/>
             <column name="fat" valueNumeric="70"/>
@@ -363,7 +363,7 @@
         <insert tableName="food_pyramid">
             <column name="id" value="00000000-0000-0000-0000-000000000011"/>
             <column name="version" valueNumeric="0"/>
-            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="average_rating" valueNumeric="5.0"/>
             <column name="name" value="K20" />
             <column name="kcal" valueNumeric="1800"/>
             <column name="fat" valueNumeric="70"/>
