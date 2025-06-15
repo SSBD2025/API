@@ -2,6 +2,9 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -110,6 +113,10 @@ public class DieticianModService implements IDieticianService {
     @Transactional(
             propagation = Propagation.REQUIRES_NEW, readOnly = false,
             transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("hasRole('DIETICIAN')")
     public BloodTestOrder orderMedicalExaminations(BloodTestOrderDTO bloodTestOrderDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
