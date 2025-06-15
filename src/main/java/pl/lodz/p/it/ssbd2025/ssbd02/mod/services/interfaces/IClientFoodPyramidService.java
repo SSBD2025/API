@@ -16,4 +16,6 @@ public interface IClientFoodPyramidService {
     void removeFoodPyramidFromClient(UUID clientId, UUID pyramidId);
     List<ClientFoodPyramidDTO> getClientPyramids();
     List<ClientFoodPyramidDTO> getClientPyramidsByDietician(UUID clientId);
+    ClientFoodPyramidDTO getMyCurrentPyramid();
+    ClientFoodPyramidDTO getCurrentPyramid(UUID clientId);
 }

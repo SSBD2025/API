@@ -173,7 +173,7 @@ public class DieticianModService implements IDieticianService {
             @Nullable Timestamp since,
             @Nullable Timestamp before
     ) {
-        Client client = clientModRepository.findClientByAccountId(accountId).orElseThrow(ClientNotFoundException::new);
+        Client client = clientModRepository.findClientById(accountId).orElseThrow(ClientNotFoundException::new);
         Page<PeriodicSurvey> surveysPage;
         if (since != null && before != null) {
             surveysPage = periodicSurveyRepository.findByClientIdAndMeasurementDateBetween(
