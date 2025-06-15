@@ -14,9 +14,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodTestOrderMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
@@ -26,10 +28,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.PermanentSurveyAlreadyExistsExcep
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.PeriodicSurveyRepository;
-import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.SurveyRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
@@ -38,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @TransactionLogged
 @Component
@@ -54,6 +54,8 @@ public class ClientModService implements IClientService {
     private final PeriodicSurveyRepository periodicSurveyRepository;
     private final LockTokenService lockTokenService;
     private final PeriodicSurveyMapper periodicSurveyMapper;
+    private final BloodTestOrderRepository bloodTestOrderRepository;
+    private final BloodTestOrderMapper bloodTestOrderMapper;
 
     @Override
     @Transactional(
@@ -349,11 +351,29 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')") //todo sprawdzic czy tu dietetyk ma zostac
     public PeriodicSurveyDTO getMyLatestPeriodicSurvey() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
         PeriodicSurvey survey = periodicSurveyRepository.findTopByClientOrderByMeasurementDateDesc(client).orElseThrow(PeriodicSurveyNotFound::new);
         return periodicSurveyMapper.toPeriodicSurveyDTO(survey);
+    }
+
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public BloodTestOrderDTO getBloodTestOrder() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
+        BloodTestOrder bloodTestOrder = bloodTestOrderRepository.
+                getAllByClient_IdAndFulfilled(client.getId(), false).orElseThrow(BloodTestOrderNotFoundException::new);
+        return bloodTestOrderMapper.toBloodTestOrderDTO(bloodTestOrder);
     }
 }

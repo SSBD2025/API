@@ -12,6 +12,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,4 +33,8 @@ public interface BloodTestOrderRepository extends AbstractRepository<BloodTestOr
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     Optional<BloodTestOrder> findById(UUID orderId);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')")
+    Optional<BloodTestOrder> getAllByClient_IdAndFulfilled(UUID clientId, boolean fulfilled);
 }

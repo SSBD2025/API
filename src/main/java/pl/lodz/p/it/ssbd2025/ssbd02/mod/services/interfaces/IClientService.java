@@ -3,6 +3,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
@@ -30,4 +31,5 @@ public interface IClientService {
     PeriodicSurveyDTO getPeriodicSurvey(UUID periodicSurveyId);
     PeriodicSurveyDTO editPeriodicSurvey(PeriodicSurveyDTO dto);
     PeriodicSurveyDTO getMyLatestPeriodicSurvey();
+    BloodTestOrderDTO getBloodTestOrder();
 }
