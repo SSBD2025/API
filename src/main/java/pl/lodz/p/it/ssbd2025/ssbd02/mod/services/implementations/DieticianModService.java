@@ -144,6 +144,21 @@ public class DieticianModService implements IDieticianService {
 
     @Override
     @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            timeoutString = "${transaction.timeout}"
+    )
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public List<BloodTestOrder> getUnfulfilledBloodTestOrders() {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Dietician dietician = dieticianModRepository.findByLogin(login).orElseThrow(DieticianNotFoundException::new);
+        List<BloodTestOrder> orders = bloodTestOrderRepository.getAllByDietician_IdAndFulfilled(dietician.getId(), false);
+        orders.forEach(order -> order.getClient().getId());
+        return orders;
+    }
+
+    @Override
+    @Transactional(
             propagation = Propagation.REQUIRES_NEW, readOnly = false,
             transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('DIETICIAN')")

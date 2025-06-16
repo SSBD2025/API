@@ -37,4 +37,9 @@ public interface BloodTestOrderRepository extends AbstractRepository<BloodTestOr
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     Optional<BloodTestOrder> getAllByClient_IdAndFulfilled(UUID clientId, boolean fulfilled);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('DIETICIAN')")
+    List<BloodTestOrder> getAllByDietician_IdAndFulfilled(UUID dieticianId, boolean fulfilled);
+
 }

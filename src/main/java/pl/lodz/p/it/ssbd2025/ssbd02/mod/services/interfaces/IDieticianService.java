@@ -19,6 +19,7 @@ public interface IDieticianService {
     Survey getPermanentSurveyByClientId(UUID clientId);
     Client getClientDetails(UUID clientId);
     BloodTestOrder orderMedicalExaminations(BloodTestOrderDTO bloodTestOrderDTO);
+    List<BloodTestOrder> getUnfulfilledBloodTestOrders();
     void confirmBloodTestOrder(UUID orderId);
     Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
 }
