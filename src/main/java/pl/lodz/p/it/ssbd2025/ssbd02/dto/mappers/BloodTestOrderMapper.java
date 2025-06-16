@@ -6,6 +6,8 @@ import org.mapstruct.Mappings;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface BloodTestOrderMapper {
     @Mappings({
@@ -14,4 +16,5 @@ public interface BloodTestOrderMapper {
     })
     BloodTestOrderDTO toBloodTestOrderDTO(BloodTestOrder bloodTestOrder);
     BloodTestOrder toBloodTestOrder(BloodTestOrderDTO bloodTestOrderDTO);
+    List<BloodTestOrderDTO> toBloodTestOrderDTOs(List<BloodTestOrder> bloodTestOrders);
 }

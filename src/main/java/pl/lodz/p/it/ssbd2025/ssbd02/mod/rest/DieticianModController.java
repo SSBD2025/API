@@ -83,6 +83,13 @@ public class DieticianModController {
     }
 
     @PreAuthorize("hasRole('DIETICIAN')")
+    @GetMapping("/orders")
+    public ResponseEntity<List<BloodTestOrderDTO>> getOrders() {
+        List<BloodTestOrder> bloodTestOrders = dieticianModService.getUnfulfilledBloodTestOrders();
+        return ResponseEntity.status(HttpStatus.OK).body(bloodTestOrderMapper.toBloodTestOrderDTOs(bloodTestOrders));
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
     @PatchMapping("/{orderId}/confirm")
     public ResponseEntity<Void> confirmBloodTestOrder(@PathVariable UUID orderId) {
         dieticianModService.confirmBloodTestOrder(orderId);
