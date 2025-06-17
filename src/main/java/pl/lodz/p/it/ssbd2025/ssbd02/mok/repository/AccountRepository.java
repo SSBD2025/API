@@ -141,6 +141,6 @@ public interface AccountRepository extends AbstractRepository<Account> {
 
     @Override
     @PreAuthorize("permitAll()")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     void delete(Account account);
 }
