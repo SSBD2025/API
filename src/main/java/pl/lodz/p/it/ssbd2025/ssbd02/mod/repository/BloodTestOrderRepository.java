@@ -38,8 +38,17 @@ public interface BloodTestOrderRepository extends AbstractRepository<BloodTestOr
     @PreAuthorize("hasRole('CLIENT')")
     Optional<BloodTestOrder> getAllByClient_IdAndFulfilled(UUID clientId, boolean fulfilled);
 
+    @Query("""
+    SELECT o FROM BloodTestOrder o
+    JOIN FETCH o.client c
+    JOIN FETCH c.account
+    WHERE o.dietician.id = :dieticianId AND o.fulfilled = :fulfilled
+""")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('DIETICIAN')")
-    List<BloodTestOrder> getAllByDietician_IdAndFulfilled(UUID dieticianId, boolean fulfilled);
+    List<BloodTestOrder> getAllByDietician_IdAndFulfilled(
+        @Param("dieticianId") UUID dieticianId,
+        @Param("fulfilled") boolean fulfilled
+    );
 
 }
