@@ -20,7 +20,8 @@ import java.util.Optional;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface ClientBloodTestReportRepository extends JpaRepository<ClientBloodTestReport, UUID> {
 
-    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+//    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @PreAuthorize("permitAll()")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         select r from ClientBloodTestReport r where r.client.id=:clientId

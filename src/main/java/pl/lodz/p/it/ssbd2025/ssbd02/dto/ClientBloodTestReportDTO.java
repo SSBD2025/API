@@ -1,10 +1,12 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.*;
+import org.springframework.validation.annotation.Validated;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
@@ -37,12 +39,13 @@ public class ClientBloodTestReportDTO {
     @Setter
     @NotNull(groups = {OnRead.class})
     @Null(groups = {OnUpdate.class, OnCreate.class})
-    private Timestamp timestamp;
+    Timestamp timestamp;
 
     @Setter
-    @NotEmpty(groups = {OnCreate.class})
+    @Valid
+    @NotEmpty(groups = OnCreate.class)
     @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
-    List<BloodTestResultDTO> results;
+    private List<BloodTestResultDTO> results;
 
     @Setter
     @NotNull(groups = {OnRead.class, OnUpdate.class})

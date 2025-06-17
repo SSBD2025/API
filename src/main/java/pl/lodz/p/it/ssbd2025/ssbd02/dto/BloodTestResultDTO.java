@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.*;
@@ -8,7 +9,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
-import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 
 import java.util.UUID;
@@ -24,21 +24,22 @@ public class BloodTestResultDTO {
     UUID id;
 
     @Setter(AccessLevel.NONE)
-    @Null(groups = {OnCreate.class, OnRead.class})
-    @NotNull(groups = OnUpdate.class)
+    @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
+//    @NotNull(groups = OnUpdate.class)
     Long version;
 
     @Setter
-    @NotNull
+    @NotNull(groups = {OnRead.class, OnUpdate.class})
     @Null(groups = {OnCreate.class})
     String lockToken;
 
     @Setter
-    @NotNull
+    @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     Double result;
 
+    @Valid
     @Setter
-    @NotNull
+    @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     BloodParameterDTO bloodParameter;
 
     @JsonIgnore

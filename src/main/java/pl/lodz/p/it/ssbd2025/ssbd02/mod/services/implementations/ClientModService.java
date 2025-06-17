@@ -77,7 +77,7 @@ public class ClientModService implements IClientService {
 
     @Override
     public UUID getClientByAccountId(UUID id) {
-        return clientModRepository.findUserIdByClientId(id).orElseThrow(AccountNotFoundException::new);
+        return clientModRepository.findClientIdByUserId(id).orElseThrow(AccountNotFoundException::new);
     }
 
 

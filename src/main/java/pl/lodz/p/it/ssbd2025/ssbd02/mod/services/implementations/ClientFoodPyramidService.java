@@ -31,6 +31,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientFoodPyramidSe
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @TransactionLogged
 @Component
@@ -77,10 +79,19 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         clientFoodPyramidRepository.saveAndFlush(assignment);
     }
 
+    @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     @Override
     public ClientFoodPyramid createAndAssignFoodPyramid(FoodPyramidDTO dto, SensitiveDTO clientId) {
-        FoodPyramid foodPyramid = foodPyramidService.createFoodPyramid(dto);
+        FoodPyramid pyramidToCompare = foodPyramidMapper.toEntity(dto);
+        List<FoodPyramid> allPyramids = StreamSupport.stream(
+                        foodPyramidRepository.findAll().spliterator(),
+                        false)
+                .toList();
+        Optional<FoodPyramid> existingPyramid = allPyramids.stream()
+                .filter(p -> p.equals(pyramidToCompare))
+                .findFirst();
+        FoodPyramid foodPyramid = existingPyramid.orElseGet(() -> foodPyramidService.createFoodPyramid(dto));
         assignFoodPyramidToClient(new AssignDietPlanDTO(UUID.fromString(clientId.getValue()), foodPyramid.getId()));
         return getByClientId(UUID.fromString(clientId.getValue())).stream()
                 .max(Comparator.comparing(ClientFoodPyramid::getTimestamp))

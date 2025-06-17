@@ -8,6 +8,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.FoodPyramidConsts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = FoodPyramidConsts.TABLE_NAME,
@@ -154,4 +155,17 @@ public class FoodPyramid extends AbstractEntity {
     @Min(0)
     @Column(name = FoodPyramidConsts.COLUMN_CHROMIUM, nullable = false, updatable = false)
     private double Chromium;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FoodPyramid that = (FoodPyramid) o;
+        return kcal == that.kcal && Double.compare(fat, that.fat) == 0 && Double.compare(saturatedFattyAcids, that.saturatedFattyAcids) == 0 && Double.compare(carbohydrates, that.carbohydrates) == 0 && Double.compare(sugar, that.sugar) == 0 && Double.compare(protein, that.protein) == 0 && Double.compare(A, that.A) == 0 && Double.compare(D, that.D) == 0 && Double.compare(E, that.E) == 0 && Double.compare(K, that.K) == 0 && Double.compare(B1, that.B1) == 0 && Double.compare(B2, that.B2) == 0 && Double.compare(B3, that.B3) == 0 && Double.compare(B5, that.B5) == 0 && Double.compare(B6, that.B6) == 0 && Double.compare(B7, that.B7) == 0 && Double.compare(B9, that.B9) == 0 && Double.compare(B12, that.B12) == 0 && Double.compare(C, that.C) == 0 && Double.compare(Potassium, that.Potassium) == 0 && Double.compare(Calcium, that.Calcium) == 0 && Double.compare(Phosphorus, that.Phosphorus) == 0 && Double.compare(Magnesium, that.Magnesium) == 0 && Double.compare(Iron, that.Iron) == 0 && Double.compare(Zinc, that.Zinc) == 0 && Double.compare(Fluorine, that.Fluorine) == 0 && Double.compare(Manganese, that.Manganese) == 0 && Double.compare(Copper, that.Copper) == 0 && Double.compare(Iodine, that.Iodine) == 0 && Double.compare(Selenium, that.Selenium) == 0 && Double.compare(Molybdenum, that.Molybdenum) == 0 && Double.compare(Chromium, that.Chromium) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kcal, fat, saturatedFattyAcids, carbohydrates, sugar, protein, A, D, E, K, B1, B2, B3, B5, B6, B7, B9, B12, C, Potassium, Calcium, Phosphorus, Magnesium, Iron, Zinc, Fluorine, Manganese, Copper, Iodine, Selenium, Molybdenum, Chromium);
+    }
 }
