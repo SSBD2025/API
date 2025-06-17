@@ -22,10 +22,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.BloodTestResultNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientBloodTestReportNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ConcurrentUpdateException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientBloodTestReportRepository;
@@ -81,12 +78,18 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     @NotNull
     private List<ClientBloodTestReportDTO> getClientBloodTestReportDTOS(UUID uuid) {
         List<ClientBloodTestReport> reports = clientBloodTestReportRepository.findAllByClientId(uuid);
+        if (reports.isEmpty()) {
+            throw new ClientBloodTestReportNotFoundException();
+        }
+        if (clientModService.getClientById(uuid).getSurvey() == null) {
+            throw new PermanentSurveyNotFoundException();
+        }
         List<ClientBloodTestReportDTO> dtos = new ArrayList<>();
         for (ClientBloodTestReport report : reports) {
             List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
             for (BloodTestResult result : report.getResults()) {
-                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
-                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(uuid).getSurvey().isGender());
+                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, clientModService.getClientById(uuid).getSurvey().isGender());
                 bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
                 resultsDTO.add(bloodTestResultDTO);
             }
@@ -101,9 +104,12 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     public ClientBloodTestReportDTO getById(SensitiveDTO reportId) {
         ClientBloodTestReport report = clientBloodTestReportRepository.findById(UUID.fromString(reportId.getValue())).orElseThrow(ClientBloodTestReportNotFoundException::new);
         List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
+        if(clientModService.getClientById(report.getClient().getId()).getSurvey() == null) {
+            throw new PermanentSurveyNotFoundException();
+        }
         for (BloodTestResult result : report.getResults()) {
-            BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
-            BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, true); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+            BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+            BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
             bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
             resultsDTO.add(bloodTestResultDTO);
         }
