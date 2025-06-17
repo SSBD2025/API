@@ -26,6 +26,8 @@ public class Survey extends AbstractEntity {
     @JoinColumn(name = SurveyConsts.COLUMN_CLIENT_ID, nullable = false, unique = true, updatable = false)
     private Client client;
 
+    @Min(value = SurveyConsts.HEIGHT_MIN)
+    @Max(value = SurveyConsts.HEIGHT_MAX)
     @Column(nullable = false)
     private double height;
 

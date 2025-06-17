@@ -83,6 +83,12 @@ public class DieticianModController {
     }
 
     @PreAuthorize("hasRole('DIETICIAN')")
+    @GetMapping("/client/{id}")
+    public ResponseEntity<ClientDTO> getDieticiansClientById(@PathVariable UUID id) {
+        return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientDTO(dieticianModService.getDieticiansClientById(id)));
+    }
+
+    @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/orders")
     public ResponseEntity<List<BloodTestOrderWithClientDTO>> getOrders() {
         List<BloodTestOrder> bloodTestOrders = dieticianModService.getUnfulfilledBloodTestOrders();

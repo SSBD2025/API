@@ -9,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ClientStatusDTO {
     private boolean hasAssignedDietician;
+    private boolean hasSubmittedPermanentSurvey;
 
     public ClientStatusDTO() {}
 
@@ -16,6 +17,7 @@ public class ClientStatusDTO {
     public String toString() {
         return "ClientStatusDTO{" +
                 "hasAssignedDietician=" + hasAssignedDietician +
+                ", hasSubmittedPermanentSurvey=" + hasSubmittedPermanentSurvey +
                 '}';
     }
 }

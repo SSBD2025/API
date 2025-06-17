@@ -145,6 +145,27 @@ public class DieticianModService implements IDieticianService {
     @Override
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
+            readOnly = true,
+            transactionManager = "modTransactionManager",
+            timeoutString = "${transaction.timeout}"
+    )
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public Client getDieticiansClientById(UUID id) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Dietician dietician = dieticianModRepository.findByLogin(login).orElseThrow(DieticianNotFoundException::new);
+        Client client = clientModRepository.findClientById(id).orElseThrow(ClientNotFoundException::new);
+        if (client.getDietician() == null) {
+            throw new ClientHasNoAssignedDieticianException();
+        }
+        if (!client.getDietician().equals(dietician)) {
+            throw new DieticianAccessDeniedException();
+        }
+        return client;
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
             transactionManager = "modTransactionManager",
             timeoutString = "${transaction.timeout}"
     )
