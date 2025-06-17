@@ -29,7 +29,8 @@ public class SurveyDTO {
     private UUID clientId;
 
     @NotNull(groups = {OnCreate.class})
-    @Positive
+    @Min(value = SurveyConsts.HEIGHT_MIN)
+    @Max(value = SurveyConsts.HEIGHT_MAX)
     private double height;
 
     @NotNull(groups = OnCreate.class)
@@ -69,7 +70,7 @@ public class SurveyDTO {
     private NutritionGoal nutritionGoal;
 
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = SurveyConsts.MEAL_TIMES_MIN, groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = SurveyConsts.MEAL_TIMES_MIN, max = SurveyConsts.MEAL_TIMES_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<Timestamp> mealTimes;
 
     @NotBlank(groups = {OnCreate.class, OnUpdate.class})

@@ -781,6 +781,48 @@
             <column name="version" valueNumeric="0" />
         </insert>
 
+        <insert tableName="account">
+            <column name="id" value="00000000-0000-0000-0000-000000001337"/>
+            <column name="login" value="kzachod"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="kzachod@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="00000000-0000-0000-0000-000000001337"/>
+            <column name="first_name" value="Kamil"/>
+            <column name="last_name" value="Zachód"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="00000000-0000-0000-0000-000000001338"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="00000000-0000-0000-0000-000000001337"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="00000000-0000-0000-0000-000000001338"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000009"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="00000000-0000-0000-0000-000000001337"/>
+            <column name="account_id" value="00000000-0000-0000-0000-000000001337"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
         <!--        client with no data-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000066"/>

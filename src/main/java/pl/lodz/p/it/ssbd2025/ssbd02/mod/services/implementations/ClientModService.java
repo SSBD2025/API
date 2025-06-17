@@ -125,10 +125,10 @@ public class ClientModService implements IClientService {
     public ClientStatusDTO getClientStatus() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
-        if (client.getDietician() == null) {
-            return new ClientStatusDTO(false);
-        }
-        return new ClientStatusDTO(true);
+        ClientStatusDTO clientStatusDTO = new ClientStatusDTO();
+        clientStatusDTO.setHasAssignedDietician(client.getDietician() != null);
+        clientStatusDTO.setHasSubmittedPermanentSurvey(client.getSurvey() != null);
+        return clientStatusDTO;
     }
 
     @Override
