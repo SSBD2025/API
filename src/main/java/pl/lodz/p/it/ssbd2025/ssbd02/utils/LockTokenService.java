@@ -6,6 +6,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenMalformedException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.token.TokenSignatureInvalidException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.ILockTokenService;
 
@@ -36,7 +38,7 @@ public class LockTokenService implements ILockTokenService {
         String decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
         String[] parts = decoded.split(":");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid token");
+            throw new TokenMalformedException();
         }
 
         UUID id = UUID.fromString(parts[0]);
@@ -45,7 +47,7 @@ public class LockTokenService implements ILockTokenService {
 
         String expected = hmacSha256(parts[0] + ":" + parts[1], secret);
         if (!expected.equals(signature)) {
-            throw new SecurityException("Invalid signature");
+            throw new TokenSignatureInvalidException();
         }
 
         return new Record<>(id, version);
