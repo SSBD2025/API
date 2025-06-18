@@ -45,7 +45,7 @@ public interface ClientModRepository extends AbstractRepository<Client> {
             @Param("dieticianId") UUID dieticianId,
             @Param("searchPhrase") String searchPhrase);
 
-    @PreAuthorize("hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN')||hasRole('CLIENT')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     Optional<Client> findClientById(@Param("clientId") UUID id);
 
