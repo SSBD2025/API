@@ -100,7 +100,7 @@ public class AlgorithmService implements IAlgorithmService {
         // CZESC D
         boolean isMan = client.getSurvey().isGender();
         ClientBloodTestReport latestBloodTestReport = clientBloodTestReportRepository.
-                findFirstByClientOrderByTimestampDesc(client).orElseThrow(ClientBloodTestReportNotFoundException::new);
+                findFirstByClient_IdOrderByTimestampDesc(client.getId()).orElseThrow(ClientBloodTestReportNotFoundException::new);
 
         //Żelazo
         latestBloodTestReport.getResults().stream()

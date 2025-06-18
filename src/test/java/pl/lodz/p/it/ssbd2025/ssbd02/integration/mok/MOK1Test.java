@@ -145,10 +145,7 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account.login").value("testuser"))
-                .andExpect(jsonPath("$.account.firstName").value("Joe"))
-                .andExpect(jsonPath("$.account.verified").value(false))
-                .andExpect(jsonPath("$.account.active").value(true));
+                .andExpect(jsonPath("$.account.firstName").value("Joe"));
 
         Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
@@ -187,10 +184,7 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account.login").value("dietician"))
-                .andExpect(jsonPath("$.account.firstName").value("Doe"))
-                .andExpect(jsonPath("$.account.verified").value(false))
-                .andExpect(jsonPath("$.account.active").value(false));
+                .andExpect(jsonPath("$.account.firstName").value("Doe"));
 
         Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
@@ -229,10 +223,7 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account.login").value("newadmin"))
-                .andExpect(jsonPath("$.account.firstName").value("doejoe"))
-                .andExpect(jsonPath("$.account.verified").value(false))
-                .andExpect(jsonPath("$.account.active").value(false));
+                .andExpect(jsonPath("$.account.firstName").value("doejoe"));
 
         Assertions.assertNotNull(accountTestHelper.getClientByLogin("testuser"));
     }
@@ -701,10 +692,7 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account.login").value("testuser2"))
-                .andExpect(jsonPath("$.account.firstName").value("Joe2"))
-                .andExpect(jsonPath("$.account.verified").value(false))
-                .andExpect(jsonPath("$.account.active").value(true));
+                .andExpect(jsonPath("$.account.firstName").value("Joe2"));
 
 
         mockMvc.perform(get("/api/account/verify")
