@@ -35,7 +35,12 @@ public class LockTokenService implements ILockTokenService {
 
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public Record<UUID, Long> verifyToken(String token) {
-        String decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+        String decoded;
+        try {
+            decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw new TokenMalformedException();
+        }
         String[] parts = decoded.split(":");
         if (parts.length != 3) {
             throw new TokenMalformedException();
