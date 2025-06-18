@@ -32,6 +32,6 @@ public interface ClientBloodTestReportRepository extends JpaRepository<ClientBlo
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Override
     <S extends ClientBloodTestReport> S saveAndFlush(S entity);
-
-    Optional <ClientBloodTestReport> findFirstByClientOrderByTimestampDesc (Client client);
+    
+    Optional<ClientBloodTestReport> findFirstByClient_IdOrderByTimestampDesc (UUID clientId);
 }

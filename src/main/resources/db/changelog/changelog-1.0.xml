@@ -1241,5 +1241,15 @@
             <column name="version" valueNumeric="0"/>
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
+
+        <insert tableName="blood_test_order">
+            <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
+            <column name="description" value="Very descriptive description"/>
+            <column name="dietitian_id" value="00000000-0000-0000-0000-000000000004"/>
+            <column name="fulfilled" valueBoolean="false" />
+            <column name="id" value="00000000-0000-0000-0000-000000000001" />
+            <column name="version" valueNumeric="0" />
+            <column name="order_date" valueDate="2025-06-05T10:30:00"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
