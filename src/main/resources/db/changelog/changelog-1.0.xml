@@ -906,5 +906,340 @@
             <column name="version" valueNumeric="0"/>
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
+
+        <insert tableName="account">
+            <column name="id" value="10000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="jsalami"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="jsalami@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="10000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="James"/>
+            <column name="last_name" value="Salami"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="10000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="10000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="10000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="10000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="10000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="20000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="mmortadella"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="mmortadella@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="20000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Maria"/>
+            <column name="last_name" value="Mortadella"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="20000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="20000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="20000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="20000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="20000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="30000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="cpastrami"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="cpastrami@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="30000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Charles"/>
+            <column name="last_name" value="Pastrami"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="30000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="30000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="30000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="30000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="30000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="40000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="lprosciutto"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="lprosciutto@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="40000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Luca"/>
+            <column name="last_name" value="Prosciutto"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="40000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="40000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="40000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="40000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="40000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="50000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="mragu"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="mragu@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="50000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Marco"/>
+            <column name="last_name" value="Ragu"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="50000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="50000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="50000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="50000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="50000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="70000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="gpancetta"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="gpancetta@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="70000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Giulia"/>
+            <column name="last_name" value="Pancetta"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="70000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="70000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="70000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="70000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="70000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="80000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="cfeta"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="cfeta@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="80000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Constantine"/>
+            <column name="last_name" value="Feta"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="80000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="80000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="80000000-0000-0000-0000-000000000070"/>
+            <column name="dietician_id" value="00000000-0000-0000-0000-000000000004"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="80000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="80000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="account">
+            <column name="id" value="90000000-0000-0000-0000-000000000066"/>
+            <column name="login" value="llornetka"/>
+            <column name="password" value="$2a$10$nkiuA200ACeQS54I.FNJr.pZ.YuaP7zt4L/qoUM4kVGiXm6zXkexG"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="email" value="llronetka@example.com"/>
+            <column name="verified" valueBoolean="true"/>
+            <column name="language" valueNumeric="1"/>
+            <column name="reminded" valueBoolean="false"/>
+            <column name="locked_until" value="null"/>
+            <column name="login_attempts" valueNumeric="0"/>
+            <column name="two_factor_auth" valueBoolean="false" />
+            <column name="auto_locked" valueBoolean="false" />
+        </insert>
+
+        <insert tableName="user_data">
+            <column name="id" value="90000000-0000-0000-0000-000000000066"/>
+            <column name="first_name" value="Łukasz"/>
+            <column name="last_name" value="Lornetka"/>
+        </insert>
+
+        <insert tableName="user_role">
+            <column name="id" value="90000000-0000-0000-0000-000000000070"/>
+            <column name="role" value="CLIENT"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="user_id" value="90000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="id" value="90000000-0000-0000-0000-000000000070"/>
+        </insert>
+
+        <insert tableName="change_password">
+            <column name="id" value="90000000-0000-0000-0000-000000000027"/>
+            <column name="account_id" value="90000000-0000-0000-0000-000000000066"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="password_to_change" valueBoolean="false"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
