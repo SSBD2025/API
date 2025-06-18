@@ -70,7 +70,7 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN')||hasRole('CLIENT')")
     public Client getClientById(UUID id) {
         return clientModRepository.findClientById(id).orElseThrow(ClientNotFoundException::new);
     }
@@ -80,7 +80,7 @@ public class ClientModService implements IClientService {
         return clientModRepository.findClientIdByUserId(id).orElseThrow(AccountNotFoundException::new);
     }
 
-
+    @PreAuthorize("hasRole('CLIENT')")
     @Override
     public Client getClientByLogin(SensitiveDTO login) {
         return clientModRepository.findByLogin(login.getValue()).orElseThrow(AccountNotFoundException::new);
