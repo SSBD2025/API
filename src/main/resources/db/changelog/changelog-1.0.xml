@@ -46,7 +46,7 @@
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
 
-<!--        Dietician-->
+        <!--        Dietician-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000003"/>
             <column name="login" value="tcheese"/>
@@ -88,7 +88,7 @@
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
 
-<!--        Client-->
+        <!--        Client-->
         <insert tableName="account">
             <column name="id" value="00000000-0000-0000-0000-000000000005"/>
             <column name="login" value="agorgonzola"/>
@@ -320,7 +320,7 @@
             <column name="report_id" value="99999999-9999-9999-9999-999999999999"/>
         </insert>
 
-<!--                Pyramids-->
+        <!--                Pyramids-->
         <insert tableName="food_pyramid">
             <column name="id" value="00000000-0000-0000-0000-000000000010"/>
             <column name="version" valueNumeric="0"/>
@@ -559,7 +559,7 @@
             <column name="version" valueNumeric="0"/>
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
-        
+
         <insert tableName="client_food_pyramid">
             <column name="client_id" value="00000000-0000-0000-0000-000000000006"/>
             <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000011"/>

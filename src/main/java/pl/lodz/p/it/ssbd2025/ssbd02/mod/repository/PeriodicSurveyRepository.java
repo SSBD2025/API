@@ -32,7 +32,7 @@ public interface PeriodicSurveyRepository extends AbstractRepository<PeriodicSur
     boolean existsByClientAndMeasurementDateAfter(Client client, Timestamp measurementDate);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-//    @PreAuthorize()//TODO dodac
+    @PreAuthorize("hasRole('DIETICIAN')")
     Optional<PeriodicSurvey> findFirstByClientOrderByMeasurementDateDesc(Client client);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
