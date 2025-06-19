@@ -94,11 +94,20 @@ public class FeedbackController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @PutMapping()
+    @Operation(summary = "Edycja opinii piramidy o podanym id",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Opinia została pomyślnie zaktualizowana"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono opinii o podanym id"),
+            @ApiResponse(responseCode = "409", description = "Jednoczesna edycja zasobu"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
+            @ApiResponse(responseCode = "403", description = "Klient nie jest autorem edytowanej opinii"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym id"),
+    })
     public ResponseEntity<FeedbackDTO> updateFeedback(@Validated(OnUpdate.class) @RequestBody FeedbackDTO feedbackDTO) {
         Feedback feedback = feedbackService.updateFeedback(feedbackMapper.toFeedback(feedbackDTO), feedbackDTO.getLockToken());
-        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
         FeedbackDTO responseDTO = feedbackMapper.toFeedbackDTO(feedback);
-        responseDTO.setLockToken(lockToken);
         return ResponseEntity.ok(responseDTO);
     }
 }
