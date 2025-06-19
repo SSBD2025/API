@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FoodPyramidDetailsDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.FoodPyramidMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.FoodPyramidService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFoodPyramidService;
@@ -27,6 +31,13 @@ public class FoodPyramidController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/{id}")
+    @Operation(summary = "Pobierz dane szczegółowe piramidy po id",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane piramidy zostały zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym id")
+    })
     public ResponseEntity<FoodPyramidDetailsDTO> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(foodPyramidService.getById(id));
     }

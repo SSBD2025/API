@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.web.bind.annotation.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientFoodPyramidService;
 
@@ -73,12 +77,28 @@ public class ClientFoodPyramidController {
 
     @GetMapping("/current")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobierz dane aktualnie przypisanej piramidy do zalogowanego użytkownika",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane piramidy zostały zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy dla tego klienta")
+    })
     public ResponseEntity<ClientFoodPyramidDTO> getCurrentFoodPyramid() {
         return ResponseEntity.ok(clientFoodPyramidService.getMyCurrentPyramid());
     }
 
     @GetMapping("/client/{clientId}/current")
     @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz dane aktualnie przypisanej piramidy do użytkownika po podanym ID",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane piramidy zostały zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym id"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy dla tego klienta")
+    })
     public ResponseEntity<ClientFoodPyramidDTO> getCurrentFoodPyramid(@PathVariable UUID clientId) {
         return ResponseEntity.ok(clientFoodPyramidService.getCurrentPyramid(clientId));
     }

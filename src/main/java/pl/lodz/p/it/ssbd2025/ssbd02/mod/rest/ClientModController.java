@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Dietician;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
@@ -112,6 +116,14 @@ public class ClientModController {
 
     @GetMapping("/{clientId}/periodic-survey")
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz liste ankiet okresowych dla podanego klienta",
+            description = "Dostępne dla CLIENT, DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista ankiet okresowych została zwrócona"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym id"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiet okresowych")
+    })
     public ResponseEntity<Page<PeriodicSurveyDTO>> getPeriodicSurveysByClientId(
             @PathVariable UUID clientId,
             Pageable pageable) {
@@ -122,6 +134,13 @@ public class ClientModController {
 
     @GetMapping("/periodic-survey/{surveyId}")
     @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz ankietę okresowyą dla podanego ID",
+            description = "Dostępne dla CLIENT, DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ankieta okresowa została zwrócona"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety okresowej")
+    })
     public ResponseEntity<PeriodicSurveyDTO> getPeriodicSurveyByClientIdAndSurveyId(
             @PathVariable UUID surveyId
     ) {
