@@ -58,7 +58,7 @@ public class MOD31Test extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(3));
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();

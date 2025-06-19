@@ -20,7 +20,7 @@ GRANT SELECT, INSERT, UPDATE ON TABLE client_blood_test_reports TO ssbd02mod;
 GRANT SELECT, UPDATE ON TABLE client TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE ON TABLE client_food_pyramid TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE ON TABLE dietary_restrictions TO ssbd02mod;
-GRANT SELECT ON TABLE dietician TO ssbd02mod;
+GRANT SELECT, UPDATE ON TABLE dietician TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE feedback TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE ON TABLE food_pyramid TO ssbd02mod;
 GRANT SELECT, INSERT, UPDATE ON TABLE periodic_survey TO ssbd02mod;

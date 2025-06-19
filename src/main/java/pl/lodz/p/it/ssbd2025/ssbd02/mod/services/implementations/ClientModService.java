@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -14,11 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.ClientStatusDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
-import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodTestOrderMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.PeriodicSurveyMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
@@ -57,6 +54,9 @@ public class ClientModService implements IClientService {
     private final PeriodicSurveyMapper periodicSurveyMapper;
     private final BloodTestOrderRepository bloodTestOrderRepository;
     private final BloodTestOrderMapper bloodTestOrderMapper;
+
+    @Value("${clients.max_clients}")
+    private int MAX_CLIENTS;
 
     @Override
     @Transactional(
@@ -110,11 +110,13 @@ public class ClientModService implements IClientService {
             }
             throw new DieticianAlreadyAssignedException();
         }
-        if (dietician.getClients().size() >= 10) {
+        if (dietician.getClients().size() >= MAX_CLIENTS) {
             throw new DieticianClientLimitExceededException();
         }
         client.setDietician(dietician);
+        dietician.setLastAssignedClient(Timestamp.from(Instant.now()));
         clientModRepository.saveAndFlush(client);
+        dieticianModRepository.saveAndFlush(dietician);
     }
 
     @Override

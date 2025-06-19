@@ -46,4 +46,8 @@ public interface DieticianModRepository extends AbstractRepository<Dietician> {
     @PreAuthorize("hasRole('CLIENT')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     Optional<Dietician> findDieticianById(UUID dieticianId);
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    Dietician saveAndFlush(Dietician dietician);
 }

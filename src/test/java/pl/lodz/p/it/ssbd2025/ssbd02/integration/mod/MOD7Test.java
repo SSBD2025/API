@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,10 +19,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.AsyncTestConfig;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +41,8 @@ public class MOD7Test extends BaseIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockitoBean
+    private EmailService emailService;
 
     @Test
     public void orderMedicalExaminationsTest() throws Exception  {
@@ -65,6 +72,8 @@ public class MOD7Test extends BaseIntegrationTest {
         );
 
         String bloodTestOrder = objectMapper.writeValueAsString(bloodTestOrderDTO);
+
+        doNothing().when(emailService).sendBloodTestOrderNotificationEmail(anyString(), anyString(), any());
 
         mockMvc.perform(post("/api/mod/dieticians/order-medical-examinations")
                         .header("Authorization", "Bearer " + token)
@@ -177,7 +186,7 @@ public class MOD7Test extends BaseIntegrationTest {
         String token = objectMapper.readTree(responseJson).get("value").asText();
 
         BloodTestOrderDTO bloodTestOrderDTO = new BloodTestOrderDTO(
-                UUID.fromString("00000000-0000-0000-0000-000000000006"),
+                UUID.fromString("20000000-0000-0000-0000-000000000070"),
                 null,
                 null,
                 "Zlecenie badań",
