@@ -6,6 +6,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestOrderConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ClientConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DieticianConsts;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,4 +26,7 @@ public class Dietician extends UserRole {
 
     @OneToMany(mappedBy = BloodTestOrderConsts.FIELD_DIETICIAN)
     private List<BloodTestOrder> bloodTestOrders;
+
+    @Column(name = DieticianConsts.LAST_ASSIGNED_CLIENT, nullable = true)
+    private Timestamp lastAssignedClient;
 }
