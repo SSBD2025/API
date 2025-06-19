@@ -1242,6 +1242,13 @@
             <column name="password_to_change" valueBoolean="false"/>
         </insert>
 
+        <insert tableName="client_food_pyramid">
+            <column name="client_id" value="80000000-0000-0000-0000-000000000070"/>
+            <column name="food_pyramid_id" value="00000000-0000-0000-0000-000000000011"/>
+            <column name="timestamp" valueDate="2024-06-17T10:00:00"/>
+            <column name="version" valueNumeric="0"/>
+        </insert>
+
         <insert tableName="account">
             <column name="id" value="91000000-0000-0000-0000-000000000066"/>
             <column name="login" value="kgolonka"/>
