@@ -51,4 +51,8 @@ public interface ClientFoodPyramidRepository extends AbstractRepository<ClientFo
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     Optional<ClientFoodPyramid> findTopByClientOrderByTimestampDesc(Client client);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('DIETICIAN') || hasRole('CLIENT')")
+    List<ClientFoodPyramid> findByClientId(UUID clientId);
 }

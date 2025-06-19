@@ -31,17 +31,6 @@ public class FeedbackController {
     private final FeedbackMapper feedbackMapper;
     private final LockTokenService lockTokenService;
 
-
-    @PreAuthorize("hasRole('DIETICIAN')")
-    @GetMapping("/client/id/{clientId}")
-    public ResponseEntity<List<FeedbackDTO>> getFeedbacksByClientId(@PathVariable UUID clientId) {
-        return ResponseEntity.ok().body(
-                feedbackMapper.toFeedbackDTOs(
-                        feedbackService.getFeedbacksByClientId(clientId)
-                )
-        );
-    }
-
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client/{clientId}/pyramid/{pyramidId}")
     public ResponseEntity<FeedbackDTO> getFeedbackByClientAndPyramid(
@@ -66,26 +55,6 @@ public class FeedbackController {
         FeedbackDTO feedbackDTO = feedbackMapper.toFeedbackDTO(feedback);
         feedbackDTO.setLockToken(lockToken);
         return ResponseEntity.ok().body(feedbackDTO);
-    }
-
-    @PreAuthorize("hasRole('DIETICIAN')")
-    @GetMapping("/client/login/{login}")
-    public ResponseEntity<List<FeedbackDTO>> getFeedbacksByClientLogin(@PathVariable String login) {
-        return ResponseEntity.ok().body(
-                feedbackMapper.toFeedbackDTOs(
-                        feedbackService.getFeedbacksByClientLogin(login)
-                )
-        );
-    }
-
-    @PreAuthorize("hasRole('DIETICIAN')")
-    @GetMapping("/pyramid/{pyramidId}")
-    public ResponseEntity<List<FeedbackDTO>> getFeedbacksByFoodPyramidId(@PathVariable UUID pyramidId) {
-        return ResponseEntity.ok().body(
-                feedbackMapper.toFeedbackDTOs(
-                        feedbackService.getFeedbacksByFoodPyramidId(pyramidId)
-                )
-        );
     }
 
     @PreAuthorize("hasRole('CLIENT')")
