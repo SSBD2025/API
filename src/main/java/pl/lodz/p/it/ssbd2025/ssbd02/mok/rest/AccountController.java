@@ -74,28 +74,28 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
         accountService.changePassword(changePasswordDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/force/changePassword")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Object> forceChangePassword(@RequestBody @Valid ForceChangePasswordDTO forceChangePasswordDTO) {
         accountService.forceChangePassword(forceChangePasswordDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> changeUserPassword(@PathVariable UUID id) {
         accountService.setGeneratedPassword(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/logout")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         accountService.logout(response);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/me")
@@ -132,7 +132,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<?> changeOwnEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeOwnEmail(changeEmailDTO.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/confirm-email")
@@ -140,7 +140,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<?> confirmEmail(@RequestParam("token") SensitiveDTO token) {
         accountService.confirmEmail(token);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/revert-email-change")
@@ -148,7 +148,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<?> revertEmailChange(@RequestParam("token") SensitiveDTO token) {
         accountService.revertEmailChange(token);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/resend-change-email")
@@ -156,7 +156,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<Void> resendEmailChangeLink() {
         accountService.resendEmailChangeLink();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/change-user-email")
@@ -166,35 +166,52 @@ public class AccountController {
             @PathVariable UUID id,
             @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeUserEmail(id, changeEmailDTO.getEmail());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Zablokuj konto o podanym id",
+            description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Konto o podanym id zostało pomyślnie zablokowane"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym id"),
+            @ApiResponse(responseCode = "403", description = "Nie można zablokować własnego konta"),
+            @ApiResponse(responseCode = "409", description = "Konto o podanym id jest już zablokowane")
+    })
     public ResponseEntity<Void> blockAccount(@PathVariable UUID id) {
         accountService.blockAccount(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{id}/unblock")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Odblokuj konto o podanym id",
+            description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Konto o podanym id zostało pomyślnie odblokowane"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym id"),
+            @ApiResponse(responseCode = "409", description = "Konto o podanym id jest już odblokowane")
+    })
     public ResponseEntity<Void> unblockAccount(@PathVariable UUID id) {
         accountService.unblockAccount(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/reset/password/request")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.getEmail());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/reset/password/{token}")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Void> resetPassword(@PathVariable SensitiveDTO token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping
@@ -226,7 +243,7 @@ public class AccountController {
     @PreAuthorize("permitAll()")
     public ResponseEntity<Void> verifyAccount(@RequestParam SensitiveDTO token) {
         accountService.verifyAccount(token);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
@@ -244,21 +261,21 @@ public class AccountController {
     public ResponseEntity<Void> updateAccountById(@RequestBody @Valid UpdateAccountDTO updateAccountDTO,
                                                   @PathVariable UUID id) {
         accountService.updateAccountById(id, updateAccountDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/me/enable2f")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Void> enableTwoFactor() {
         accountService.enableTwoFactor();
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/me/disable2f")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Void> disableTwoFactor() {
         accountService.disableTwoFactor();
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/log-role-change")
@@ -266,7 +283,7 @@ public class AccountController {
     public ResponseEntity<Void> logRoleChange(@RequestBody @Valid RoleChangeLogDTO roleChangeLogDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.logUserRoleChange(login, roleChangeLogDTO.getPreviousRole(), roleChangeLogDTO.getNewRole());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/unlock")
@@ -274,7 +291,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<?> unlockRequest(@RequestParam SensitiveDTO token) {
         accountService.unlockAccount(token);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/auth/email/request")
@@ -282,7 +299,7 @@ public class AccountController {
     @MethodCallLogged
     public ResponseEntity<?> authWithEmailRequest(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.authWithEmailRequest(changeEmailDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/auth/email")

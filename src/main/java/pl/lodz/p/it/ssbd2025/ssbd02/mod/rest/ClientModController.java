@@ -79,6 +79,14 @@ public class ClientModController {
 
     @GetMapping("/permanent-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobierz swoją ankietę parametrów stałych",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ankieta parametrów stałych została pomyślnie pobrana"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety parametrów stałych dla klienta"),
+    })
     public ResponseEntity<SurveyDTO> getPermanentSurvey() {
         Survey survey = clientService.getPermanentSurvey();
         SurveyDTO responseDTO = surveyMapper.toSurveyDTO(survey);
@@ -107,6 +115,14 @@ public class ClientModController {
 
     @PostMapping("/periodic-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Wypełnij ankietę okresową",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Ankieta okresowa została pomyślnie dodana"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
+            @ApiResponse(responseCode = "409", description = "Nie mineły 24 godziny od ostatniego wypełnienia ankiety okresowej")
+    })
     public ResponseEntity<PeriodicSurveyDTO> submitPeriodicSurvey(@Validated(OnCreate.class)
                                                                   @RequestBody PeriodicSurveyDTO periodicSurveyDTO) {
 
