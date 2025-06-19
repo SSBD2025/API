@@ -1,6 +1,9 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -23,6 +26,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRequest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnReset;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IAccountService;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IJwtService;
@@ -96,6 +100,12 @@ public class AccountController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz dane zalogowanego użytkownika", description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane użytkownika zostały poprawnie zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym loginie")
+    })
     public AccountWithTokenDTO getMe() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         return accountService.getAccountByLogin(login);
@@ -103,6 +113,15 @@ public class AccountController {
 
     @PutMapping("/me")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Operation(summary = "Zaktualizuj dane zalogowanego użytkownika", description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane użytkownika zostały zaktualizowane"),
+            @ApiResponse(responseCode = "403", description = "Konto nie jest aktywne"),
+            @ApiResponse(responseCode = "403", description = "Niepoprawny lock token"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym loginie"),
+            @ApiResponse(responseCode = "409", description = "Jednoczesna zmiana zasobu")
+    })
     public void updateMe(@RequestBody @Valid UpdateAccountDTO updateAccountDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.updateMyAccount(login, updateAccountDTO);
@@ -193,6 +212,12 @@ public class AccountController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Pobierz dane użytkownika po ID", description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane użytkownika zostały poprawnie zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym id")
+    })
     public AccountWithTokenDTO getAccountById(@PathVariable UUID id) {
         return accountService.getAccountById(id);
     }
@@ -207,6 +232,15 @@ public class AccountController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Zaktualizuj dane użytkownika po ID", description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dane użytkownika zostały zaktualizowane"),
+            @ApiResponse(responseCode = "403", description = "Konto nie jest aktywne"),
+            @ApiResponse(responseCode = "403", description = "Niepoprawny lock token"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym loginie"),
+            @ApiResponse(responseCode = "409", description = "Jednoczesna zmiana zasobu")
+    })
     public ResponseEntity<Void> updateAccountById(@RequestBody @Valid UpdateAccountDTO updateAccountDTO,
                                                   @PathVariable UUID id) {
         accountService.updateAccountById(id, updateAccountDTO);
