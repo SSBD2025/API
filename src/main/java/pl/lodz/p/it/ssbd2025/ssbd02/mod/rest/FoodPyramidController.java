@@ -27,7 +27,6 @@ import java.util.UUID;
 public class FoodPyramidController {
 
     private final FoodPyramidService foodPyramidService;
-    private final FoodPyramidMapper foodPyramidMapper;
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/{id}")
