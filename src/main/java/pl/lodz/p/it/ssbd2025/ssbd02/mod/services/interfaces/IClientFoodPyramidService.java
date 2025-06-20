@@ -13,7 +13,6 @@ public interface IClientFoodPyramidService {
     List<ClientFoodPyramid> getByClientId(UUID clientId);
     void assignFoodPyramidToClient(AssignDietPlanDTO dto);
     ClientFoodPyramid createAndAssignFoodPyramid(FoodPyramidDTO dto, SensitiveDTO clientId);
-    void removeFoodPyramidFromClient(UUID clientId, UUID pyramidId);
     List<ClientFoodPyramidDTO> getClientPyramids();
     List<ClientFoodPyramidDTO> getClientPyramidsByDietician(UUID clientId);
     ClientFoodPyramidDTO getMyCurrentPyramid();

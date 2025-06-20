@@ -58,7 +58,7 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
     @Override
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(
-            propagation = Propagation.REQUIRES_NEW,
+            propagation = Propagation.REQUIRED,
             transactionManager = "modTransactionManager",
             readOnly = false,
             timeoutString = "${transaction.timeout}")
@@ -81,6 +81,10 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     @Override
     public ClientFoodPyramid createAndAssignFoodPyramid(FoodPyramidDTO dto, SensitiveDTO clientId) {
         FoodPyramid pyramidToCompare = foodPyramidMapper.toEntity(dto);
@@ -96,11 +100,6 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         return getByClientId(UUID.fromString(clientId.getValue())).stream()
                 .max(Comparator.comparing(ClientFoodPyramid::getTimestamp))
                 .orElseThrow(FoodPyramidNotFoundException::new);
-    }
-
-    @Override
-    public void removeFoodPyramidFromClient(UUID clientId, UUID pyramidId) {
-
     }
 
     @Override
