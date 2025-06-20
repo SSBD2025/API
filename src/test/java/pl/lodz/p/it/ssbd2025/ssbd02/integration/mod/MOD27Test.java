@@ -310,6 +310,7 @@ public class MOD27Test extends BaseIntegrationTest {
         FeedbackDTO feedbackDTO = new FeedbackDTO();
         feedbackDTO.setRating(1);
         feedbackDTO.setDescription("Nie pomaga");
+        feedbackDTO.setLockToken("lt");
 
         String responseJson = loginResult.getResponse().getContentAsString();
         String token = objectMapper.readTree(responseJson).get("value").asText();
@@ -344,6 +345,7 @@ public class MOD27Test extends BaseIntegrationTest {
         FeedbackDTO feedbackDTO = new FeedbackDTO();
         feedbackDTO.setRating(1);
         feedbackDTO.setDescription("Nie pomaga");
+        feedbackDTO.setLockToken("lt");
 
         String responseJson = loginResult.getResponse().getContentAsString();
         String token = objectMapper.readTree(responseJson).get("value").asText();

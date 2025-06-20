@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -9,10 +10,13 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class AccountWithRolesDTO {
-        AccountDTO accountDTO;
-        List<AccountRoleDTO> userRoleDTOS;
+    @NotNull
+    AccountDTO accountDTO;
+    @NotNull
+    List<AccountRoleDTO> userRoleDTOS;
 
-    private AccountWithRolesDTO() {}
+    private AccountWithRolesDTO() {
+    }
 
     @Override
     public String toString() {
