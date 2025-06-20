@@ -18,7 +18,6 @@ import java.util.UUID;
 @Setter(AccessLevel.NONE)
 @Getter
 @AllArgsConstructor
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountDTO {
 
         @Null(groups = {OnCreate.class, OnUpdate.class})

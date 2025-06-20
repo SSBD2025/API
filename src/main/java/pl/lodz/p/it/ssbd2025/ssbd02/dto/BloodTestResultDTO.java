@@ -14,7 +14,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 import java.util.UUID;
 
 @Data
-//@Setter(AccessLevel.NONE)
 @Getter
 @AllArgsConstructor
 public class BloodTestResultDTO {
@@ -25,7 +24,6 @@ public class BloodTestResultDTO {
 
     @Setter(AccessLevel.NONE)
     @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
-//    @NotNull(groups = OnUpdate.class)
     Long version;
 
     @Setter
