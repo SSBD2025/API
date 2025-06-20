@@ -22,25 +22,25 @@ import java.sql.Timestamp;
 @ToString(callSuper = true)
 public class PeriodicSurvey extends AbstractEntity {
     @ManyToOne
-    @JoinColumn(name = PeriodicSurveyConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
+    @JoinColumn(name = PeriodicSurveyConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false, unique = false)
     @ToString.Exclude
     private Client client;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_WEIGHT, nullable = false, updatable = true)
+    @Column(name = PeriodicSurveyConsts.COLUMN_WEIGHT, nullable = false, updatable = true, unique = false)
     @DecimalMin(value = PeriodicSurveyConsts.WEIGHT_MIN)
     @DecimalMax(value = PeriodicSurveyConsts.WEIGHT_MAX)
     private double weight;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_PRESSURE, nullable = false, updatable = true)
+    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_PRESSURE, nullable = false, updatable = true, unique = false)
     @Pattern(regexp = PeriodicSurveyConsts.BLOOD_PRESSURE_PATTERN, message = PeriodicSurveyConsts.BLOOD_PRESSURE_MESSAGE)
     private String bloodPressure;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_SUGAR_LEVEL, nullable = false, updatable = true)
+    @Column(name = PeriodicSurveyConsts.COLUMN_BLOOD_SUGAR_LEVEL, nullable = false, updatable = true, unique = false)
     @DecimalMin(value = PeriodicSurveyConsts.BLOOD_SUGAR_MIN)
     @DecimalMax(value = PeriodicSurveyConsts.BLOOD_SUGAR_MAX)
     private double bloodSugarLevel;
 
-    @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = true)
+    @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = true, unique = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp measurementDate;
 }

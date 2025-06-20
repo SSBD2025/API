@@ -28,21 +28,21 @@ public class ClientFoodPyramid {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("clientId")
     @JsonBackReference
-    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_CLIENT_ID)
+    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_CLIENT_ID, nullable = false , updatable = false, unique = false)
     private Client client;
 
     @ManyToOne
     @MapsId("foodPyramidId")
-    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_FOOD_PYRAMID_ID)
+    @JoinColumn(name = ClientFoodPyramidConsts.COLUMN_FOOD_PYRAMID_ID, nullable = false, updatable = false, unique = false)
     @JsonBackReference
     private FoodPyramid foodPyramid;
 
-    @Column(name = ClientFoodPyramidConsts.COLUMN_TIMESTAMP, nullable = false)
+    @Column(name = ClientFoodPyramidConsts.COLUMN_TIMESTAMP, nullable = false, updatable = false, unique = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
     @Version
-    @Column(name = ClientFoodPyramidConsts.COLUMN_VERSION, nullable = false)
+    @Column(name = ClientFoodPyramidConsts.COLUMN_VERSION, nullable = false, updatable = true, unique = false)
     private Long version;
 
     public ClientFoodPyramid(Client client, FoodPyramid foodPyramid, Timestamp timestamp) {

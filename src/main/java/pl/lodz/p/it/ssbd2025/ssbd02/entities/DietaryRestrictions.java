@@ -17,15 +17,15 @@ public class DietaryRestrictions extends AbstractEntity {
     @JoinColumn(name = DietaryRestrictionsConsts.COLUMN_CLIENT_ID, nullable = false, unique = true, updatable = false)
     private Client client;
 
-    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGAN, nullable = false)
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGAN, nullable = false, updatable = true, unique = false)
     private boolean vegan = DietaryRestrictionsConsts.DEFAULT_IS_VEGAN;
 
-    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGETARIAN, nullable = false)
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_VEGETARIAN, nullable = false, updatable = true, unique = false)
     private boolean vegetarian = DietaryRestrictionsConsts.DEFAULT_IS_VEGETARIAN;
 
-    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_KETO, nullable = false)
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_KETO, nullable = false, updatable = true, unique = false)
     private boolean keto = DietaryRestrictionsConsts.DEFAULT_IS_KETO;
 
-    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_GLUTEN_FREE, nullable = false)
+    @Column(name = DietaryRestrictionsConsts.COLUMN_IS_GLUTEN_FREE, nullable = false, updatable = true, unique = false)
     private boolean glutenFree = DietaryRestrictionsConsts.DEFAULT_IS_GLUTEN_FREE;
 }

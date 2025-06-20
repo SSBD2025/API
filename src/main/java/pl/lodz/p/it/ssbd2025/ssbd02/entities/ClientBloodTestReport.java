@@ -31,5 +31,6 @@ public class ClientBloodTestReport extends AbstractEntity {
     private Timestamp timestamp;
 
     @OneToMany(mappedBy = "report", cascade = {CascadeType.PERSIST})
+    @Column(nullable = false, updatable = false)
     private List<BloodTestResult> results;
 }

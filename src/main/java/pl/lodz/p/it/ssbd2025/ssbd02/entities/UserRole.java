@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -29,8 +30,9 @@ public abstract class UserRole extends AbstractEntity {
     @Setter
     private boolean active = UserRoleConsts.DEFAULT_ACTIVE;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = UserRoleConsts.COLUMN_USER_ID, nullable = false, updatable = false)
+    @JoinColumn(name = UserRoleConsts.COLUMN_USER_ID, nullable = false, updatable = false, unique = false)
     @Setter
     private Account account;
 
