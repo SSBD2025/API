@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ChangePasswordConsts;
 
@@ -12,8 +13,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ChangePasswordConsts;
 @ToString(callSuper = true)
 public class ChangePasswordEntity extends AbstractEntity {
 
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = ChangePasswordConsts.ACCOUNT_COLUMN_NAME)
+    @NotNull
     private Account account;
 
     @Setter
