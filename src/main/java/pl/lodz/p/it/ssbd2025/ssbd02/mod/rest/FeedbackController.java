@@ -18,6 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IFeedbackService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,7 +78,7 @@ public class FeedbackController {
             description = "Dostępne dla CLIENT")
     @AuthorizedEndpoint
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Opinia została dodana"),
+            @ApiResponse(responseCode = "201", description = "Opinia została dodana"),
             @ApiResponse(responseCode = "403", description = "Ta piramida nie jest przypisana do tego użytkownika"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym id"),
@@ -87,7 +88,9 @@ public class FeedbackController {
         Feedback feedback = feedbackService.addFeedback(pyramidId, feedbackMapper.toFeedback(feedbackDTO));
         FeedbackDTO responseDTO = feedbackMapper.toFeedbackDTO(feedback);
 
-        return ResponseEntity.ok(responseDTO);
+        URI location = URI.create(String.format("/pyramids/%s/feedback/%s", pyramidId, feedback.getId()));
+
+        return ResponseEntity.created(location).body(responseDTO);
     }
 
     @PreAuthorize("hasRole('CLIENT')")

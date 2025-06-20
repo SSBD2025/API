@@ -1,12 +1,17 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +26,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +42,9 @@ public class MOK15Test extends BaseIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockitoBean
+    private JavaMailSender mailSender;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -45,6 +54,36 @@ public class MOK15Test extends BaseIntegrationTest {
     private final String accountId ="00000000-0000-0000-0000-000000000001";
 
     private String accessToken;
+
+    private String token;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        MimeMessage realMimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
+
+        String loginRequestJson = """
+                {
+                  "login": "jcheddar",
+                  "password": "P@ssw0rd!"
+                }
+                """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk()).andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        token = objectMapper.readTree(responseJson).get("value").asText();
+    }
+
+    @AfterEach
+    void teardown() throws Exception {
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
+    }
 
     void loginUser() throws Exception {
         String loginRequestJson = """
@@ -65,14 +104,14 @@ public class MOK15Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void shouldReturnAccountById() throws Exception {
         String expectedToken = "fixed-token-123";
 
         when(lockTokenService.generateToken(any(UUID.class), anyLong()))
                 .thenReturn(new SensitiveDTO(expectedToken));
 
-        mockMvc.perform(get("/api/account/" + accountId).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/account/" + accountId).contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.account.login").value("jcheddar"))
                 .andExpect(jsonPath("$.account.id").value(accountId))
@@ -93,18 +132,18 @@ public class MOK15Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void shouldReturn404WhenAccountDoesNotExist() throws Exception {
         UUID randomUUID = UUID.randomUUID();
 
-        mockMvc.perform(get("/api/account/" + randomUUID.toString()))
+        mockMvc.perform(get("/api/account/" + randomUUID.toString())
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void shouldReturn400ForInvalidUuidFormat() throws Exception {
-        mockMvc.perform(get("/api/account/" + "bajo-jajo"))
+        mockMvc.perform(get("/api/account/" + "bajo-jajo")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
     }
 
@@ -130,6 +169,9 @@ public class MOK15Test extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.roles[0].roleName").value("CLIENT"))
                 .andExpect(jsonPath("$.roles[0].active").value(true))
                 .andExpect(jsonPath("$.lockToken").value(expectedToken));
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + accessToken)).andReturn();
     }
 
     @Test
