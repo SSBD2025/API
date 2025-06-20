@@ -14,7 +14,7 @@ public class BloodTestConsts {
     public static final String COLUMN_TIMESTAMP = "timestamp";
     public static final String CLIENT_ID_INDEX = "cbtr_client_id_index";
 
-    public static final String RESULT_MIN = "0";
+    public static final String RESULT_MIN = "0.0";
 
     public static final int RESULTS_MIN_SIZE = 1;
     public static final int RESULTS_MAX_SIZE = 31;

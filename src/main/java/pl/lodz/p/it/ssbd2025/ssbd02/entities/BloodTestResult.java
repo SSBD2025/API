@@ -1,6 +1,7 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
@@ -18,6 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
 @ToString(callSuper = true)
 public class BloodTestResult extends AbstractEntity {
     @Column(name = BloodTestConsts.COLUMN_RESULT, nullable = false)
+    @DecimalMin(value = BloodTestConsts.RESULT_MIN)
     private Double result;
 
     @Enumerated(EnumType.STRING)

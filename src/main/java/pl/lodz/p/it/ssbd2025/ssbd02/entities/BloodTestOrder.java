@@ -1,6 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestOrderConsts;
@@ -34,6 +36,7 @@ public class BloodTestOrder extends AbstractEntity {
     private Timestamp orderDate;
 
     @Column(name = BloodTestOrderConsts.COLUMN_DESCRIPTION, nullable = false, columnDefinition = "TEXT")
+    @Size(min = BloodTestOrderConsts.DESCRIPTION_MIN, max = BloodTestOrderConsts.DESCRIPTION_MAX)
     private String description;
 
     @ElementCollection
@@ -43,6 +46,7 @@ public class BloodTestOrder extends AbstractEntity {
     )
     @Column(name = BloodTestOrderConsts.COLUMN_PARAMETER, nullable = false)
     @Enumerated(EnumType.STRING)
+    @Size(min = BloodTestOrderConsts.PARAMETERS_MIN, max = BloodTestOrderConsts.PARAMETERS_MAX)
     private List<BloodParameter> parameters;
 
     @Column(name = BloodTestOrderConsts.COLUMN_FULFILLED)
