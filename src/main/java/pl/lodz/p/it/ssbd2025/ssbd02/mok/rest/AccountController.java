@@ -130,6 +130,14 @@ public class AccountController {
     @PostMapping("/change-email")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @MethodCallLogged
+    @Operation(summary = "Zmień własny adres e-mail",
+            description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Wysłano e-mail z linkiem do potwierdzenia zmiany zmiany"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "409", description = "Adres e-mail jest już w użyciu"),
+    })
     public ResponseEntity<?> changeOwnEmail(@RequestBody @Valid ChangeEmailDTO changeEmailDTO) {
         accountService.changeOwnEmail(changeEmailDTO.getEmail());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -138,6 +146,13 @@ public class AccountController {
     @GetMapping("/confirm-email")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
+    @Operation(summary = "Potwierdź zmianę adresu e-mail",
+            description = "Dostępne dla wszystkich")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Zmieniono adres e-mail i wysłano wiadomość e-mail z linkiem do przywrócenia wcześniejszego adresu e-mail na stary adres e-mail"),
+            @ApiResponse(responseCode = "401", description = "Token do zmiany adresu e-mail wygasł"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+    })
     public ResponseEntity<?> confirmEmail(@RequestParam("token") SensitiveDTO token) {
         accountService.confirmEmail(token);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -146,6 +161,13 @@ public class AccountController {
     @GetMapping("/revert-email-change")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
+    @Operation(summary = "Przywróć stary adres e-mail",
+            description = "Dostępne dla wszystkich")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Przywrócono stary adres e-mail"),
+            @ApiResponse(responseCode = "401", description = "Token do zmiany adresu e-mail wygasł"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+    })
     public ResponseEntity<?> revertEmailChange(@RequestParam("token") SensitiveDTO token) {
         accountService.revertEmailChange(token);
         return ResponseEntity.noContent().build();
@@ -154,6 +176,13 @@ public class AccountController {
     @PostMapping("/resend-change-email")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @MethodCallLogged
+    @AuthorizedEndpoint
+    @Operation(summary = "Przywróć stary adres e-mail",
+            description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Przywrócono stary adres e-mail"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+    })
     public ResponseEntity<Void> resendEmailChangeLink() {
         accountService.resendEmailChangeLink();
         return ResponseEntity.noContent().build();
@@ -162,6 +191,14 @@ public class AccountController {
     @PostMapping("/{id}/change-user-email")
     @PreAuthorize("hasRole('ADMIN')")
     @MethodCallLogged
+    @Operation(summary = "Zmień własny adres e-mail",
+            description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Wysłano e-mail z linkiem do potwierdzenia zmiany zmiany"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "409", description = "Adres e-mail jest już w użyciu"),
+    })
     public ResponseEntity<?> changeUserEmail(
             @PathVariable UUID id,
             @RequestBody @Valid ChangeEmailDTO changeEmailDTO) {

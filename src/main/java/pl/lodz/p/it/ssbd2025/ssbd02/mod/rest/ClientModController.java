@@ -56,6 +56,14 @@ public class ClientModController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/assign-dietician/{dieticianId}")
+    @Operation(summary = "Przypisz dietetyka do klienta",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dietetyk został przypisany"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono dietetyka o podanym Id; nie znaleziono klienta"),
+            @ApiResponse(responseCode = "409", description = "Inny dietetyk jest już przypisany do klienta; ten dietetyk jest już przypisany do klienta; dietetyk osiągnął już limit klientów")
+    })
     public ResponseEntity<Void> assignDietician(@PathVariable UUID dieticianId) {
         clientService.assignDietician(dieticianId);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -63,12 +71,26 @@ public class ClientModController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/status")
+    @Operation(summary = "Probierz status klienta",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono status klienta")
+    })
     public ResponseEntity<ClientStatusDTO> getClientStatus() {
         return ResponseEntity.ok(clientService.getClientStatus());
     }
 
     @PostMapping("/permanent-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Wypełnij ankietę parametrów stałych",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Wypełniono ankietę parametrów stałych"),
+            @ApiResponse(responseCode = "409", description = "Klient już wypełnił ankietę; klient nie ma przypisangeo dietetyka"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+    })
     public ResponseEntity<SurveyDTO> submitPermanentSurvey(
             @Validated(OnCreate.class)
             @RequestBody SurveyDTO surveyDTO) {
@@ -106,6 +128,12 @@ public class ClientModController {
 
     @GetMapping("/get-available-dieticians")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobierz dostępnych dietetyków",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę dostępnych dietetyków")
+    })
     public ResponseEntity<List<DieticianDTO>> getAvailableDieticians(
             @RequestParam(required = false) String searchPhrase
     ) {

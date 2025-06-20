@@ -56,6 +56,14 @@ public class ClientFoodPyramidController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client-pyramids")
+    @Operation(summary = "Pobierz piramidy żywieniowe klienta",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę piramid żywieniowych"),
+            @ApiResponse(responseCode = "204", description = "Zwrócono pustą listę piramid żywieniowych"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta"),
+    })
     public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramids() {
         List<ClientFoodPyramidDTO> pyramids = clientFoodPyramidService.getClientPyramids();
         if (pyramids.isEmpty()) {
@@ -66,6 +74,14 @@ public class ClientFoodPyramidController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/dietician/{clientId}")
+    @Operation(summary = "Pobierz piramidy żywieniowe klienta przypisanego do dietetyka",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę piramid żywieniowych"),
+            @ApiResponse(responseCode = "204", description = "Zwrócono pustą listę piramid żywieniowych"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono dietetyka; nie znaleziono klienta"),
+    })
     public ResponseEntity<List<ClientFoodPyramidDTO>> getClientPyramidsAsDietician(
             @PathVariable UUID clientId) {
         List<ClientFoodPyramidDTO> pyramids = clientFoodPyramidService.getClientPyramidsByDietician(clientId);
