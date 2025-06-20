@@ -72,6 +72,14 @@ public class AccountController {
 
     @PostMapping("/changePassword")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Operation(summary = "Zmień hasło własnego konta", description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Operacja powiodła się"),
+            @ApiResponse(responseCode = "401", description = "Niepoprawne hasło"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "400", description = "Hasło używane wcześniej")
+    })
     public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
         accountService.changePassword(changePasswordDTO);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -79,6 +87,13 @@ public class AccountController {
 
     @PostMapping("/force/changePassword")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Zmień hasło po pierwszym uwierzytelnieniu lub po zmianie hasła przez administratora",
+    description = "Dostępne dla wszystkich")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Operacja powiodła się"),
+            @ApiResponse(responseCode = "401", description = "Niepoprawne hasło"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+    })
     public ResponseEntity<Object> forceChangePassword(@RequestBody @Valid ForceChangePasswordDTO forceChangePasswordDTO) {
         accountService.forceChangePassword(forceChangePasswordDTO);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -86,6 +101,12 @@ public class AccountController {
 
     @PostMapping("/{id}/changePassword")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Zmień hasło użytkownikowi", description = "Dostępne dla ADMIN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Operacja powiodła się"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+    })
     public ResponseEntity<Object> changeUserPassword(@PathVariable UUID id) {
         accountService.setGeneratedPassword(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -239,6 +260,11 @@ public class AccountController {
 
     @PostMapping("/reset/password/request")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Otrzymaj link do resetu hasła na podany adres e-mail", description = "Dostępne dla wszystkich")
+    @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "Operacja powiodła się, podano poprawny e-mail"),
+      @ApiResponse(responseCode = "204", description = "Operacja nie powiodła się, podano niepoprawny e-mail"),
+    })
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -246,6 +272,15 @@ public class AccountController {
 
     @PostMapping("/reset/password/{token}")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Ustawienie nowego hasła po resecie", description = "Dostępne dla wszystkich")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Operacja powiodła się"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono tokenu"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "401", description = "Token wygasł"),
+            @ApiResponse(responseCode = "400", description = "Nowe hasło było już używane"),
+
+    })
     public ResponseEntity<Void> resetPassword(@PathVariable SensitiveDTO token, @RequestBody @Validated(OnReset.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(token, resetPasswordDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
