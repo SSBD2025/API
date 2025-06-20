@@ -27,23 +27,19 @@ import java.util.UUID;
 public class ClientFoodPyramidController {
     private final IClientFoodPyramidService clientFoodPyramidService;
 
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<ClientFoodPyramidDTO>> getByClientId(@PathVariable UUID clientId) {
-        // Implementation will be added later
-        return null;
-    }
-
     @PostMapping
     @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Przypisz piramidę żywieniową do klienta",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Piramida żywieniowa została pomyślnie przypisana klientowi"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym ID lub piramidy o podanym ID"),
+            @ApiResponse(responseCode = "409", description = "Piramida żywieniowa jest już przypisana temu klientowi")
+    })
     public ResponseEntity<Void> assignFoodPyramidToClient(@Valid @RequestBody AssignDietPlanDTO dto) {
         clientFoodPyramidService.assignFoodPyramidToClient(dto);
         return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/client/{clientId}/pyramid/{pyramidId}")
-    public ResponseEntity<Void> removeFoodPyramidFromClient(@PathVariable UUID clientId, @PathVariable UUID pyramidId) {
-        // Implementation will be added later
-        return null;
     }
 
     @PostMapping("/new/{clientId}")

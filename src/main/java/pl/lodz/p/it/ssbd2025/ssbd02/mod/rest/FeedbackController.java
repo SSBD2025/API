@@ -33,6 +33,13 @@ public class FeedbackController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/client/{clientId}/pyramid/{pyramidId}")
+    @Operation(summary = "Pobierz opinię klienta na temat wybranej piramidy",
+            description = "Dostępne dla CLIENT.")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Opinia została zwrócona pomyślnie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta, piramidy lub opinii")
+    })
     public ResponseEntity<FeedbackDTO> getFeedbackByClientAndPyramid(
             @PathVariable UUID clientId,
             @PathVariable UUID pyramidId
@@ -46,6 +53,13 @@ public class FeedbackController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/my-pyramid/{pyramidId}")
+    @Operation(summary = "Pobierz swoją opinię dla wybranej piramidy",
+            description = "Dostępne dla CLIENT.")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Opinia została zwrócona pomyślnie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy lub opinii dla zalogowanego użytkownika")
+    })
     public ResponseEntity<FeedbackDTO> getMyFeedbackForPyramid(
             @PathVariable UUID pyramidId
     ) {

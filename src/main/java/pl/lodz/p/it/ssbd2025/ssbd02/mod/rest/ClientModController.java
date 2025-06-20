@@ -88,6 +88,15 @@ public class ClientModController {
 
     @PutMapping("/permanent-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Edytuj ankietę stałą", description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ankieta stała została zaktualizowana"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "403", description = "Brak dostępu do edycji ankiety"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety"),
+            @ApiResponse(responseCode = "409", description = "Konflikt wersji danych")
+    })
     public ResponseEntity<SurveyDTO> editPermanentSurvey(
             @Validated(OnUpdate.class)
             @RequestBody SurveyDTO surveyDTO) {
