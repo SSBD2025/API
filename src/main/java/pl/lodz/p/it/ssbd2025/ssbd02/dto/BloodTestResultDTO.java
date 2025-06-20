@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.*;
@@ -9,6 +10,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
 
 import java.util.UUID;
@@ -33,6 +35,7 @@ public class BloodTestResultDTO {
 
     @Setter
     @NotNull(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
+    @DecimalMin(value = BloodTestConsts.RESULT_MIN, groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     Double result;
 
     @Valid
