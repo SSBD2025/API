@@ -66,7 +66,7 @@ public class MOK3Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(emailService, times(1)).sendResetPasswordEmail(
                 eq("jcheddar@example.com"),
@@ -83,7 +83,7 @@ public class MOK3Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         accountTestHelper.checkPassword("jcheddar", "P@ssw0rd?");
     }
@@ -101,45 +101,6 @@ public class MOK3Test extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-//    @Test
-//    @WithMockUser(roles = {"CLIENT"})
-//    public void resetPasswordRequest_TokenExpired() throws Exception {
-//        accountTestHelper.setPassword("jcheddar", "P@ssw0rd!");
-//        String email = "jcheddar@example.com";
-//        String newPassword = "P@ssw0rd?";
-//
-//        ResetPasswordDTO resetPasswordRequestDTO = new ResetPasswordDTO(email, null);
-//
-//        doNothing().when(emailService).sendResetPasswordEmail(
-//                anyString(), anyString(), any(), tokenCaptor.capture());
-//
-//        String requestJson = objectMapper.writeValueAsString(resetPasswordRequestDTO);
-//
-//        mockMvc.perform(post("/api/account/reset/password/request")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestJson))
-//                .andExpect(status().isOk());
-//
-//        verify(emailService, times(1)).sendResetPasswordEmail(
-//                eq(email),
-//                anyString(),
-//                any(),
-//                anyString()
-//        );
-//
-//        String capturedToken = tokenCaptor.getValue();
-//
-//
-//        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(null, newPassword);
-//        String resetJson = objectMapper.writeValueAsString(resetPasswordDTO);
-//
-//        mockMvc.perform(post("/api/account/reset/password/" + capturedToken)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(resetJson))
-//                .andExpect(status().isUnauthorized());
-//
-//        accountTestHelper.checkPassword("jcheddar", "P@ssw0rd!");
-//    }
 
     @Test
     public void resetPasswordRequest_AccountNotFound() throws Exception {
@@ -154,7 +115,7 @@ public class MOK3Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
 

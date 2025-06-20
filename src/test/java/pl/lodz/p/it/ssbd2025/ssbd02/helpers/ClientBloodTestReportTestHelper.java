@@ -46,22 +46,15 @@ public class ClientBloodTestReportTestHelper {
         System.out.println("PLT value restored to 250.0 for report: " + reportId);
     }
 
-    // Metoda do odczytu raportu - używa nowej transakcji aby zagwarantować dostęp do lazy collections
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     public ClientBloodTestReport getClientBloodTestReportById(UUID reportId) {
-        // Jeśli masz metodę findByIdWithResults w repository, użyj jej zamiast findById
-        // ClientBloodTestReport report = reportRepo.findByIdWithResults(reportId)
-        //         .orElseThrow(() -> new IllegalArgumentException("Report not found with id: " + reportId));
-
         ClientBloodTestReport report = reportRepo.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found with id: " + reportId));
 
-        // Inicjalizujemy kolekcję wyników aby uniknąć lazy loading exception
         report.getResults().size();
-        // Dodatkowo inicjalizujemy nested properties
         report.getResults().forEach(result -> {
             if (result.getBloodParameter() != null) {
-                result.getBloodParameter().name(); // Inicjalizujemy blood parameter
+                result.getBloodParameter().name();
             }
         });
 

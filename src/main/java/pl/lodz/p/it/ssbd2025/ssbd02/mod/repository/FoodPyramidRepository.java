@@ -29,4 +29,8 @@ public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
 //    @PreAuthorize() TODO dodac
     FoodPyramid findByName(String name);
+
+    @PreAuthorize("permitAll()") //FOR TESTS ONLY
+    @Transactional(propagation = Propagation.MANDATORY)
+    void delete(FoodPyramid foodPyramid);
 }

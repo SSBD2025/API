@@ -79,7 +79,7 @@ public class MOK9Test extends BaseIntegrationTest {
     public void logout(String token) throws Exception {
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isNoContent());
     }
 
     @Order(1)
@@ -90,7 +90,7 @@ public class MOK9Test extends BaseIntegrationTest {
         doNothing().when(emailService).sendPasswordChangedByAdminEmail(anyString(), anyString(), any(), tokenCaptor.capture(), anyString());
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + adminAccessToken)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isNoContent());
         String token = tokenCaptor.getValue().getValue();
         ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
                 null,
@@ -100,7 +100,7 @@ public class MOK9Test extends BaseIntegrationTest {
         mockMvc.perform(post("/api/account/reset/password/" + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isNoContent());
         logout(adminAccessToken);
         accountTestHelper.checkPassword("agorgonzola", "P@ssw0rd!!");
     }
@@ -163,7 +163,7 @@ public class MOK9Test extends BaseIntegrationTest {
         );
         mockMvc.perform(post("/api/account/" + clientUUID + "/changePassword")
                 .header("Authorization", "Bearer " + adminAccessToken)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isNoContent());
         logout(adminAccessToken);
 
         accountTestHelper.markAsChanged("agorgonzola");
