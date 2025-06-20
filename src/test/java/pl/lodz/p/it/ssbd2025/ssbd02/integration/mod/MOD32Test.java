@@ -9,6 +9,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -17,7 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.AsyncTestConfig;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.SensitiveDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientModService;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,6 +47,8 @@ public class MOD32Test extends BaseIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ClientModService clientModService;
 
     String nineClientsDieticianId = "00000000-0000-0000-0000-000000000004";
     String dieticianId = "00000000-0000-0000-0000-000000000009";
@@ -64,6 +75,12 @@ public class MOD32Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("jorzel", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT"))));
+        Client client = clientModService.getClientByLogin(new SensitiveDTO("jorzel"));
+        SecurityContextHolder.setContext(securityContext);
+        Assertions.assertEquals(UUID.fromString(dieticianId), client.getDietician().getId());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();
