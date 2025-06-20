@@ -55,7 +55,7 @@ public class MOK8Test extends BaseIntegrationTest {
     public void logout(String token) throws Exception {
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isNoContent());
     }
 
 
@@ -90,7 +90,7 @@ public class MOK8Test extends BaseIntegrationTest {
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonChangePassword))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         accountTestHelper.checkPassword("drice", "P@ssw0rd?");
     }

@@ -3,26 +3,35 @@ package pl.lodz.p.it.ssbd2025.ssbd02.integration.mod;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.LoginDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.ClientBloodTestReportTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,20 +59,43 @@ public class MOD30Test extends BaseIntegrationTest {
     private String token;
     UUID reportId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
+    @BeforeEach
+    void setup() throws Exception {
+        LoginDTO loginDTO = new LoginDTO("drice", "P@ssw0rd!");
+        String json = objectMapper.writeValueAsString(loginDTO);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andReturn();
+        String responseJson = loginResult.getResponse().getContentAsString();
+        token = objectMapper.readTree(responseJson).get("value").asText();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+    }
+
     @AfterEach
-    void cleanupAfterTest() {
+    void teardown() throws Exception {
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
     }
 
 
     @Test
     @WithMockUser(roles = {"DIETICIAN"})
     void edit_SUCCESS_test() throws Exception {
+//        SecurityContext context = SecurityContextHolder.createEmptyContext();
+//        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
+//        context.setAuthentication(auth);
+//        SecurityContextHolder.setContext(context);
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
                 .filter(r -> "PLT".equals(r.getBloodParameter().name()))
                 .findFirst()
                 .orElseThrow();
-
         String payload = """
         {
             "lockToken": "%s",
@@ -87,6 +119,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isOk());
@@ -136,6 +169,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isOk());
@@ -154,6 +188,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload2)
                 )
@@ -210,6 +245,10 @@ public class MOD30Test extends BaseIntegrationTest {
     @Test
     @WithMockUser(roles = {"DIETICIAN"})
     void edit_clientBloodTestReportIdNotFound_Test() throws Exception {
+//        SecurityContext context = SecurityContextHolder.createEmptyContext();
+//        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
+//        context.setAuthentication(auth);
+//        SecurityContextHolder.setContext(context);
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
                 .filter(r -> "PLT".equals(r.getBloodParameter().name()))
@@ -241,6 +280,7 @@ public class MOD30Test extends BaseIntegrationTest {
                 275
         );
         MvcResult result = mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isNotFound()).andReturn();
@@ -292,6 +332,7 @@ public class MOD30Test extends BaseIntegrationTest {
                 275
         );
         MvcResult result = mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isNotFound()).andReturn();
@@ -382,10 +423,23 @@ public class MOD30Test extends BaseIntegrationTest {
                 lockTokenService.generateToken(pltBefore.getId(), pltBefore.getVersion()).getValue()
         );
 
+        LoginDTO loginDTO = new LoginDTO("agorgonzola", "P@ssw0rd!");
+        String json = objectMapper.writeValueAsString(loginDTO);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andReturn();
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String clientToken = objectMapper.readTree(responseJson).get("value").asText();
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + clientToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + clientToken)).andReturn();
 
         ClientBloodTestReport afterReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltAfter = afterReport.getResults().stream()
@@ -433,6 +487,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -482,6 +537,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -534,6 +590,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest());
@@ -580,6 +637,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -614,6 +672,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -660,6 +719,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -712,6 +772,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -760,6 +821,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -805,6 +867,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -851,6 +914,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -892,6 +956,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest())
@@ -944,6 +1009,7 @@ public class MOD30Test extends BaseIntegrationTest {
         );
 
         mockMvc.perform(put("/api/mod/blood-test-reports")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isBadRequest());

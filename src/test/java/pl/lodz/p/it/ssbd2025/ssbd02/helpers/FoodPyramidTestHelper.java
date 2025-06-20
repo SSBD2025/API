@@ -2,6 +2,7 @@ package pl.lodz.p.it.ssbd2025.ssbd02.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FeedbackRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.FoodPyramidRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @TestComponent
@@ -53,5 +55,31 @@ public class FoodPyramidTestHelper {
     @Transactional(readOnly = true, transactionManager = "modTransactionManager")
     public List<ClientFoodPyramid> getClientFoodPyramids(UUID clientId) {
         return clientFoodPyramidRepository.findByClientId(clientId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
+    public FoodPyramid createFoodPyramid(FoodPyramid foodPyramid) {
+        return foodPyramidRepository.saveAndFlush(foodPyramid);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
+    @WithMockUser(roles = "DIETICIAN")
+    public FoodPyramid findByName(String name) {
+        return Optional.ofNullable(foodPyramidRepository.findByName(name))
+                .orElseThrow(() -> new IllegalArgumentException("Food pyramid with name " + name + " not found"));
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY, transactionManager = "modTransactionManager")
+    @WithMockUser(roles = "DIETICIAN")
+    public void deleteFoodPyramid(FoodPyramid foodPyramid) {
+        foodPyramidRepository.delete(foodPyramid);
+//        foodPyramidRepository.flush();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
+    @WithMockUser(roles = "DIETICIAN")
+    public void deleteByName(String name) {
+        FoodPyramid pyramid = findByName(name);
+        deleteFoodPyramid(pyramid);
     }
 }
