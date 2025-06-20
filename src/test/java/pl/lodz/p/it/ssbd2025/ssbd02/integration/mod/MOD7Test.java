@@ -18,7 +18,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.AsyncTestConfig;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.BloodTestOrderDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestOrder;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.ModTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.DieticianModService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
 
 import java.util.List;
@@ -43,6 +46,10 @@ public class MOD7Test extends BaseIntegrationTest {
     private ObjectMapper objectMapper;
     @MockitoBean
     private EmailService emailService;
+    @Autowired
+    private DieticianModService dieticianModService;
+    @Autowired
+    private ModTestHelper modTestHelper;
 
     @Test
     public void orderMedicalExaminationsTest() throws Exception  {
@@ -80,6 +87,12 @@ public class MOD7Test extends BaseIntegrationTest {
                         .content(bloodTestOrder)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+
+        modTestHelper.setDieticianContext();
+        List<BloodTestOrder> bloodTestOrders = dieticianModService.getUnfulfilledBloodTestOrders();
+        modTestHelper.resetContext();
+        Assertions.assertNotNull(bloodTestOrders);
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000013"), bloodTestOrders.getLast().getClient().getId());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();

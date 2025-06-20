@@ -8,6 +8,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -17,8 +21,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.AsyncTestConfig;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.SurveyDTO;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.ActivityLevel;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.NutritionGoal;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.ModTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientModService;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -40,6 +47,8 @@ public class MOD20Test extends BaseIntegrationTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    ClientModService clientModService;
 
     @Test
     public void submitPermanentSurveyTest() throws Exception {
@@ -88,6 +97,12 @@ public class MOD20Test extends BaseIntegrationTest {
                         .content(survey)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("kkaktus", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT"))));
+        Survey permanentSurvey = clientModService.getPermanentSurvey();
+        SecurityContextHolder.setContext(securityContext);
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000013"), permanentSurvey.getClient().getId());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();

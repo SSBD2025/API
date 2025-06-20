@@ -92,7 +92,7 @@ public class MOK10Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeEmailJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         TokenEntity token = tokenRepository.findAll().stream()
                 .filter(t -> t.getType() == TokenType.EMAIL_CHANGE)
@@ -107,7 +107,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Assertions.assertEquals("newemail@example.com", accountTestHelper.getClientByLogin("drice").getEmail());
     }
@@ -297,7 +297,7 @@ public class MOK10Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeEmailJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         TokenEntity token = tokenRepository.findAll().stream()
                 .filter(t -> t.getType() == TokenType.EMAIL_CHANGE)
@@ -312,7 +312,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/account/confirm-email")
                         .param("token", token.getToken()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         TokenEntity revertToken = tokenRepository.findAll().stream()
                 .filter(t -> t.getType() == TokenType.EMAIL_REVERT)
@@ -324,7 +324,7 @@ public class MOK10Test extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/account/revert-email-change")
                         .param("token", revertToken.getToken()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Assertions.assertEquals("tcheese@example.com", accountTestHelper.getClientByLogin("tcheese").getEmail());
     }
@@ -367,14 +367,14 @@ public class MOK10Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeEmailJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         doNothing().when(emailService).sendChangeEmail(anyString(), anyString(), any(), any());
 
         mockMvc.perform(post("/api/account/resend-change-email")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
