@@ -106,6 +106,9 @@ public class DieticianModService implements IDieticianService {
             client.getSurvey().getMedications().size();
             client.getSurvey().getMealTimes().size();
         }
+        for (ClientBloodTestReport report : client.getBloodTestReports()) {
+            report.getResults().size();
+        }
         return client;
     }
 
