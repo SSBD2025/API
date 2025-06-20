@@ -48,4 +48,6 @@ public class FoodPyramidConsts {
     public static final int MIN_NAME = 2;
     public static final int MAX_NAME = 20;
     public static final int MIN_VALUE = 0;
+    public static final String MIN_DECIMAL = "0.0";
+    public static final String MAX_DECIMAL = "5.0";
 }
