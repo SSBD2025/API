@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -8,8 +9,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ClientStatusDTO {
-    private boolean hasAssignedDietician;
-    private boolean hasSubmittedPermanentSurvey;
+    @NotNull
+    private Boolean hasAssignedDietician;
+    @NotNull
+    private Boolean hasSubmittedPermanentSurvey;
 
     public ClientStatusDTO() {}
 

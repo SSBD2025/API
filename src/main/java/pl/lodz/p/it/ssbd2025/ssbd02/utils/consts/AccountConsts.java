@@ -11,6 +11,7 @@ public class AccountConsts {
     public static final int LOGIN_MAX = 50;
 
     public static final int EMAIL_MAX = 128;
+    public static final int EMAIL_MIN = 0;
 
     public static final int NAME_MIN = 1;
     public static final int NAME_MAX = 50;

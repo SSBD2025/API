@@ -11,6 +11,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnRead;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.BloodTestOrderConsts;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,10 +29,10 @@ public class BloodTestOrderDTO {
     @NotNull(groups = OnRead.class)
     private Timestamp orderDate;
     @NotBlank(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 10, max = 500, groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = BloodTestOrderConsts.DESCRIPTION_MIN, max = BloodTestOrderConsts.DESCRIPTION_MAX, groups = {OnCreate.class, OnUpdate.class})
     private String description;
     @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @Size(min = 1, max = 31, groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = BloodTestOrderConsts.PARAMETERS_MIN, max = BloodTestOrderConsts.PARAMETERS_MAX, groups = {OnCreate.class, OnUpdate.class})
     private List<BloodParameter> parameters;
     private boolean fulfilled;
 
