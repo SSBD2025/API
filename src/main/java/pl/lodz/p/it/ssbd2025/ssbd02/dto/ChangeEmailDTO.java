@@ -12,7 +12,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 @AllArgsConstructor
 public class ChangeEmailDTO {
         @Email
-        @Size(max = AccountConsts.EMAIL_MAX)
+        @Size(min = AccountConsts.EMAIL_MIN, max = AccountConsts.EMAIL_MAX)
         @NotBlank
         String email;
 

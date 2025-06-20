@@ -16,4 +16,9 @@ public class BloodTestOrderConsts {
 
     public static final String CLIENT_ID_INDEX = "blood_test_order_client_id_idx";
     public static final String DIETITIAN_ID_INDEX = "blood_test_order_dietitian_id_idx";
+
+    public static final int DESCRIPTION_MIN = 10;
+    public static final int DESCRIPTION_MAX = 500;
+    public static final int PARAMETERS_MIN = 1;
+    public static final int PARAMETERS_MAX = 31;
 }

@@ -43,14 +43,14 @@ public class Survey extends AbstractEntity {
     @Builder.Default
     @NotNull
     @Size(min = SurveyConsts.DIET_PREFERENCES_MIN, max = SurveyConsts.DIET_PREFERENCES_MAX)
-    @Column(name = SurveyConsts.COLUMN_DIET_PREFERENCES, nullable = false, updatable = false, unique = false)
+    @Column(name = SurveyConsts.COLUMN_DIET_PREFERENCES, nullable = false, unique = false)
     private List<String> dietPreferences = new ArrayList<>();
 
     @ElementCollection
     @Builder.Default
     @NotNull
     @Size(min = SurveyConsts.ALLERGIES_MIN, max = SurveyConsts.ALLERGIES_MAX)
-    @Column(nullable = false, updatable = false, unique = false)
+    @Column(nullable = false, unique = false)
     private List<String> allergies = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -68,14 +68,14 @@ public class Survey extends AbstractEntity {
     @Builder.Default
     @NotNull
     @Size(min = SurveyConsts.ILLNESSES_MIN, max = SurveyConsts.ILLNESSES_MAX)
-    @Column(nullable = false, updatable = false, unique = false)
+    @Column(nullable = false, unique = false)
     private List<String> illnesses = new ArrayList<>();
 
     @ElementCollection
     @Builder.Default
     @NotNull
     @Size(min = SurveyConsts.MEDICATIONS_MIN, max = SurveyConsts.MEDICATIONS_MAX)
-    @Column(nullable = false, updatable = false, unique = false)
+    @Column(nullable = false, unique = false)
     private List<String> medications = new ArrayList<>();
 
     @Min(value = SurveyConsts.MEALS_PER_DAY_MIN)
@@ -92,7 +92,7 @@ public class Survey extends AbstractEntity {
     @Builder.Default
     @NotNull
     @Size(min = SurveyConsts.MEAL_TIMES_MIN, max = SurveyConsts.MEAL_TIMES_MAX)
-    @Column(name = SurveyConsts.COLUMN_MEAL_TIMES, nullable = false, updatable = false, unique = false)
+    @Column(name = SurveyConsts.COLUMN_MEAL_TIMES, nullable = false, unique = false)
     private List<Timestamp> mealTimes = new ArrayList<>();
 
     @Size(min = SurveyConsts.EATING_HABITS_MIN, max = SurveyConsts.EATING_HABITS_MAX)

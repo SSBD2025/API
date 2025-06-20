@@ -44,4 +44,8 @@ public class FoodPyramidConsts {
 
     public static final String FIELD_CLIENT = "client";
     public static final String FIELD_FOOD_PYRAMID = "foodPyramid";
+
+    public static final int MIN_NAME = 2;
+    public static final int MAX_NAME = 20;
+    public static final int MIN_VALUE = 0;
 }
