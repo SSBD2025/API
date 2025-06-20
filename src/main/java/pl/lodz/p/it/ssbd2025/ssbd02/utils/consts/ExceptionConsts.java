@@ -4,6 +4,7 @@ public final class ExceptionConsts {
 
     private ExceptionConsts() {}
 
+    public static final String AUTHENTICATION_FAILURE = "authentication_failure";
     public static final String ACCOUNT_ALREADY_BLOCKED = "account_already_blocked";
     public static final String ACCOUNT_ALREADY_UNBLOCKED = "account_already_unblocked";
     public static final String ACCOUNT_ALREADY_VERIFIED = "account_already_verified";

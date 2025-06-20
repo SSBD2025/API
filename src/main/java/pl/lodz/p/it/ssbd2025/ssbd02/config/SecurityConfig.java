@@ -32,8 +32,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter, BearerTokenAuthenticationFilter.class)
-//                .oauth2ResourceServer((oauth2) -> oauth2 //those 2 lines cause all the trouble
-//                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter)))
+//                .oauth2ResourceServer((oauth2) -> oauth2 //ignore
+//                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtOAuthConverter))) //ignore
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.POST,
                                 "/api/account",
@@ -53,8 +53,7 @@ public class SecurityConfig {
                                 "/api/account/confirm-email",
                                 "/api/account/revert-email-change",
                                 "/api/account/verify",
-                                "/api/account/unlock",
-                                "/test"
+                                "/api/account/unlock"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/account/login/2fa"
@@ -69,13 +68,10 @@ public class SecurityConfig {
                                 "/api/account/{id}/unblock"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/account/me",
-                                "/api/account",
-                                "/api/account/{id}"
+                                "/api/account/me"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.PUT,
-                                "/api/account/me",
-                                "/api/account/{id}"
+                                "/api/account/me"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/blood-test-reports/{clientId}"
@@ -83,6 +79,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/mod/blood-parameters/{male}"
                         ).hasRole("DIETICIAN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/account",
+                                "/api/account/{id}"
+                        ).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/admin/register",
                                 "/api/account/{id}/changePassword",
@@ -91,7 +91,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/account/{accountId}/roles/admin",
                                 "/api/account/{accountId}/roles/dietician",
-                                "/api/account/{accountId}/roles/client"
+                                "/api/account/{accountId}/roles/client",
+                                "/api/account/{id}"
                         ).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/account/{accountId}/roles/admin",
