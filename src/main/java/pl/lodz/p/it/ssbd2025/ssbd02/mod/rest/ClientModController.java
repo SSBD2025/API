@@ -48,12 +48,6 @@ public class ClientModController {
     private final PeriodicSurveyMapper periodicSurveyMapper;
     private final LockTokenService lockTokenService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientDTO> getClientById(@PathVariable UUID id) {
-        // Implementation will be added later
-        return null;
-    }
-
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/assign-dietician/{dieticianId}")
     @Operation(summary = "Przypisz dietetyka do klienta",

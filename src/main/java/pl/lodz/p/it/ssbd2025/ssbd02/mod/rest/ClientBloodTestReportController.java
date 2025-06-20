@@ -65,12 +65,6 @@ public class ClientBloodTestReportController {
         return ResponseEntity.ok().body(clientBloodTestReportService.getById(new SensitiveDTO(reportId.toString())));
     }
 
-    @DeleteMapping("/{reportId}")
-    public ResponseEntity<Void> deleteReport(@PathVariable UUID reportId) {
-        // Implementation will be added later
-        return null;
-    }
-
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('DIETICIAN')")
     public ResponseEntity<?> editBloodTestReport(@RequestBody @Validated(OnUpdate.class) ClientBloodTestReportDTO result) {
