@@ -154,7 +154,7 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
         List<ClientFoodPyramid> pyramids = clientFoodPyramidRepository
                 .findByClientIdOrderByTimestampDesc(client.getId());
         if (pyramids.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         UUID latestId = pyramids.getFirst().getFoodPyramid().getId();
         List<ClientFoodPyramidDTO> result = new ArrayList<>();

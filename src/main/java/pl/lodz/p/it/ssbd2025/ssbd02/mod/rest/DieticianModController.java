@@ -43,6 +43,13 @@ public class DieticianModController {
 
     @GetMapping("/get-clients-by-dietician")
     @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz klientów przypisanych do dietetyka",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę klientów"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono dietetyka")
+    })
     public ResponseEntity<List<ClientDTO>> getClientsByDietician(
             @RequestParam(required = false) String searchPhrase
     ) {
@@ -80,6 +87,15 @@ public class DieticianModController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @PostMapping("/order-medical-examinations")
+    @Operation(summary = "Zleć klientowi wykonanie badań krwi",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Zlecono klientowi wykonanie badań krwi"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta; nie znaleziono dietetyka"),
+            @ApiResponse(responseCode = "409", description = "Zlecono już wykonanie badań krwi temu klientowi; klient nie ma przypisanego dietetyka"),
+    })
     public ResponseEntity<BloodTestOrderDTO> orderMedicalExaminations(
             @Validated(OnCreate.class)
             @RequestBody BloodTestOrderDTO bloodTestOrderDTO
@@ -90,6 +106,14 @@ public class DieticianModController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/client/{id}")
+    @Operation(summary = "Pobierz klienta przypisangeo do dietetyka po Id",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta; nie znaleziono dietetyka"),
+            @ApiResponse(responseCode = "409", description = "Klient nie ma przypisanego dietetyka"),
+    })
     public ResponseEntity<ClientDTO> getDieticiansClientById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientDTO(dieticianModService.getDieticiansClientById(id)));
     }
