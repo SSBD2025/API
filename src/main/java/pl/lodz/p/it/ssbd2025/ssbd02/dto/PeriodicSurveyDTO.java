@@ -15,27 +15,43 @@ import java.util.UUID;
 @Setter(AccessLevel.NONE)
 @Getter
 @AllArgsConstructor
-public class PeriodicSurveyDTO {
+public class PeriodicSurveyDTO { //zrobione
 
+    @Null(groups = {OnCreate.class, OnUpdate.class})
+    @NotNull(groups = OnRead.class)
     private UUID id;
 
+    @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     private Long version;
 
+    @Null(groups = {OnCreate.class, OnRead.class, OnUpdate.class})
     private UUID clientId;
 
     @Setter
+    @NotNull(groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = PeriodicSurveyConsts.WEIGHT_MIN, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMax(value = PeriodicSurveyConsts.WEIGHT_MAX, groups = {OnCreate.class, OnUpdate.class})
     private Double weight;
 
     @Setter
+    @NotBlank(groups = {OnCreate.class, OnUpdate.class})
+    @Pattern(regexp = PeriodicSurveyConsts.BLOOD_PRESSURE_PATTERN, message = PeriodicSurveyConsts.BLOOD_PRESSURE_MESSAGE, groups = {OnCreate.class, OnUpdate.class})
     private String bloodPressure;
 
     @Setter
+    @NotNull(groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = PeriodicSurveyConsts.BLOOD_SUGAR_MIN, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMax(value = PeriodicSurveyConsts.BLOOD_SUGAR_MAX, groups = {OnCreate.class, OnUpdate.class})
     private Double bloodSugarLevel;
 
     @Setter
+    @Null(groups = {OnCreate.class, OnUpdate.class})
+    @NotNull(groups = OnRead.class)
     private Timestamp measurementDate;
 
     @Setter
+    @NotNull(groups = {OnUpdate.class})
+    @Null(groups = {OnCreate.class, OnRead.class})
     private String lockToken;
 
     @Override

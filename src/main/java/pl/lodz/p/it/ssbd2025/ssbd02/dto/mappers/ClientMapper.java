@@ -42,7 +42,7 @@ public interface ClientMapper {
             @Mapping(target = "lastName", source = "account.lastName"),
             @Mapping(source = "periodicSurveys", target = "periodicSurvey"),
             @Mapping(source = "survey", target = "survey"),
-//    @Mapping(source = "bloodTestReports", target = "bloodTestReport") TODO odkomentowac po merge
+            @Mapping(source = "bloodTestReports", target = "bloodTestReport")
     })
     ClientDetailsDTO toDetailsDto(Client client);
 
