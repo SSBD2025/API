@@ -1,12 +1,15 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.integration.mok;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +23,10 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +39,9 @@ public class MOK12Test extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JavaMailSender mailSender;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,6 +56,10 @@ public class MOK12Test extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() throws Exception {
+        MimeMessage realMimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(realMimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
+
         String loginRequestJson = """
         {
           "login": "agorgonzola",

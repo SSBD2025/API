@@ -110,7 +110,7 @@ public class MOD22Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(feedbackDTO))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.description").value(desc))
                 .andExpect(jsonPath("$.rating").value(rating)).andReturn();
@@ -215,7 +215,7 @@ public class MOD22Test extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(feedbackDTO))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").exists())
                 .andExpect(jsonPath("$.description").value(desc))
                 .andExpect(jsonPath("$.rating").value(rating)).andReturn();

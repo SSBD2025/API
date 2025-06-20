@@ -111,11 +111,14 @@ public class MOD17Test extends BaseIntegrationTest {
                 .andReturn();
 
         String responseJson = loginResult.getResponse().getContentAsString();
-        token = objectMapper.readTree(responseJson).get("value").asText();
+        String token2 = objectMapper.readTree(responseJson).get("value").asText();
 
         mockMvc.perform(get("/api/mod/food-pyramids/" + pyramidId)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer " + token2)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token2)).andReturn();
     }
 }
