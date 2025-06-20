@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.FeedbackConsts;
@@ -28,21 +26,26 @@ public class Feedback extends AbstractEntity {
     @Column(name = FeedbackConsts.COLUMN_RATING)
     private int rating;
 
+    @NotNull
+    @NotBlank
     @Length(min = FeedbackConsts.DESCRIPTION_MIN, max = FeedbackConsts.DESCRIPTION_MAX)
     @Column(name = FeedbackConsts.COLUMN_DESCRIPTION)
     private String description;
 
+    @NotNull
     @Column(name = FeedbackConsts.COLUMN_TIMESTAMP)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp timestamp;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = FeedbackConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false)
+    @JoinColumn(name = FeedbackConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false, unique = false)
     @ToString.Exclude
     private Client client;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = FeedbackConsts.COLUMN_FOOD_PYRAMID_ID, nullable = false, updatable = false)
+    @JoinColumn(name = FeedbackConsts.COLUMN_FOOD_PYRAMID_ID, nullable = false, updatable = false, unique = false)
     @ToString.Exclude
     private FoodPyramid foodPyramid;
 }
