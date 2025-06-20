@@ -217,6 +217,12 @@ public class AccountController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Pobierz listę kont z rólami",
+            description = "Dostępne tylko dla administratora. Możliwość filtrowania po statusie aktywności, weryfikacji oraz frazie wyszukiwania.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócono stronę z listą kont"),
+            @ApiResponse(responseCode = "403", description = "Brak uprawnień")
+    })
     public Page<AccountWithRolesDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) Boolean verified,
@@ -280,6 +286,14 @@ public class AccountController {
 
     @PostMapping("/log-role-change")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @Operation(summary = "Zaloguj zmianę roli użytkownika",
+            description = "Dostępne dla użytkowników posiadających rolę ADMIN, CLIENT lub DIETICIAN. Służy do rejestracji zmiany roli po stronie klienta.")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zalogowano zmianę roli pomyślnie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta użytkownika"),
+            @ApiResponse(responseCode = "403", description = "Brak uprawnień do wykonania operacji")
+    })
     public ResponseEntity<Void> logRoleChange(@RequestBody @Valid RoleChangeLogDTO roleChangeLogDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         accountService.logUserRoleChange(login, roleChangeLogDTO.getPreviousRole(), roleChangeLogDTO.getNewRole());
@@ -305,6 +319,15 @@ public class AccountController {
     @PostMapping("/auth/email")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
+    @Operation(summary = "Uwierzytelnianie konta za pomocą kodu e-mail",
+            description = "Dostępne publicznie. Loguje użytkownika na podstawie ważnego kodu przesłanego e-mailem.")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Uwierzytelnienie zakończone sukcesem, zwrócono token dostępu"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta lub tokenu"),
+            @ApiResponse(responseCode = "403", description = "Konto nieaktywne, niezweryfikowane lub nieposiadające ról"),
+            @ApiResponse(responseCode = "409", description = "Brak przypisanych ról aktywnych")
+    })
     public ResponseEntity<?> authWithEmail(@RequestBody @Valid SensitiveDTO code, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
         return ResponseEntity.status(HttpStatus.OK).body(accountService.authWithEmail(code, ipAddress, response));

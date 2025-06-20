@@ -44,6 +44,12 @@ public class FoodPyramidController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Pobierz listę wszystkich piramid żywieniowych",
+            description = "Dostępne dla DIETICIAN.")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pobrano listę piramid żywieniowych (może być pusta)")
+    })
     public List<FoodPyramidDTO> getAllFoodPyramids() {
         return foodPyramidService.getAllFoodPyramids();
     }

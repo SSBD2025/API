@@ -50,18 +50,6 @@ public class DieticianModController {
         return ResponseEntity.status(HttpStatus.OK).body(clientMapper.toClientListDTO(clients));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DieticianDTO> getById(@PathVariable UUID id) {
-        // Implementation will be added later
-        return null;
-    }
-
-    @GetMapping("/{dieticianId}/clients")
-    public ResponseEntity<List<ClientDTO>> getClients(@PathVariable UUID dieticianId) {
-        // Implementation will be added later
-        return null;
-    }
-
     @GetMapping("/{clientId}/permanent-survey")
     @PreAuthorize("hasRole('DIETICIAN')")
     @Operation(summary = "Pobierz ankietę parametrów stałych klienta o podanym id",
