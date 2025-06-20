@@ -18,6 +18,8 @@ public class FoodPyramidDTO {
     @NotNull(groups = OnUpdate.class)
     private UUID id;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL)
+    @DecimalMax(value = FoodPyramidConsts.MAX_DECIMAL)
     private double averageRating;
 
     @NotBlank(groups = {OnCreate.class, OnUpdate.class})
@@ -27,68 +29,68 @@ public class FoodPyramidDTO {
     @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
     private int kcal;
 
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double fat;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double saturatedFattyAcids;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double carbohydrates;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double sugar;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double protein;
 
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double A;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double D;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double E;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double K;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B1;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B2;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B3;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B5;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B6;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B7;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B9;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double B12;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double C;
 
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Potassium;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Calcium;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Phosphorus;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Magnesium;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Iron;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Zinc;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Fluorine;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Manganese;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Copper;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Iodine;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Selenium;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Molybdenum;
-    @Min(value = FoodPyramidConsts.MIN_VALUE, groups = {OnCreate.class, OnUpdate.class})
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, groups = {OnCreate.class, OnUpdate.class})
     private double Chromium;
 }
