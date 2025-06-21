@@ -1,7 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
@@ -10,6 +8,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.Language;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.AccountConsts;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.DTOConsts;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.validation.ValidIpAddress;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.validation.ValidLogin;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -30,6 +30,7 @@ public class AccountDTO {
 
         @NotNull(groups = {OnCreate.class, OnRead.class})
         @Null(groups = OnUpdate.class)
+        @ValidLogin(groups = OnCreate.class)
         @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX, groups = OnCreate.class)
         String login;
 
@@ -75,11 +76,13 @@ public class AccountDTO {
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
+        @ValidIpAddress(groups = {OnRead.class, OnUpdate.class})
         @Max(AccountConsts.IP_MAX)
         String lastSuccessfulLoginIp;
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
+        @ValidIpAddress(groups = {OnRead.class, OnUpdate.class})
         @Max(AccountConsts.IP_MAX)
         String lastFailedLoginIp;
 

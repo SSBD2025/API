@@ -79,4 +79,8 @@ public class AccountConsts {
     public static final String LAST_SUCCESSFUL_LOGIN_PAST_OR_PRESENT = "Last successful login cannot be in the future";
     public static final String LAST_FAILED_LOGIN_PAST_OR_PRESENT = "Last failed login cannot be in the future";
     public static final String IP_SIZE_MESSAGE = "IP address cannot exceed " + IP_MAX + " characters";
+    public static final String ACCOUNT_NOT_NULL_MESSAGE = "Account cannot be null";
+    public static final String ROLES_NOT_NULL_MESSAGE = "Roles collection cannot be null";
+    public static final String ROLES_NOT_EMPTY_MESSAGE = "Roles collection cannot be empty";
+
 }
