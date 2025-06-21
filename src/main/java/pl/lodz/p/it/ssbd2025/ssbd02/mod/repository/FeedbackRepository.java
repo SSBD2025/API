@@ -26,12 +26,12 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     @PreAuthorize("hasRole('CLIENT')")
     Feedback saveAndFlush(Feedback feedback);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.foodPyramid.id = :pyramidId")
     Double calculateAverageRating(@Param("pyramidId") UUID pyramidId);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     boolean existsByClientIdAndFoodPyramidId(UUID clientId, UUID pyramidId);
 
@@ -39,11 +39,11 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     @PreAuthorize("hasRole('CLIENT')")
     void delete(Feedback feedback);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('DIETICIAN')")
     List<Feedback> findAllByClient(Client client);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('DIETICIAN')")
     List<Feedback> findAllByFoodPyramid(FoodPyramid pyramid);
 
