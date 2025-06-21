@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;

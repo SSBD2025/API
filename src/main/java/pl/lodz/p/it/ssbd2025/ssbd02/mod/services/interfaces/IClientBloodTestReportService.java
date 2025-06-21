@@ -14,7 +14,7 @@ public interface IClientBloodTestReportService {
     List<ClientBloodTestReportDTO> getAllByClientId(SensitiveDTO clientId);
     List<ClientBloodTestReportDTO> getAllByClientLogin();
     ClientBloodTestReportDTO getById(SensitiveDTO reportId);
-    ClientBloodTestReport createReport(SensitiveDTO clientId, ClientBloodTestReport report);
+    ClientBloodTestReportDTO createReport(SensitiveDTO clientId, ClientBloodTestReport report);
     void deleteReport(UUID reportId);
     void updateReport(@Validated(OnUpdate.class) ClientBloodTestReportDTO reportDTO);
 }
