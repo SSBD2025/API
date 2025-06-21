@@ -118,7 +118,8 @@ public class MOD16Test extends BaseIntegrationTest {
 
                 .andExpect(jsonPath("$[0].bloodTestOrderDTO.clientId").value("00000000-0000-0000-0000-000000000006"))
                 .andExpect(jsonPath("$[0].bloodTestOrderDTO.description").value("Very descriptive description"))
-                .andExpect(jsonPath("$[0].bloodTestOrderDTO.parameters.length()").value(0))
+                .andExpect(jsonPath("$[0].bloodTestOrderDTO.parameters.length()").value(1))
+                .andExpect(jsonPath("$[0].bloodTestOrderDTO.parameters", hasItems("HGB")))
                 .andExpect(jsonPath("$[0].minimalClientDTO.id").value("00000000-0000-0000-0000-000000000006"))
                 .andExpect(jsonPath("$[0].minimalClientDTO.firstName").value("Anthony"))
 

@@ -250,4 +250,214 @@ public class MOD21Test extends BaseIntegrationTest {
                 .header("Authorization", "Bearer " + aToken)).andReturn();
     }
 
+    @Test
+    public void submitPeriodicSurveyWeightMissingTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                null,
+                "120/80",
+                100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("weight"))
+                .andExpect(jsonPath("$.violations[0].message").value("must not be null"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyWeightTooLowTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                10.0,
+                "120/80",
+                100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("weight"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be greater than or equal to 20.0"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyWeightTooHighTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                1000.0,
+                "120/80",
+                100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("weight"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be less than or equal to 350.0"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyBloodPressureMissingTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                null,
+                100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("bloodPressure"))
+                .andExpect(jsonPath("$.violations[0].message").value("must not be blank"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyBloodPressureInvalidPatternTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                "120-80",
+                100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("bloodPressure"))
+                .andExpect(jsonPath("$.violations[0].message").value("Blood pressure must be in the format 'XX/XX'"));
+    }
+
+
+    @Test
+    public void submitPeriodicSurveyBloodSugarLevelMissingTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                "120/80",
+                null,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("bloodSugarLevel"))
+                .andExpect(jsonPath("$.violations[0].message").value("must not be null"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyBloodSugarLevelTooLowTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                "120/80",
+                -100.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("bloodSugarLevel"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be greater than or equal to 10.0"));
+    }
+
+    @Test
+    public void submitPeriodicSurveyBloodSugarLevelTooHighTest() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO2 = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                "120/80",
+                10000.0,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO2);
+
+        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("bloodSugarLevel"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be less than or equal to 500.0"));
+    }
+
+
 }

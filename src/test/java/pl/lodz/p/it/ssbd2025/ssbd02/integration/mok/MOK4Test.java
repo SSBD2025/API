@@ -87,7 +87,7 @@ public class MOK4Test extends BaseIntegrationTest {
 
         mockMvc.perform(post("/api/account/" + dieticianId.toString() +"/block")
                 .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Assertions.assertFalse(accountTestHelper.getClientByLogin("tcheese").isActive());
     }
@@ -107,7 +107,7 @@ public class MOK4Test extends BaseIntegrationTest {
     public void blockAlreadyBlockedUserNegativeTest() throws Exception {
         mockMvc.perform(post("/api/account/" + adminDieticianId.toString() +"/block")
                         .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Assertions.assertFalse(accountTestHelper.getClientByLogin("drice").isActive());
 
@@ -145,8 +145,6 @@ public class MOK4Test extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
-//        Assertions.assertEquals("Access Denied", result.getResponse().getErrorMessage());
-
     }
 
     @Test
@@ -156,7 +154,6 @@ public class MOK4Test extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
-//        Assertions.assertEquals("Access Denied", result.getResponse().getErrorMessage());
         Assertions.assertTrue(accountTestHelper.getClientByLogin("jcheddar").isActive());
     }
 
