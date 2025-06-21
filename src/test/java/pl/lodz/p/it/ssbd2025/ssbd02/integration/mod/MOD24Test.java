@@ -254,4 +254,19 @@ public class MOD24Test extends BaseIntegrationTest {
                         .content(bodySession2))
                 .andExpect(status().isConflict());
     }
+
+    @Test
+    public void shouldFailWhenMealTimesIsNull() throws Exception {
+        SurveyDTO existing = fetchCurrentSurvey();
+        existing.setMealTimes(null);
+        existing.setLockToken(fetchCurrentSurvey().getLockToken());
+
+        String body = objectMapper.writeValueAsString(existing);
+
+        mockMvc.perform(put(ENDPOINT)
+                        .header("Authorization", "Bearer " + clientToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
 }

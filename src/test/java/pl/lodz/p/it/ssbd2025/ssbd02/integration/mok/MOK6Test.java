@@ -87,7 +87,7 @@ public class MOK6Test extends BaseIntegrationTest {
         if (agorgonzolaToken != null) {
             mockMvc.perform(post("/api/account/logout")
                             .header("Authorization", "Bearer " + agorgonzolaToken))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
             agorgonzolaToken = null;
         }
     }
