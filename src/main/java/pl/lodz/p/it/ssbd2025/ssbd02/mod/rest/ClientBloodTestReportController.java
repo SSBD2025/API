@@ -40,7 +40,6 @@ public class ClientBloodTestReportController {
     private final IClientBloodTestReportService clientBloodTestReportService;
     private final ClientBloodTestReportMapper clientBloodTestReportMapper;
     private final LockTokenService lockTokenService;
-    private final ClientModService clientModService;
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @PostMapping("/client/{clientId}")
@@ -55,9 +54,7 @@ public class ClientBloodTestReportController {
     })
     public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
         ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
-        ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(
-                clientBloodTestReportService.createReport(clientId, newClientBloodTestResult),
-                clientModService.getClientById(UUID.fromString(clientId.getValue())).getSurvey().isGender());
+        ClientBloodTestReportDTO dto = clientBloodTestReportService.createReport(clientId, newClientBloodTestResult);
         dto.setLockToken(lockTokenService.generateToken(dto.getId(), dto.getVersion()).getValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }

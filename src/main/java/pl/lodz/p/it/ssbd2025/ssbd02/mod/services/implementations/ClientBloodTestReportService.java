@@ -22,6 +22,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
@@ -108,8 +109,8 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
             throw new PermanentSurveyNotFoundException();
         }
         for (BloodTestResult result : report.getResults()) {
-            BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
-            BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, clientModService.getClientById(report.getClient().getId()).getSurvey().isGender()); //TODO true -> clientModService.getClientById(uuid).getSurvey().isGender()
+            BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(report.getClient().getId()).getSurvey().isGender());
+            BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, clientModService.getClientById(report.getClient().getId()).getSurvey().isGender());
             bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
             resultsDTO.add(bloodTestResultDTO);
         }
@@ -119,13 +120,16 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('DIETICIAN')")
     @Override
-    public ClientBloodTestReport createReport(SensitiveDTO clientId, ClientBloodTestReport report) {
-//        UUID uuid = clientModService.getClientByAccountId(UUID.fromString(clientId.getValue()));
+    public ClientBloodTestReportDTO createReport(SensitiveDTO clientId, ClientBloodTestReport report) {
         Client client = clientModRepository.findClientById(UUID.fromString(clientId.getValue())).orElseThrow(ClientNotFoundException::new);
         report.setClient(client);
         report.setTimestamp(Timestamp.from(Instant.now()));
         report.getResults().forEach(result -> result.setReport(report));
-        return clientBloodTestReportRepository.saveAndFlush(report);
+        Survey survey = client.getSurvey();
+        if(survey == null) {
+            throw new PermanentSurveyNotFoundException();
+        }
+        return clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportRepository.saveAndFlush(report), survey.isGender());
     }
 
     @Override

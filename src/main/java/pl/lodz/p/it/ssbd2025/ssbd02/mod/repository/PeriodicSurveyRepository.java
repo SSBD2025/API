@@ -47,9 +47,15 @@ public interface PeriodicSurveyRepository extends AbstractRepository<PeriodicSur
     @PreAuthorize("hasRole('CLIENT')")
     Optional<PeriodicSurvey> findTopByClientOrderByMeasurementDateDesc(Client client);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
     Page<PeriodicSurvey> findByClientIdAndMeasurementDateBetween(UUID clientId, Timestamp measurementDateAfter, Timestamp measurementDateBefore, Pageable pageable);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
     Page<PeriodicSurvey> findByClientIdAndMeasurementDateAfter(UUID clientId, Timestamp measurementDateAfter, Pageable pageable);
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT') || hasRole('DIETICIAN')")
     Page<PeriodicSurvey> findByClientIdAndMeasurementDateBefore(UUID clientId, Timestamp measurementDateBefore, Pageable pageable);
 }
