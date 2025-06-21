@@ -18,6 +18,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientBloodTestReportMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.SurveyNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
@@ -42,6 +44,15 @@ public class ClientBloodTestReportController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @PostMapping("/client/{clientId}")
+    @AuthorizedEndpoint
+    @Operation(summary = "Utworzenie raportu wyników badań krwi klienta",
+            description = "Dostępne dla DIETICIAN")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Utworzony został raport wyników badań klienta"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawnie sformatowane żądanie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety parametrów stałych"),
+    })
     public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
         ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
         ClientBloodTestReportDTO dto = clientBloodTestReportMapper.toClientBloodTestReportDTO(

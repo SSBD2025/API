@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.AppBaseException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mok.service.interfaces.IClientService;
 
@@ -35,6 +39,12 @@ public class ClientController {
 
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Zarejestruj się jako klient", description = "Dostępne dla wszystkich (także użytkowników nieuwierzytelnionych)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Konto klienta zostaje utworzone"),
+            @ApiResponse(responseCode = "409", description = "Naruszenie ograniczeń - unikalność - login w użyciu"),
+            @ApiResponse(responseCode = "409", description = "Naruszenie ograniczeń - unikalność - email w użyciu"),
+    })
     public ClientDTO registerClient(@RequestBody @Validated(OnCreate.class) ClientDTO clientDTO) {
         Client newClientData = userRoleMapper.toNewClientData(clientDTO.getClient());
         Account newAccount = accountMapper.toNewAccount(clientDTO.getAccount());

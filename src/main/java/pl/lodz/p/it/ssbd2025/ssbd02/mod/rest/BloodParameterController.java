@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mod.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,6 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.BloodParameter;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.ClientNotFoundException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.SurveyNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientModService;
 
@@ -34,6 +38,14 @@ public class BloodParameterController {
 
     @PreAuthorize("hasRole('DIETICIAN')")
     @GetMapping("/{clientId}")
+    @AuthorizedEndpoint
+    @Operation(summary = "Pobranie listy obsługiwanych parametrów krwi",
+            description = "Dostępne dla DIETICIAN")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista pobrana poprawnie"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety parametrów stałych"),
+    })
     public List<BloodParameterDTO> getAllBloodParameters(@PathVariable SensitiveDTO clientId) {
         Survey survey = clientModService.getClientById(UUID.fromString(clientId.getValue())).getSurvey();
         if (survey == null) {

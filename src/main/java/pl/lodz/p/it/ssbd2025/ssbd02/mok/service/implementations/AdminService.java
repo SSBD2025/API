@@ -61,7 +61,7 @@ public class AdminService implements IAdminService {
     @Value("${account.verification.threshold}")
     private long accountVerificationThreshold;
 
-    @PreAuthorize("hasRole('ADMIN')") //ostatecznie to odkomentowac
+    @PreAuthorize("hasRole('ADMIN')")
     @TransactionLogged
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "mokTransactionManager", timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")

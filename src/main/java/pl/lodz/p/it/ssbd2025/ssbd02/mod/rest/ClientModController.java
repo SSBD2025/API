@@ -197,6 +197,14 @@ public class ClientModController {
 
     @GetMapping("/periodic-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobierz listę swoich ankiet okresowych",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista ankiet została zwrócona"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiet okresowych"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta")
+    })
     public ResponseEntity<Object> getMyPeriodicSurveys(
             Pageable pageable,
             @RequestParam(required = false)
@@ -214,6 +222,17 @@ public class ClientModController {
 
     @PutMapping("/periodic-survey")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Edytuj swoją ostatnią ankietę okresową",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ankieta została zmodyfikowana"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawnie sformatowane dane"),
+            @ApiResponse(responseCode = "403", description = "Niepoprawny lock token"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiety okresowej"),
+            @ApiResponse(responseCode = "409", description = "Konflikt wersji danych")
+    })
     public ResponseEntity<Object> editPeriodicSurvey(
             @Validated(OnUpdate.class) @RequestBody PeriodicSurveyDTO periodicSurveyDTO) {
         PeriodicSurveyDTO dto = clientService.editPeriodicSurvey(periodicSurveyDTO);
@@ -222,6 +241,14 @@ public class ClientModController {
 
     @GetMapping("/periodic-survey/latest")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobranie ostatniej ankiety okresowej",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ankieta została zmodyfikowana"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiety okresowej"),
+    })
     public ResponseEntity<Object> getMyLatestPeriodicSurvey() {
         PeriodicSurveyDTO periodicSurveyDTO = clientService.getMyLatestPeriodicSurvey();
         return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
@@ -229,6 +256,14 @@ public class ClientModController {
 
     @GetMapping("/blood-test-order")
     @PreAuthorize("hasRole('CLIENT')")
+    @Operation(summary = "Pobranie zlecenia na badanie krwi",
+            description = "Dostępne dla CLIENT")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Badanie krwi zostało zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono zlecenia na badanie krwi"),
+    })
     public ResponseEntity<Object> getBloodTestOrders() {
         BloodTestOrderDTO dto = clientService.getBloodTestOrder();
         return ResponseEntity.status(HttpStatus.OK).body(dto);

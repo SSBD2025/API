@@ -141,6 +141,14 @@ public class DieticianModController {
 
     @GetMapping("/{clientId}/periodic-surveys")
     @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Pobranie listy ankiet okresowych",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista ankiet okresowych została zwrócona"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta o podanym id"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiet okresowych"),
+    })
     public ResponseEntity<Object> getPeriodicSurveysByAccountId(
             @PathVariable UUID clientId,
             Pageable pageable,
@@ -151,7 +159,6 @@ public class DieticianModController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime before
             ) {
-
         Page<PeriodicSurveyDTO> dtoPage = dieticianModService.getPeriodicSurveysByAccountId(clientId, pageable,
                 since != null ? Timestamp.valueOf(since) : null,
                 before != null ? Timestamp.valueOf(before) : null);
