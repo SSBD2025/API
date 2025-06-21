@@ -1,5 +1,6 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
@@ -30,8 +31,8 @@ public class AccountDTO {
 
         @NotNull(groups = {OnCreate.class, OnRead.class})
         @Null(groups = OnUpdate.class)
-        @ValidLogin(groups = OnCreate.class)
         @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX, groups = OnCreate.class)
+        @ValidLogin(groups = OnCreate.class)
         String login;
 
         @Null(groups = {OnUpdate.class, OnRead.class})
@@ -49,10 +50,12 @@ public class AccountDTO {
 
         @NotBlank(groups = {OnCreate.class, OnRead.class})
         @Size(min = AccountConsts.NAME_MIN, max = AccountConsts.NAME_MAX, groups = {OnCreate.class, OnUpdate.class})
+        @Pattern(regexp = AccountConsts.NAME_REGEX, message = AccountConsts.NAME_MESSAGE, groups = {OnCreate.class, OnUpdate.class})
         String firstName;
 
         @NotBlank(groups = {OnCreate.class, OnRead.class})
         @Size(min = AccountConsts.NAME_MIN, max = AccountConsts.NAME_MAX, groups = {OnCreate.class, OnUpdate.class})
+        @Pattern(regexp = AccountConsts.NAME_REGEX, message = AccountConsts.NAME_MESSAGE, groups = {OnCreate.class, OnUpdate.class})
         String lastName;
 
         @NotNull(groups = {OnCreate.class, OnRead.class})
@@ -76,14 +79,14 @@ public class AccountDTO {
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
-        @ValidIpAddress(groups = {OnRead.class, OnUpdate.class})
-        @Max(AccountConsts.IP_MAX)
+        @Size(max = AccountConsts.IP_MAX, groups = OnRead.class)
+        @ValidIpAddress(allowEmpty = true, groups = OnRead.class)
         String lastSuccessfulLoginIp;
 
         @NotNull(groups = OnRead.class)
         @Null(groups = {OnCreate.class, OnUpdate.class})
-        @ValidIpAddress(groups = {OnRead.class, OnUpdate.class})
-        @Max(AccountConsts.IP_MAX)
+        @Size(max = AccountConsts.IP_MAX, groups = OnRead.class)
+        @ValidIpAddress(allowEmpty = true, groups = OnRead.class)
         String lastFailedLoginIp;
 
         @NotNull(groups = {OnRead.class, OnCreate.class, OnUpdate.class})
@@ -93,15 +96,18 @@ public class AccountDTO {
         boolean reminded;
 
         @NotNull(groups = {OnCreate.class})
+        @Min(value = 0, groups = {OnCreate.class})
+        @Max(value = AccountConsts.MAX_LOGIN_ATTEMPTS, groups = {OnCreate.class})
         int loginAttempts;
 
         @Null(groups = {OnCreate.class})
+        @Future(message = AccountConsts.LOCKED_UNTIL_FUTURE_MESSAGE, groups = OnCreate.class)
         Timestamp lockedUntil;
 
         @NotNull(groups = {OnCreate.class})
         boolean autoLocked;
 
-        private AccountDTO(){}
+        private AccountDTO() {}
 
         @Override
         public String toString() {
