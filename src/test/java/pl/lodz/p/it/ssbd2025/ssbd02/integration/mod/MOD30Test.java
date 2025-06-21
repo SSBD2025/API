@@ -724,8 +724,9 @@ public class MOD30Test extends BaseIntegrationTest {
                         .content(payload))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").isArray())
-                .andExpect(jsonPath("$.violations.length()").value(1))
-                .andExpect(jsonPath("$.violations[0].fieldName").value("lockToken"));
+                .andExpect(jsonPath("$.violations.length()").value(2))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("lockToken"))
+                .andExpect(jsonPath("$.violations[1].fieldName").value("lockToken"));
 
         ClientBloodTestReport afterReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltAfter = afterReport.getResults().stream()

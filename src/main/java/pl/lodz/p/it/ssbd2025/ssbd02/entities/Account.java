@@ -131,9 +131,7 @@ public class Account extends AbstractEntity {
     )
     @Column(
             name = AccountConsts.COLUMN_OLD_PASSWORD,
-            nullable = false,
-            insertable = false,
-            updatable = false
+            nullable = false
     )
     @Size(
             max = AccountConsts.MAX_PASSWORD_HISTORY,

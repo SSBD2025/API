@@ -51,8 +51,7 @@ public class ClientFoodPyramidController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Piramida została stworzona i przypisana do klienta"),
-            @ApiResponse(responseCode = "200",
-                    description = "Piramida o identycznych parametrach została przypisana do klienta"),
+            @ApiResponse(responseCode = "200", description = "Piramida o identycznych parametrach została przypisana do klienta"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym ID"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym ID"),
             @ApiResponse(responseCode = "409", description = "Piramida żywieniowa jest już przypisana temu klientowi")
