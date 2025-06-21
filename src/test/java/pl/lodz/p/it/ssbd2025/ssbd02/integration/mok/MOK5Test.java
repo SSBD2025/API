@@ -86,13 +86,13 @@ public class MOK5Test extends BaseIntegrationTest {
 
             mockMvc.perform(post("/api/account/" + blockedClientId.toString() +"/unblock")
                             .header("Authorization", "Bearer " + adminToken))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             Assertions.assertTrue(accountTestHelper.getClientByLogin("userlogin").isActive());
 
             mockMvc.perform(post("/api/account/" + blockedClientId.toString() +"/block")
                             .header("Authorization", "Bearer " + adminToken))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             Assertions.assertFalse(accountTestHelper.getClientByLogin("userlogin").isActive());
         }
@@ -135,7 +135,6 @@ public class MOK5Test extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
-//        Assertions.assertEquals("Access Denied", result.getResponse().getErrorMessage());
         Assertions.assertFalse(accountTestHelper.getClientByLogin("userlogin").isActive());
 
     }
@@ -147,7 +146,6 @@ public class MOK5Test extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
-//        Assertions.assertEquals("Access Denied", result.getResponse().getErrorMessage());
         Assertions.assertFalse(accountTestHelper.getClientByLogin("userlogin").isActive());
 
     }

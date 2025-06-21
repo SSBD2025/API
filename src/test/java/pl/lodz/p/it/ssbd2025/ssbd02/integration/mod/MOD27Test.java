@@ -25,7 +25,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.FeedbackDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Feedback;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.FoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.FeedbackTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.FoodPyramidTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
 import java.util.List;
@@ -63,7 +65,11 @@ public class MOD27Test extends BaseIntegrationTest {
     @MockitoBean
     private JavaMailSender mailSender;
 
-    String feedbackId = "00000000-0000-0000-0000-000000000021";
+    @Autowired
+    private FoodPyramidTestHelper foodPyramidTestHelper;
+
+    private final String feedbackId = "00000000-0000-0000-0000-000000000021";
+    private final String pyramidId = "00000000-0000-0000-0000-000000000011";
 
     @BeforeEach
     void setup() throws Exception {
@@ -78,6 +84,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
         );
 
+        FoodPyramid foodPyramid1 = foodPyramidTestHelper.getFoodPyramid(UUID.fromString(pyramidId));
         Feedback feedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
         String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
 
@@ -116,13 +123,14 @@ public class MOD27Test extends BaseIntegrationTest {
                 new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
         );
 
+        FoodPyramid foodPyramid2 = foodPyramidTestHelper.getFoodPyramid(UUID.fromString(pyramidId));
         Feedback updatedFeedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
 
         Assertions.assertNotNull(updatedFeedback);
         Assertions.assertEquals(updatedFeedback.getRating(), feedbackDTO.getRating());
         Assertions.assertEquals(updatedFeedback.getDescription(), feedbackDTO.getDescription());
+        Assertions.assertNotEquals(foodPyramid1.getAverageRating(), foodPyramid2.getAverageRating());
 
-        //TODO dodac sprawdznie oceny pirmaidy
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();
@@ -356,6 +364,186 @@ public class MOD27Test extends BaseIntegrationTest {
                         .content(body)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
+
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
+    }
+
+    @Test
+    public void  updateFeedbackRatingTooLowTest() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
+        );
+        Feedback feedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setRating(-1);
+        feedbackDTO.setDescription("Nie pomaga");
+        feedbackDTO.setLockToken(lockToken);
+        SecurityContextHolder.clearContext();
+
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String token = objectMapper.readTree(responseJson).get("value").asText();
+
+        mockMvc.perform(put("/api/mod/feedbacks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(feedbackDTO))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be greater than or equal to 1"));
+
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
+    }
+
+    @Test
+    public void  updateFeedbackRatingTooHighTest() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
+        );
+        Feedback feedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setRating(6);
+        feedbackDTO.setDescription("Nie pomaga");
+        feedbackDTO.setLockToken(lockToken);
+        SecurityContextHolder.clearContext();
+
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String token = objectMapper.readTree(responseJson).get("value").asText();
+
+        mockMvc.perform(put("/api/mod/feedbacks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(feedbackDTO))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
+                .andExpect(jsonPath("$.violations[0].message").value("must be less than or equal to 5"));
+
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
+    }
+
+    @Test
+    public void  updateFeedbackDescriptionTooShortTest() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
+        );
+        Feedback feedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setRating(3);
+        feedbackDTO.setDescription("");
+        feedbackDTO.setLockToken(lockToken);
+        SecurityContextHolder.clearContext();
+
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String token = objectMapper.readTree(responseJson).get("value").asText();
+
+        mockMvc.perform(put("/api/mod/feedbacks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(feedbackDTO))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(2));
+
+        mockMvc.perform(post("/api/account/logout")
+                .header("Authorization", "Bearer " + token)).andReturn();
+    }
+
+    @Test
+    public void  updateFeedbackDescriptionTooLongTest() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
+        );
+        Feedback feedback = feedbackTestHelper.getFeedback(UUID.fromString(feedbackId));
+        String lockToken = lockTokenService.generateToken(feedback.getId(), feedback.getVersion()).getValue();
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setRating(3);
+        feedbackDTO.setDescription("slnvjsdkavnsdjkvnsdjkvnsdkjvnasdjkvnsdjklvnsadjklvnsdkjlvnsdajkvsdnklvjasdnvjkasdnvkjlsd" +
+                "slnvjsdkavnsdjkvnsdjkvnsdkjvnasdjkvnsdjklvnsadjklvnsdkjlvnsdajkvsdnklvjasdnvjkasdnvkjlsd" +
+                "slnvjsdkavnsdjkvnsdjkvnsdkjvnasdjkvnsdjklvnsadjklvnsdkjlvnsdajkvsdnklvjasdnvjkasdnvkjlsd" +
+                "slnvjsdkavnsdjkvnsdjkvnsdkjvnasdjkvnsdjklvnsadjklvnsdkjlvnsdajkvsdnklvjasdnvjkasdnvkjlsd");
+        feedbackDTO.setLockToken(lockToken);
+        SecurityContextHolder.clearContext();
+
+        String loginRequestJson = """
+        {
+          "login": "agorgonzola",
+          "password": "P@ssw0rd!"
+        }
+        """;
+
+        MvcResult loginResult = mockMvc.perform(post("/api/account/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseJson = loginResult.getResponse().getContentAsString();
+        String token = objectMapper.readTree(responseJson).get("value").asText();
+
+        mockMvc.perform(put("/api/mod/feedbacks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(feedbackDTO))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.violations").isArray())
+                .andExpect(jsonPath("$.violations.length()").value(1))
+                .andExpect(jsonPath("$.violations[0].fieldName").value("description"))
+                .andExpect(jsonPath("$.violations[0].message").value("length must be between 1 and 255"));
 
 
         mockMvc.perform(post("/api/account/logout")

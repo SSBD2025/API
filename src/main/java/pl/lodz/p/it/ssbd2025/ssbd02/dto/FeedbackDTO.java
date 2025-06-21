@@ -39,7 +39,7 @@ public class FeedbackDTO {
     @NotNull(groups = {OnRead.class})
     private UUID foodPyramidId;
 
-    @NotNull(groups = {OnUpdate.class, OnRead.class})
+    @NotNull(groups = {OnUpdate.class})
     @NotBlank(groups = {OnUpdate.class, OnRead.class})
     private String lockToken;
 }
