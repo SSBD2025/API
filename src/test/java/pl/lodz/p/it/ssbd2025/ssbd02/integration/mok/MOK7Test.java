@@ -76,7 +76,7 @@ public class MOK7Test extends BaseIntegrationTest {
         if (adminToken != null) {
             mockMvc.perform(post("/api/account/logout")
                             .header("Authorization", "Bearer " + adminToken))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
             adminToken = null;
         }
     }

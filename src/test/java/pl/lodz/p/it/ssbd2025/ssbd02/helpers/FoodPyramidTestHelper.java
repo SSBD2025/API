@@ -53,6 +53,7 @@ public class FoodPyramidTestHelper {
     }
 
     @Transactional(readOnly = true, transactionManager = "modTransactionManager")
+    @WithMockUser(roles = "DIETICIAN")
     public List<ClientFoodPyramid> getClientFoodPyramids(UUID clientId) {
         return clientFoodPyramidRepository.findByClientId(clientId);
     }

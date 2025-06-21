@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -13,6 +15,8 @@ import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AssignDietPlanDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientFoodPyramid;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.FoodPyramidTestHelper;
 
 import java.util.List;
@@ -83,16 +87,18 @@ public class MOD18Test extends BaseIntegrationTest {
         AssignDietPlanDTO dto = new AssignDietPlanDTO();
         dto.setClientId(clientId);
         dto.setFoodPyramidId(foodPyramidId);
-
         mockMvc.perform(post(ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + dieticianToken)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
-
+        TestingAuthenticationToken auth =
+                new TestingAuthenticationToken("tcheese", "P@ssw0rd!", "ROLE_DIETICIAN");
+        SecurityContextHolder.getContext().setAuthentication(auth);
         List<ClientFoodPyramid> assignments = foodPyramidTestHelper.getClientFoodPyramids(clientId);
         assertThat(assignments).hasSize(1);
-        assertThat(assignments.getFirst().getFoodPyramid().getId()).isEqualTo(foodPyramidId);
+        assertThat(assignments.get(0).getFoodPyramid().getId()).isEqualTo(foodPyramidId);
+        SecurityContextHolder.clearContext();
     }
 
     @Test
