@@ -96,57 +96,75 @@ public class FoodPyramid extends AbstractEntity {
     @Column(name = FoodPyramidConsts.COLUMN_B5, nullable = false, updatable = false)
     private double B5;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_B6, nullable = false, updatable = false)
     private double B6;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_B7, nullable = false, updatable = false)
     private double B7;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_B9, nullable = false, updatable = false)
     private double B9;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_B12, nullable = false, updatable = false)
     private double B12;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_C, nullable = false, updatable = false)
     private double C;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_POTASSIUM, nullable = false, updatable = false)
     private double Potassium;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_CALCIUM, nullable = false, updatable = false)
     private double Calcium;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_PHOSPHORUS, nullable = false, updatable = false)
     private double Phosphorus;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_MAGNESIUM, nullable = false, updatable = false)
     private double Magnesium;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_IRON, nullable = false, updatable = false)
     private double Iron;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_ZINC, nullable = false, updatable = false)
     private double Zinc;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_FLUORINE, nullable = false, updatable = false)
     private double Fluorine;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_MANGANESE, nullable = false, updatable = false)
     private double Manganese;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_COPPER, nullable = false, updatable = false)
     private double Copper;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_IODINE, nullable = false, updatable = false)
     private double Iodine;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_SELENIUM, nullable = false, updatable = false)
     private double Selenium;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_MOLYBDENUM, nullable = false, updatable = false)
     private double Molybdenum;
 
+    @DecimalMin(value = FoodPyramidConsts.MIN_DECIMAL, inclusive = true)
     @Column(name = FoodPyramidConsts.COLUMN_CHROMIUM, nullable = false, updatable = false)
     private double Chromium;
 
