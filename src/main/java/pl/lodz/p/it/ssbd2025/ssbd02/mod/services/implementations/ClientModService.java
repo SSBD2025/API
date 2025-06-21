@@ -168,9 +168,7 @@ public class ClientModService implements IClientService {
             transactionManager = "modTransactionManager",
             readOnly = true,
             timeoutString = "${transaction.timeout}")
-    @Retryable(retryFor = {
-            JpaSystemException.class,
-            ConcurrentUpdateException.class},
+    @Retryable(retryFor = {JpaSystemException.class},
     backoff = @Backoff(
             delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")

@@ -379,6 +379,14 @@ public class AccountController {
 
     @PostMapping("/me/enable2f")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Włączenie dwuskładnikowego uwierzytelniania",
+            description = "Dostępne dla uwierzytelnionego użytkownika")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Dwuskładnikowe uwierzytelnianie zostało pomyślnie włączone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "409", description = "Dwuskładnikowe uwierzytelnianie było wcześniej włączone")
+    })
     public ResponseEntity<Void> enableTwoFactor() {
         accountService.enableTwoFactor();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -386,6 +394,14 @@ public class AccountController {
 
     @PostMapping("/me/disable2f")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Wyłączenie dwuskładnikowego uwierzytelniania",
+            description = "Dostępne dla uwierzytelnionego użytkownika")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Dwuskładnikowe uwierzytelnianie zostało pomyślnie wyłączone"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
+            @ApiResponse(responseCode = "409", description = "Dwuskładnikowe uwierzytelnianie było wcześniej wyłączone")
+    })
     public ResponseEntity<Void> disableTwoFactor() {
         accountService.disableTwoFactor();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -397,7 +413,7 @@ public class AccountController {
             description = "Dostępne dla użytkowników posiadających rolę ADMIN, CLIENT lub DIETICIAN. Służy do rejestracji zmiany roli po stronie klienta.")
     @AuthorizedEndpoint
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Zalogowano zmianę roli pomyślnie"),
+            @ApiResponse(responseCode = "204", description = "Zalogowano zmianę roli pomyślnie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta użytkownika"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień do wykonania operacji")
     })
@@ -410,6 +426,14 @@ public class AccountController {
     @GetMapping("/unlock")
     @PreAuthorize("permitAll()")
     @MethodCallLogged
+    @Operation(summary = "Odblokowanie konta po 30 dniach nieaktywności",
+            description = "Dostępne dla nieuwierzytelnionego użytkownika")
+    @ApiResponses(value =  {
+            @ApiResponse(responseCode = "204", description = "Konto zostało pomyślnie odblokowane"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono żetonu"),
+            @ApiResponse(responseCode = "401", description = "Skończył się czas ważnosci żetonu"),
+
+    })
     public ResponseEntity<?> unlockRequest(@RequestParam SensitiveDTO token) {
         accountService.unlockAccount(token);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

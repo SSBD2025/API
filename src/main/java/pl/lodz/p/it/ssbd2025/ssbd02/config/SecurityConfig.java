@@ -74,10 +74,22 @@ public class SecurityConfig {
                                 "/api/account/me"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
+                                "/api/mod/clients/periodic-survey"
+                        ).hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/mod/clients/permanent-survey"
+                        ).hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/mod/feedbacks"
+                        ).hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/blood-test-reports/{clientId}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/mod/blood-parameters/{male}"
+                                "/api/mod/blood-parameters/{male}",
+                                "/api/mod/dieticians/{clientId}/details",
+                                "/api/mod/dieticians/{clientId}/permanent-survey",
+                                "/api/mod/dieticians/orders"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account",

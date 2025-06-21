@@ -93,9 +93,14 @@ public class DieticianModService implements IDieticianService {
     @Override
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
+            readOnly = true,
             transactionManager = "modTransactionManager",
             timeoutString = "${transaction.timeout}"
     )
+    @Retryable(retryFor = {JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("hasRole('DIETICIAN')")
     public Client getClientDetails(UUID clientId) {
         Client client = clientModRepository.findClientById(clientId).orElseThrow(ClientNotFoundException::new);
@@ -169,6 +174,7 @@ public class DieticianModService implements IDieticianService {
     @Override
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
+            readOnly = true,
             transactionManager = "modTransactionManager",
             timeoutString = "${transaction.timeout}"
     )

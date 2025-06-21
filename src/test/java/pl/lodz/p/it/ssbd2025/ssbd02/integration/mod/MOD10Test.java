@@ -165,7 +165,7 @@ public class MOD10Test extends BaseIntegrationTest {
 
     @Test
     public void getSelfPermanentSurveyNoTokenProvidedTest() throws Exception {
-        mockMvc.perform(post("/api/mod/clients/periodic-survey"))
+        mockMvc.perform(get("/api/mod/clients/periodic-survey"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -180,7 +180,7 @@ public class MOD10Test extends BaseIntegrationTest {
         String responseJson = loginResult.getResponse().getContentAsString();
         String clientToken = objectMapper.readTree(responseJson).get("value").asText();
 
-        mockMvc.perform(post("/api/mod/clients/periodic-survey")
+        mockMvc.perform(get("/api/mod/clients/periodic-survey")
                         .header("Authorization", "Bearer " + clientToken + "1"))
                 .andExpect(status().isUnauthorized());
 
@@ -199,9 +199,9 @@ public class MOD10Test extends BaseIntegrationTest {
         String responseJson = loginResult.getResponse().getContentAsString();
         String dieticianToken = objectMapper.readTree(responseJson).get("value").asText();
 
-        mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                        .header("Authorization", "Bearer " + dieticianToken + "1"))
-                .andExpect(status().isUnauthorized()); //???
+        mockMvc.perform(get("/api/mod/clients/periodic-survey")
+                        .header("Authorization", "Bearer " + dieticianToken))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + dieticianToken)).andReturn();
@@ -225,9 +225,9 @@ public class MOD10Test extends BaseIntegrationTest {
         String responseJson = loginResult.getResponse().getContentAsString();
         String adminToken = objectMapper.readTree(responseJson).get("value").asText();
 
-        mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                        .header("Authorization", "Bearer " + adminToken + "1"))
-                .andExpect(status().isUnauthorized()); //???
+        mockMvc.perform(get("/api/mod/clients/periodic-survey")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + adminToken)).andReturn();
@@ -281,8 +281,6 @@ public class MOD10Test extends BaseIntegrationTest {
         );
 
         Survey surveyFromDB = surveyHelper.getSurveyByClientId(clientId);
-
-
 
         Assertions.assertNotNull(surveyFromDB);
         Assertions.assertEquals(180.0, surveyFromDB.getHeight());
@@ -342,8 +340,8 @@ public class MOD10Test extends BaseIntegrationTest {
         String clientToken = objectMapper.readTree(responseJson).get("value").asText();
 
         mockMvc.perform(get("/api/mod/dieticians/" + clientId.toString() + "/permanent-survey")
-                        .header("Authorization", "Bearer " + clientToken + "1"))
-                .andExpect(status().isUnauthorized()); //???
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + clientToken)).andReturn();
@@ -368,8 +366,8 @@ public class MOD10Test extends BaseIntegrationTest {
         String adminToken = objectMapper.readTree(responseJson).get("value").asText();
 
         mockMvc.perform(get("/api/mod/dieticians/" + clientId.toString() + "/permanent-survey")
-                        .header("Authorization", "Bearer " + adminToken + "1"))
-                .andExpect(status().isUnauthorized()); //???
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + adminToken)).andReturn();
