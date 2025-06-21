@@ -305,7 +305,7 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')") // TO MA ZOSTAC CLIENT ONLY PRZESTAC MI TO ZMIENIAC !!!!!!!!!!!!!!!!!
+    @PreAuthorize("hasRole('CLIENT')")
     public Page<PeriodicSurveyDTO> getPeriodicSurveys(
             Pageable pageable,
             @Nullable Timestamp since,

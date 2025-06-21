@@ -1,5 +1,8 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +38,12 @@ public class DieticianController {
 
     @PostMapping(value = "/register", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Zarejestruj się jako dietetyk", description = "Dostępne dla wszystkich (także użytkowników nieuwierzytelnionych)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Konto dietetyka zostaje utworzone"),
+            @ApiResponse(responseCode = "409", description = "Naruszenie ograniczeń - unikalność - login w użyciu"),
+            @ApiResponse(responseCode = "409", description = "Naruszenie ograniczeń - unikalność - email w użyciu"),
+    })
     public DieticianDTO registerDietician(@RequestBody @Validated(OnCreate.class) DieticianDTO dieticianDTO) {
         Dietician newDieticianData = userRoleMapper.toNewDietician(dieticianDTO.getDietician());
         Account newAccount = accountMapper.toNewAccount(dieticianDTO.getAccount());

@@ -454,13 +454,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO = new AccountDTO(
                 null,
                 null,
-                "firstclient2",
+                "firstclientt",
                 "P@ssw0rd!",
                 null,
                 null,
-                "firstclient2",
-                "firstclient2",
-                "firstclient2@example.com",
+                "firstclientt",
+                "firstclientt",
+                "firstclientt@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -487,13 +487,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO4 = new AccountDTO(
                 null,
                 null,
-                "secondclient2",
+                "secondclientt",
                 "P@ssw0rd!",
                 null,
                 null,
-                "secondclient2",
-                "secondclient2",
-                "firstclient2@example.com",
+                "secondclientt",
+                "secondclientt",
+                "firstclientt@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -523,13 +523,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO = new AccountDTO(
                 null,
                 null,
-                "firstdietician2",
+                "firstdieticiann",
                 "P@ssw0rd!",
                 null,
                 null,
-                "firstdietician2",
-                "firstdietician2",
-                "firstdietician2@example.com",
+                "firstdieticiann",
+                "firstdieticiann",
+                "firstdieticiann@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -556,13 +556,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO4 = new AccountDTO(
                 null,
                 null,
-                "seconddietician2",
+                "seconddieticiann",
                 "P@ssw0rd!",
                 null,
                 null,
-                "seconddietician2",
-                "seconddietician2",
-                "firstdietician2@example.com",
+                "seconddieticiann",
+                "seconddieticiann",
+                "firstdieticiann@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -592,13 +592,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO = new AccountDTO(
                 null,
                 null,
-                "firstadmin2",
+                "firstadminn",
                 "P@ssw0rd!",
                 null,
                 null,
-                "firstadmin2",
-                "firstadmin2",
-                "firstadmin2@example.com",
+                "firstadminn",
+                "firstadminn",
+                "firstadminn@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -632,13 +632,13 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
         AccountDTO accountDTO2 = new AccountDTO(
                 null,
                 null,
-                "secondadmin2",
+                "secondadminn",
                 "P@ssw0rd!",
                 null,
                 null,
-                "secondadmin2",
-                "secondadmin2",
-                "firstadmin2@example.com",
+                "secondadminn",
+                "secondadminn",
+                "firstadminn@example.com",
                 null,
                 null,
                 Language.pl_PL,
@@ -669,7 +669,7 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                 "testuser2",
                 "P@ssw0rd!",
                 null, null,
-                "Joe2", "Doe2",
+                "Joee", "Doee",
                 "doe.joe2@example.com",
                 null, null,
                 Language.pl_PL,
@@ -692,12 +692,12 @@ public class MOK1Test extends BaseIntegrationTest { //REGISTER
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account.firstName").value("Joe2"));
+                .andExpect(jsonPath("$.account.firstName").value("Joee"));
 
 
         mockMvc.perform(get("/api/account/verify")
                         .param("token", tokenCaptor.getValue().getValue()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
 
         Account account = accountRepository.findByLogin("testuser2")

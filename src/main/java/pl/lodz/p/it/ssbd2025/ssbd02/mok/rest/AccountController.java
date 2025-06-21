@@ -52,6 +52,18 @@ public class AccountController {
 
     @PostMapping(value = "/login", consumes =  MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Zaloguj się do systemu", description = "Dostępne dla wszystkich (także użytkowników nieuwierzytelnionych)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zwrócony zostaje żeton uwierzytelnienia"),
+            @ApiResponse(responseCode = "401", description = "Zostały podane niepoprawne dane uwierzytelniające"),
+            @ApiResponse(responseCode = "403", description = "Konto zostało zablokowane po zbyt długej nieaktywności"),
+            @ApiResponse(responseCode = "403", description = "Niepoprawne hasło zostało podane zbyt wiele razy"),
+            @ApiResponse(responseCode = "403", description = "Konto nie posiada żadnej roli"),
+            @ApiResponse(responseCode = "403", description = "Konto nie jest aktywne"),
+            @ApiResponse(responseCode = "403", description = "Konto nie jest zweryfikowane"),
+            @ApiResponse(responseCode = "404", description = "Konto o podanym loginie nie istnieje"),
+            @ApiResponse(responseCode = "428", description = "Wymagana jest zmiana hasła"),
+    })
     public SensitiveDTO login(@RequestBody @Validated(OnCreate.class) LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
         return accountService.login(loginDTO.getLogin(), new SensitiveDTO(loginDTO.getPassword()), ipAddress, response);
@@ -66,6 +78,15 @@ public class AccountController {
 
     @PostMapping(value = "/refresh")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Odśwież żeton", description = "Dostępne dla wszystkich (także użytkowników nieuwierzytelnionych)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Żeton zostaje odświeżony"),
+            @ApiResponse(responseCode = "403", description = "Podany został poprawny żeton ale o niepoprawnym typie"),
+            @ApiResponse(responseCode = "404", description = "Ciasteczko nie zostało odnalezione"),
+            @ApiResponse(responseCode = "404", description = "Żeton nie został odnaleziony"),
+            @ApiResponse(responseCode = "404", description = "Żeton nie został odnaleziony"),
+            @ApiResponse(responseCode = "403", description = "Konto nie posiada żadnej roli"),
+    })
     public SensitiveDTO refresh(HttpServletRequest request, HttpServletResponse response) {
         return jwtService.refresh(request, response);
     }
@@ -114,6 +135,12 @@ public class AccountController {
 
     @PostMapping("/logout")
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
+    @AuthorizedEndpoint
+    @Operation(summary = "Wyloguj się z systemu", description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Użytkownik zostaje wylogowany"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta o podanym loginie")
+    })
     public ResponseEntity<?> logout(HttpServletResponse response) {
         accountService.logout(response);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -319,6 +346,14 @@ public class AccountController {
 
     @GetMapping("/verify")
     @PreAuthorize("permitAll()")
+    @Operation(summary = "Weryfikacja konta", description = "Dostępne dla wszystkich (także użytkowników nieuwierzytelnionych)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Konto zostaje zweryfikowane"),
+            @ApiResponse(responseCode = "401", description = "Żeton wygasł"),
+            @ApiResponse(responseCode = "404", description = "Żeton nie został odnaleziony"),
+            @ApiResponse(responseCode = "404", description = "Konto nie zostało odnalezione"),
+            @ApiResponse(responseCode = "409", description = "Konto już zostało zweryfikowane"),
+    })
     public ResponseEntity<Void> verifyAccount(@RequestParam SensitiveDTO token) {
         accountService.verifyAccount(token);
         return ResponseEntity.noContent().build();

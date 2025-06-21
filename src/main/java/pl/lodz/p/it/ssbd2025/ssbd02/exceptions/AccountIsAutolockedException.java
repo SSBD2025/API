@@ -6,6 +6,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.ExceptionConsts;
 
 public class AccountIsAutolockedException extends AppBaseException {
     public AccountIsAutolockedException() {
-        super(HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()), ExceptionConsts.ACCOUNT_IS_AUTOLOCKED);
+        super(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()), ExceptionConsts.ACCOUNT_IS_AUTOLOCKED);
     }
 }
