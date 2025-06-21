@@ -164,7 +164,7 @@ public class MOK3Test extends BaseIntegrationTest {
                         .content(json))
                 .andExpect(status().isBadRequest()).andReturn();
         String responseBody = result.getResponse().getContentAsString();
-        Assertions.assertTrue(responseBody.contains("{\"violations\":[{\"fieldName\":\"email\",\"message\":\"must not be null\"}]}"));
+        Assertions.assertTrue(responseBody.contains("{\"violations\":[{\"fieldName\":\"email\",\"message\":\"must not be null\"},{\"fieldName\":\"email\",\"message\":\"must not be blank\"}]}"));
     }
 
 }
