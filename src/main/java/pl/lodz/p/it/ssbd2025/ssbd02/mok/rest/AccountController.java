@@ -331,7 +331,8 @@ public class AccountController {
             description = "Dostępne tylko dla administratora. Możliwość filtrowania po statusie aktywności, weryfikacji oraz frazie wyszukiwania.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Zwrócono stronę z listą kont"),
-            @ApiResponse(responseCode = "403", description = "Brak uprawnień")
+            @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe parametry zapytania")
     })
     public Page<AccountWithRolesDTO> getAllAccounts(
             @RequestParam(required = false) Boolean active,

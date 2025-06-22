@@ -35,7 +35,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została przypisana pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
-            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
     public ResponseEntity<Void> assignAdminRole(@NotNull @PathVariable UUID accountId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -52,7 +53,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została przypisana pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
-            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
 
     public ResponseEntity<Void> assignDieticianRole(@NotNull @PathVariable UUID accountId) {
@@ -70,7 +72,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została przypisana pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
-            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Konflikt ról lub próba przypisania roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
     public ResponseEntity<Void> assignClientRole(@NotNull @PathVariable UUID accountId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -87,7 +90,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została usunięta pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta lub aktywnej roli"),
-            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
     public ResponseEntity<Void> unassignAdminRole(@NotNull @PathVariable UUID accountId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -104,7 +108,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została usunięta pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta lub aktywnej roli"),
-            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
     public ResponseEntity<Void> unassignDieticianRole(@NotNull @PathVariable UUID accountId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -121,7 +126,8 @@ public class UserRoleController {
             @ApiResponse(responseCode = "204", description = "Rola została usunięta pomyślnie"),
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta lub aktywnej roli"),
-            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie")
+            @ApiResponse(responseCode = "409", description = "Próba usunięcia roli samemu sobie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora konta (UUID)")
     })
     public ResponseEntity<Void> unassignClientRole(@NotNull @PathVariable UUID accountId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();

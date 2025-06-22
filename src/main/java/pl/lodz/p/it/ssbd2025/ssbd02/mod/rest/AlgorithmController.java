@@ -40,6 +40,7 @@ public class AlgorithmController {
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety parametrów stałych"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety okresowej"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono wyników badań krwi"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłwe dane wejściowe (UUID)")
     })
     public ResponseEntity<FoodPyramidDTO> algorithm(@PathVariable UUID clientId) {
         return ResponseEntity.ok().body(foodPyramidMapper.toDto(algorithmService.generateFoodPyramid(clientId)));

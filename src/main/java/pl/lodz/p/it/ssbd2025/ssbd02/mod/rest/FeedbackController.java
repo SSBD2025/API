@@ -39,7 +39,8 @@ public class FeedbackController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Opinia została zwrócona pomyślnie"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta, piramidy lub opinii")
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta, piramidy lub opinii"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora (UUID)")
     })
     public ResponseEntity<FeedbackDTO> getFeedbackByClientAndPyramid(
             @PathVariable UUID clientId,
@@ -59,7 +60,8 @@ public class FeedbackController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Opinia została zwrócona pomyślnie"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy lub opinii dla zalogowanego użytkownika")
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy lub opinii dla zalogowanego użytkownika"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora (UUID)")
     })
     public ResponseEntity<FeedbackDTO> getMyFeedbackForPyramid(
             @PathVariable UUID pyramidId

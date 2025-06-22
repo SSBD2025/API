@@ -35,7 +35,8 @@ public class ClientFoodPyramidController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Piramida żywieniowa została pomyślnie przypisana klientowi"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym ID lub piramidy o podanym ID"),
-            @ApiResponse(responseCode = "409", description = "Piramida żywieniowa jest już przypisana temu klientowi")
+            @ApiResponse(responseCode = "409", description = "Piramida żywieniowa jest już przypisana temu klientowi"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłwe dane wejściowe")
     })
     public ResponseEntity<Void> assignFoodPyramidToClient(@Valid @RequestBody AssignDietPlanDTO dto) {
         clientFoodPyramidService.assignFoodPyramidToClient(dto);
