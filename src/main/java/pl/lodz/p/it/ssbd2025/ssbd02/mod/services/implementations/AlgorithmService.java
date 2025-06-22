@@ -29,7 +29,6 @@ public class AlgorithmService implements IAlgorithmService {
     private final ClientModRepository clientModRepository;
     private final FoodPyramidRepository foodPyramidRepository;
     private final PeriodicSurveyRepository periodicSurveyRepository;
-    private final BloodTestResultRepository bloodTestResultRepository;
     private final ClientBloodTestReportRepository clientBloodTestReportRepository;
 
     @PreAuthorize("hasRole('DIETICIAN')")

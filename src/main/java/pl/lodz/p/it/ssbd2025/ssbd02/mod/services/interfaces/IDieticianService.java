@@ -20,6 +20,6 @@ public interface IDieticianService {
     Client getClientDetails(UUID clientId);
     BloodTestOrder orderMedicalExaminations(BloodTestOrderDTO bloodTestOrderDTO);
     List<BloodTestOrder> getUnfulfilledBloodTestOrders();
-    Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
+    Page<PeriodicSurveyDTO> getPeriodicSurveysByClientId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
     Client getDieticiansClientById(UUID id);
 }

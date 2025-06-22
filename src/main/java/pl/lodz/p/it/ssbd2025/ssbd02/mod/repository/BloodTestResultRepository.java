@@ -21,6 +21,6 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface BloodTestResultRepository extends AbstractRepository<BloodTestResult> {
     @PreAuthorize("hasRole('DIETICIAN')")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     <S extends BloodTestResult> S saveAndFlush(S entity);
 }

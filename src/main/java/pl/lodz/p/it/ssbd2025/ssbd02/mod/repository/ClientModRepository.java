@@ -56,7 +56,7 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("SELECT c FROM Client c WHERE c.account.id = :clientId")
-    Optional<Client> findClientByAccountId(@Param("clientId") UUID clientId);
+    Optional<Client> findClientByAccountId(@Param("clientId") UUID clientId); // <- no usages ???
 
     @PreAuthorize("permitAll()")
     @Query("""
