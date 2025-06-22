@@ -111,6 +111,7 @@ public class DieticianModController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Zwrócono klienta"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta; nie znaleziono dietetyka"),
             @ApiResponse(responseCode = "409", description = "Klient nie ma przypisanego dietetyka"),
     })
@@ -130,13 +131,6 @@ public class DieticianModController {
     public ResponseEntity<List<BloodTestOrderWithClientDTO>> getOrders() {
         List<BloodTestOrder> bloodTestOrders = dieticianModService.getUnfulfilledBloodTestOrders();
         return ResponseEntity.status(HttpStatus.OK).body(bloodTestOrderMapper.toBloodTestOrderWithClientDTO(bloodTestOrders));
-    }
-
-    @PreAuthorize("hasRole('DIETICIAN')")
-    @PatchMapping("/{orderId}/confirm")
-    public ResponseEntity<Void> confirmBloodTestOrder(@PathVariable UUID orderId) {
-        dieticianModService.confirmBloodTestOrder(orderId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{clientId}/periodic-surveys")

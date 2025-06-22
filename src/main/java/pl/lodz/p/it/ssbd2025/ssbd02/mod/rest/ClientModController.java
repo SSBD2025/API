@@ -55,6 +55,7 @@ public class ClientModController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Dietetyk został przypisany"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono dietetyka o podanym Id; nie znaleziono klienta"),
             @ApiResponse(responseCode = "409", description = "Inny dietetyk jest już przypisany do klienta; ten dietetyk jest już przypisany do klienta; dietetyk osiągnął już limit klientów")
     })
@@ -82,6 +83,7 @@ public class ClientModController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Wypełniono ankietę parametrów stałych"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "409", description = "Klient już wypełnił ankietę; klient nie ma przypisangeo dietetyka"),
             @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
     })
