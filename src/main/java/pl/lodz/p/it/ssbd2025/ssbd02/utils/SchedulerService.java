@@ -130,7 +130,7 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Scheduled(fixedRateString = "${scheduler.periodic_survey.reminder}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
     protected void periodicSurveyReminder() {
         Timestamp oneWeekAgo = Timestamp.valueOf(LocalDateTime.now().minusWeeks(1));
         List<Client> clients = clientModRepository.findClientsWithLastPeriodicSurveyBefore(oneWeekAgo);

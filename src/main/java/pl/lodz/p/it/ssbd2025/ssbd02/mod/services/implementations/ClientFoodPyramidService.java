@@ -67,7 +67,7 @@ public class ClientFoodPyramidService implements IClientFoodPyramidService {
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
     public void assignFoodPyramidToClient(AssignDietPlanDTO dto) {
-        Client client = clientModRepository.findById(dto.getClientId()).orElseThrow(ClientNotFoundException::new);
+        Client client = clientModRepository.findClientById(dto.getClientId()).orElseThrow(ClientNotFoundException::new);
         FoodPyramid foodPyramid = foodPyramidRepository.findById(dto.getFoodPyramidId()).orElseThrow(FoodPyramidNotFoundException::new);
         boolean alreadyAssigned = clientFoodPyramidRepository
                 .existsByClientAndFoodPyramid(client, foodPyramid);

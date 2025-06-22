@@ -7,10 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 
 import java.util.List;
@@ -34,4 +31,8 @@ public interface ClientBloodTestReportRepository extends JpaRepository<ClientBlo
     <S extends ClientBloodTestReport> S saveAndFlush(S entity);
     
     Optional<ClientBloodTestReport> findFirstByClient_IdOrderByTimestampDesc (UUID clientId);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    Optional<ClientBloodTestReport> findById(UUID id);
 }

@@ -82,15 +82,16 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         if (reports.isEmpty()) {
             throw new ClientBloodTestReportNotFoundException();
         }
-        if (clientModService.getClientById(uuid).getSurvey() == null) {
+        Client client = clientModRepository.findClientById(uuid).orElseThrow(ClientNotFoundException::new);
+        if (client.getSurvey() == null) {
             throw new PermanentSurveyNotFoundException();
         }
         List<ClientBloodTestReportDTO> dtos = new ArrayList<>();
         for (ClientBloodTestReport report : reports) {
             List<BloodTestResultDTO> resultsDTO = new ArrayList<>();
             for (BloodTestResult result : report.getResults()) {
-                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), clientModService.getClientById(uuid).getSurvey().isGender());
-                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, clientModService.getClientById(uuid).getSurvey().isGender());
+                BloodParameterDTO bloodParameterDTO = bloodParameterMapper.toBloodParameterDTO(result.getBloodParameter(), client.getSurvey().isGender());
+                BloodTestResultDTO bloodTestResultDTO = bloodTestResultMapper.toBloodTestResultDTO(result, client.getSurvey().isGender());
                 bloodTestResultDTO.setBloodParameter(bloodParameterDTO);
                 resultsDTO.add(bloodTestResultDTO);
             }
