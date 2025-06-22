@@ -76,7 +76,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/mod/clients/periodic-survey",
                                 "/api/mod/clients/assign-dietician/{dieticianId}",
-                                "/api/mod/clients/permanent-survey"
+                                "/api/mod/clients/permanent-survey",
+                                "/api/mod/feedbacks/pyramid/{pyramidId}"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/mod/clients/permanent-survey",
@@ -110,7 +111,9 @@ public class SecurityConfig {
                                 "/api/mod/dieticians/client/{id}",
                                 "/api/mod/dieticians/{clientId}/periodic-surveys",
                                 "/api/mod/client-food-pyramids/dietician/{clientId}",
-                                "/api/mod/food-pyramids"
+                                "/api/mod/food-pyramids",
+                                "/api/mod/client-food-pyramids/client/{clientId}/current",
+                                "/api/mod/food-pyramids/{id}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account",
@@ -132,6 +135,13 @@ public class SecurityConfig {
                                 "/api/account/{accountId}/roles/dietician",
                                 "/api/account/{accountId}/roles/client"
                         ).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/mod/clients/{clientId}/periodic-survey",
+                                "/api/mod/clients/periodic-survey/{surveyId}")
+                        .hasAnyRole("CLIENT", "DIETICIAN")
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/mod/feedbacks/{feedbackId}")
+                        .hasRole("CLIENT")
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",

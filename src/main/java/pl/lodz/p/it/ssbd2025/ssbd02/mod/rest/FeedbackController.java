@@ -81,6 +81,7 @@ public class FeedbackController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Opinia została dodana"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "403", description = "Ta piramida nie jest przypisana do tego użytkownika"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym id"),
@@ -102,6 +103,7 @@ public class FeedbackController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Opinia została usunięta"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono opinii o podanym id"),
             @ApiResponse(responseCode = "403", description = "Ta piramida nie jest przypisana do tego użytkownika"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym loginie"),
