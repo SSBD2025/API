@@ -366,7 +366,7 @@ public class ClientModService implements IClientService {
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
-    @PreAuthorize("hasRole('CLIENT')|| hasRole('DIETICIAN')") //todo sprawdzic czy tu dietetyk ma zostac
+    @PreAuthorize("hasRole('CLIENT')")
     public PeriodicSurveyDTO getMyLatestPeriodicSurvey() {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
@@ -388,7 +388,7 @@ public class ClientModService implements IClientService {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
         BloodTestOrder bloodTestOrder = bloodTestOrderRepository.
-                getAllByClient_IdAndFulfilled(client.getId(), false).orElseThrow(BloodTestOrderNotFoundException::new);
+                getFirstByClient_IdAndFulfilledOrderByOrderDateDesc(client.getId(), false).orElseThrow(BloodTestOrderNotFoundException::new);
         return bloodTestOrderMapper.toBloodTestOrderDTO(bloodTestOrder);
     }
 }

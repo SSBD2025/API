@@ -143,7 +143,7 @@ public class DieticianModController {
             @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta o podanym id"),
             @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiet okresowych"),
     })
-    public ResponseEntity<Object> getPeriodicSurveysByAccountId(
+    public ResponseEntity<Object> getPeriodicSurveysByClientId(
             @PathVariable UUID clientId,
             Pageable pageable,
             @RequestParam(required = false)
@@ -153,7 +153,7 @@ public class DieticianModController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime before
             ) {
-        Page<PeriodicSurveyDTO> dtoPage = dieticianModService.getPeriodicSurveysByAccountId(clientId, pageable,
+        Page<PeriodicSurveyDTO> dtoPage = dieticianModService.getPeriodicSurveysByClientId(clientId, pageable,
                 since != null ? Timestamp.valueOf(since) : null,
                 before != null ? Timestamp.valueOf(before) : null);
         return ResponseEntity.status(HttpStatus.OK).body(dtoPage);

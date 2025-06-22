@@ -26,17 +26,13 @@ public interface BloodTestOrderRepository extends AbstractRepository<BloodTestOr
     BloodTestOrder saveAndFlush(BloodTestOrder bloodTestOrder);
 
     @PreAuthorize("hasRole('DIETICIAN')")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = false)//to ma byc readonly=false???
     @Query("SELECT COUNT(b) > 0 FROM BloodTestOrder b WHERE b.client = :client AND b.fulfilled = false")
     boolean hasUnfulfilledOrders(Client client);
 
-    @PreAuthorize("hasRole('DIETICIAN')")
+    @PreAuthorize("hasRole('DIETICIAN')")//to ma byc readonly=false???
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     Optional<BloodTestOrder> findById(UUID orderId);
-
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("hasRole('CLIENT')")
-    Optional<BloodTestOrder> getAllByClient_IdAndFulfilled(UUID clientId, boolean fulfilled);
 
     @Query("""
     SELECT o FROM BloodTestOrder o
@@ -51,4 +47,7 @@ public interface BloodTestOrderRepository extends AbstractRepository<BloodTestOr
         @Param("fulfilled") boolean fulfilled
     );
 
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')")
+    Optional<BloodTestOrder> getFirstByClient_IdAndFulfilledOrderByOrderDateDesc(UUID clientId, boolean fulfilled);
 }
