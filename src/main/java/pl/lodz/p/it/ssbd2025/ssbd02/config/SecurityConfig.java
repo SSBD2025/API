@@ -85,7 +85,10 @@ public class SecurityConfig {
                                 "/api/mod/clients/blood-test-order",
                                 "/api/mod/clients/periodic-survey",
                                 "/api/mod/clients/periodic-survey/latest",
-                                "/api/mod/client-food-pyramids/client-pyramids"
+                                "/api/mod/client-food-pyramids/client-pyramids",
+                                "/api/mod/feedbacks/client/{clientId}/pyramid/{pyramidId}",
+                                "/api/mod/feedbacks/my-pyramid/{pyramidId}",
+                                "/api/mod/clients/permanent-survey"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/mod/clients/periodic-survey",
@@ -94,7 +97,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/blood-test-reports/{clientId}",
                                 "/api/mod/blood-test-reports/client/{clientId}",
-                                "/api/mod/dieticians/order-medical-examinations"
+                                "/api/mod/dieticians/order-medical-examinations",
+                                "/api/mod/client-food-pyramids"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/mod/algorithm/{clientId}",
@@ -105,7 +109,8 @@ public class SecurityConfig {
                                 "/api/mod/dieticians/get-clients-by-dietician",
                                 "/api/mod/dieticians/client/{id}",
                                 "/api/mod/dieticians/{clientId}/periodic-surveys",
-                                "/api/mod/client-food-pyramids/dietician/{clientId}"
+                                "/api/mod/client-food-pyramids/dietician/{clientId}",
+                                "/api/mod/food-pyramids"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account",
