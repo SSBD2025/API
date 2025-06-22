@@ -196,13 +196,13 @@ public class DieticianModService implements IDieticianService {
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
     @PreAuthorize("hasRole('DIETICIAN')")
-    public Page<PeriodicSurveyDTO> getPeriodicSurveysByAccountId(
-            UUID accountId,
+    public Page<PeriodicSurveyDTO> getPeriodicSurveysByClientId(
+            UUID clientId,
             Pageable pageable,
             @Nullable Timestamp since,
             @Nullable Timestamp before
     ) {
-        Client client = clientModRepository.findClientById(accountId).orElseThrow(ClientNotFoundException::new);
+        Client client = clientModRepository.findClientById(clientId).orElseThrow(ClientNotFoundException::new);
         Page<PeriodicSurvey> surveysPage;
         if (since != null && before != null) {
             surveysPage = periodicSurveyRepository.findByClientIdAndMeasurementDateBetween(

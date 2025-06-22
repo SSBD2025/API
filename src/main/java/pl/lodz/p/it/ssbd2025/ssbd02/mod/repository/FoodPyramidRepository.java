@@ -28,11 +28,11 @@ public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
     FoodPyramid saveAndFlush(FoodPyramid foodPyramid);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-//    @PreAuthorize() TODO dodac
+    @PreAuthorize("hasRole('DIETICIAN')")
     FoodPyramid findByName(String name);
 
-    @PreAuthorize("permitAll()") //FOR TESTS ONLY
-    @Transactional(propagation = Propagation.MANDATORY)
+    @PreAuthorize("permitAll()") //FOR TESTS ONLY <- po co ???
+    @Transactional(propagation = Propagation.MANDATORY) // <- brak readonly
     void delete(FoodPyramid foodPyramid);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
