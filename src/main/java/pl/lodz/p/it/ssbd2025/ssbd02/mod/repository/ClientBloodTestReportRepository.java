@@ -9,10 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 
@@ -42,4 +39,8 @@ public interface ClientBloodTestReportRepository extends JpaRepository<ClientBlo
     @PreAuthorize("hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     Optional<ClientBloodTestReport> findFirstByClient_IdOrderByTimestampDesc (UUID clientId);
+
+    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
+    Optional<ClientBloodTestReport> findById(UUID id);
 }
