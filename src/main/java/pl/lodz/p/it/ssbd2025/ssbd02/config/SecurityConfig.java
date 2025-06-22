@@ -82,22 +82,29 @@ public class SecurityConfig {
                                 "/api/mod/clients/permanent-survey",
                                 "/api/mod/clients/status",
                                 "/api/mod/clients/get-available-dieticians",
+                                "/api/mod/clients/blood-test-order",
+                                "/api/mod/clients/periodic-survey",
+                                "/api/mod/clients/periodic-survey/latest",
                                 "/api/mod/client-food-pyramids/client-pyramids"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT,
+                                "/api/mod/clients/periodic-survey",
                                 "/api/mod/feedbacks"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.POST,
                                 "/api/blood-test-reports/{clientId}",
+                                "/api/mod/blood-test-reports/client/{clientId}",
                                 "/api/mod/dieticians/order-medical-examinations"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/mod/blood-parameters/{male}",
+                                "/api/mod/algorithm/{clientId}",
+                                "/api/mod/blood-parameters/{clientId}",
                                 "/api/mod/dieticians/{clientId}/details",
                                 "/api/mod/dieticians/{clientId}/permanent-survey",
                                 "/api/mod/dieticians/orders",
                                 "/api/mod/dieticians/get-clients-by-dietician",
                                 "/api/mod/dieticians/client/{id}",
+                                "/api/mod/dieticians/{clientId}/periodic-surveys",
                                 "/api/mod/client-food-pyramids/dietician/{clientId}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
