@@ -71,6 +71,13 @@ public class AccountController {
 
     @PostMapping(value = "/login/2fa", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('2FA_AUTHORITY')")
+    @Operation(summary = "Weryfikacja kodu 2FA", description = "Weryfikuje kod dwuskładnikowy i zwraca żeton uwierzytelnienia")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Poprawna weryfikacja"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Ważność żetonu wygasła"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta lub żetonu lub żeton jest niepoprawny"),
+    })
     public SensitiveDTO verifyTwoFactor(@RequestBody @Validated(OnRequest.class)TwoFactorDTO twoFactorDTO, HttpServletRequest request, HttpServletResponse response) {
         String ipAddress = getClientIp(request);
         return accountService.verifyTwoFactorCode(new SensitiveDTO(twoFactorDTO.getCode()), ipAddress, response);
@@ -182,7 +189,8 @@ public class AccountController {
             description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
     @AuthorizedEndpoint
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Wysłano e-mail z linkiem do potwierdzenia zmiany zmiany"),
+            @ApiResponse(responseCode = "204", description = "Wysłano e-mail z linkiem do potwierdzenia zmiany zmiany adresu e-mail"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
             @ApiResponse(responseCode = "409", description = "Adres e-mail jest już w użyciu"),
     })
@@ -198,8 +206,9 @@ public class AccountController {
             description = "Dostępne dla wszystkich")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Zmieniono adres e-mail i wysłano wiadomość e-mail z linkiem do przywrócenia wcześniejszego adresu e-mail na stary adres e-mail"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "401", description = "Token do zmiany adresu e-mail wygasł"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono żetonu")
     })
     public ResponseEntity<?> confirmEmail(@RequestParam("token") SensitiveDTO token) {
         accountService.confirmEmail(token);
@@ -213,8 +222,9 @@ public class AccountController {
             description = "Dostępne dla wszystkich")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Przywrócono stary adres e-mail"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "401", description = "Token do zmiany adresu e-mail wygasł"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono żetonu")
     })
     public ResponseEntity<?> revertEmailChange(@RequestParam("token") SensitiveDTO token) {
         accountService.revertEmailChange(token);
@@ -229,7 +239,7 @@ public class AccountController {
             description = "Dostępne dla ADMIN, CLIENT i DIETICIAN")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Przywrócono stary adres e-mail"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono tokenu")
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta; nie znaleziono żetonu")
     })
     public ResponseEntity<Void> resendEmailChangeLink() {
         accountService.resendEmailChangeLink();
@@ -244,6 +254,7 @@ public class AccountController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Wysłano e-mail z linkiem do potwierdzenia zmiany zmiany"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne dane wejściowe"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono konta"),
             @ApiResponse(responseCode = "409", description = "Adres e-mail jest już w użyciu"),
     })

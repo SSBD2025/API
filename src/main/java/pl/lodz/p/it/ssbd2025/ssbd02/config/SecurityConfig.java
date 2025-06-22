@@ -74,22 +74,31 @@ public class SecurityConfig {
                                 "/api/account/me"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.POST,
-                                "/api/mod/clients/periodic-survey"
+                                "/api/mod/clients/periodic-survey",
+                                "/api/mod/clients/assign-dietician/{dieticianId}",
+                                "/api/mod/clients/permanent-survey"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/mod/clients/permanent-survey"
+                                "/api/mod/clients/permanent-survey",
+                                "/api/mod/clients/status",
+                                "/api/mod/clients/get-available-dieticians",
+                                "/api/mod/client-food-pyramids/client-pyramids"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/mod/feedbacks"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.POST,
-                                "/api/blood-test-reports/{clientId}"
+                                "/api/blood-test-reports/{clientId}",
+                                "/api/mod/dieticians/order-medical-examinations"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/mod/blood-parameters/{male}",
                                 "/api/mod/dieticians/{clientId}/details",
                                 "/api/mod/dieticians/{clientId}/permanent-survey",
-                                "/api/mod/dieticians/orders"
+                                "/api/mod/dieticians/orders",
+                                "/api/mod/dieticians/get-clients-by-dietician",
+                                "/api/mod/dieticians/client/{id}",
+                                "/api/mod/client-food-pyramids/dietician/{clientId}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account",
