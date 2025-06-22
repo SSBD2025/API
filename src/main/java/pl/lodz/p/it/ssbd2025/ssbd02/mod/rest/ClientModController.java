@@ -170,6 +170,7 @@ public class ClientModController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista ankiet okresowych została zwrócona"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym id"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiet okresowych")
     })
@@ -188,6 +189,7 @@ public class ClientModController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ankieta okresowa została zwrócona"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety okresowej")
     })
     public ResponseEntity<PeriodicSurveyDTO> getPeriodicSurveyByClientIdAndSurveyId(

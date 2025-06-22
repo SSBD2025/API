@@ -35,6 +35,7 @@ public class FoodPyramidController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Dane piramidy zostały zwrócone"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy o podanym id")
     })
     public ResponseEntity<FoodPyramidDetailsDTO> getById(@PathVariable UUID id) {

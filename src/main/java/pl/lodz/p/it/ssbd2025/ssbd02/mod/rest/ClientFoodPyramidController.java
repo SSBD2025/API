@@ -119,6 +119,7 @@ public class ClientFoodPyramidController {
     @AuthorizedEndpoint
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Dane piramidy zostały zwrócone"),
+            @ApiResponse(responseCode = "400", description = "Niepoprawne żądanie"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym id"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono piramidy dla tego klienta")
     })
