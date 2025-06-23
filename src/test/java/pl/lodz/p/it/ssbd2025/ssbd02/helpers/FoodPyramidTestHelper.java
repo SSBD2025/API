@@ -2,6 +2,11 @@ package pl.lodz.p.it.ssbd2025.ssbd02.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,6 +46,8 @@ public class FoodPyramidTestHelper {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private SecurityContext securityContext;
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
     public FoodPyramid getFoodPyramid(UUID id) {
         return foodPyramidRepository.findById(id).orElseThrow(FoodPyramidNotFoundException::new);
@@ -66,7 +73,7 @@ public class FoodPyramidTestHelper {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     @WithMockUser(roles = "DIETICIAN")
     public FoodPyramid findByName(String name) {
-        return Optional.ofNullable(foodPyramidRepository.findByName(name))
+        return Optional.ofNullable(foodPyramidRepository.findByNameForTests(name))
                 .orElseThrow(() -> new IllegalArgumentException("Food pyramid with name " + name + " not found"));
     }
 

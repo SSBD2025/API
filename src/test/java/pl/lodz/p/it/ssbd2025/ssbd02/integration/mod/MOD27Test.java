@@ -78,7 +78,7 @@ public class MOD27Test extends BaseIntegrationTest {
         doNothing().when(mailSender).send(any(MimeMessage.class));
     }
 
-        @Test
+    @Test
     public void updateFeedbackTest() throws Exception {
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("agorgonzola", null, List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
@@ -110,13 +110,13 @@ public class MOD27Test extends BaseIntegrationTest {
         String responseJson = loginResult.getResponse().getContentAsString();
         String token = objectMapper.readTree(responseJson).get("value").asText();
 
-       mockMvc.perform(put("/api/mod/feedbacks")
-            .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(feedbackDTO))
-                    .header("Authorization", "Bearer " + token))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.description").value("Nie pomaga"))
-            .andExpect(jsonPath("$.rating").value(1));
+        mockMvc.perform(put("/api/mod/feedbacks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(feedbackDTO))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Nie pomaga"))
+                .andExpect(jsonPath("$.rating").value(1));
 
 
         SecurityContextHolder.getContext().setAuthentication(
@@ -260,8 +260,8 @@ public class MOD27Test extends BaseIntegrationTest {
         String body = objectMapper.writeValueAsString(feedbackDTO);
 
         mockMvc.perform(put("/api/mod/feedbacks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -325,9 +325,9 @@ public class MOD27Test extends BaseIntegrationTest {
         String body = objectMapper.writeValueAsString(feedbackDTO);
 
         mockMvc.perform(put("/api/mod/feedbacks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-                .header("Authorization", "Bearer " + token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
 
 
@@ -408,7 +408,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
                 .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
-                .andExpect(jsonPath("$.violations[0].message").value("must be greater than or equal to 1"));
+                .andExpect(jsonPath("$.violations[0].message").value("musi być równe lub większe od 1"));
 
 
         mockMvc.perform(post("/api/account/logout")
@@ -453,7 +453,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
                 .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
-                .andExpect(jsonPath("$.violations[0].message").value("must be less than or equal to 5"));
+                .andExpect(jsonPath("$.violations[0].message").value("musi być równe lub mniejsze od 5"));
 
 
         mockMvc.perform(post("/api/account/logout")
@@ -543,7 +543,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
                 .andExpect(jsonPath("$.violations[0].fieldName").value("description"))
-                .andExpect(jsonPath("$.violations[0].message").value("length must be between 1 and 255"));
+                .andExpect(jsonPath("$.violations[0].message").value("długość musi wynosić od 1 do 255"));
 
 
         mockMvc.perform(post("/api/account/logout")
