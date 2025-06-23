@@ -9,12 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -26,7 +20,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.ClientBloodTestReportTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +46,7 @@ public class MOD30Test extends BaseIntegrationTest {
     @Autowired
     private ClientBloodTestReportTestHelper helper;
 
+
     @Autowired
     private LockTokenService lockTokenService;
 
@@ -71,14 +65,11 @@ public class MOD30Test extends BaseIntegrationTest {
                 .andReturn();
         String responseJson = loginResult.getResponse().getContentAsString();
         token = objectMapper.readTree(responseJson).get("value").asText();
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
-        context.setAuthentication(auth);
-        SecurityContextHolder.setContext(context);
     }
 
     @AfterEach
     void teardown() throws Exception {
+
         mockMvc.perform(post("/api/account/logout")
                 .header("Authorization", "Bearer " + token)).andReturn();
     }
@@ -118,7 +109,6 @@ public class MOD30Test extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isOk());
-
         ClientBloodTestReport afterReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltAfter = afterReport.getResults().stream()
                 .filter(r -> "PLT".equals(r.getBloodParameter().name()))
@@ -236,6 +226,8 @@ public class MOD30Test extends BaseIntegrationTest {
 //                        .content(payload))
 //                .andExpect(status().isNotFound());
 //    }
+
+
     @Test
     void edit_clientBloodTestReportIdNotFound_Test() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
