@@ -87,7 +87,6 @@ public class SecurityConfig {
                                 "/api/mod/clients/periodic-survey",
                                 "/api/mod/clients/periodic-survey/latest",
                                 "/api/mod/client-food-pyramids/client-pyramids",
-                                "/api/mod/feedbacks/client/{clientId}/pyramid/{pyramidId}",
                                 "/api/mod/feedbacks/my-pyramid/{pyramidId}",
                                 "/api/mod/clients/permanent-survey",
                                 "/api/mod/blood-test-reports/client",

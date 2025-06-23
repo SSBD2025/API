@@ -33,27 +33,6 @@ public class FeedbackController {
     private final LockTokenService lockTokenService;
 
     @PreAuthorize("hasRole('CLIENT')")
-    @GetMapping("/client/{clientId}/pyramid/{pyramidId}")
-    @Operation(summary = "Pobierz opinię klienta na temat wybranej piramidy",
-            description = "Dostępne dla CLIENT.")
-    @AuthorizedEndpoint
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Opinia została zwrócona pomyślnie"),
-            @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta, piramidy lub opinii"),
-            @ApiResponse(responseCode = "400", description = "Nieprawidłowy format identyfikatora (UUID)")
-    })
-    public ResponseEntity<FeedbackDTO> getFeedbackByClientAndPyramid(
-            @PathVariable UUID clientId,
-            @PathVariable UUID pyramidId
-    ) {
-        return ResponseEntity.ok().body(
-                feedbackMapper.toFeedbackDTO(
-                        feedbackService.getFeedbackByClientAndPyramid(clientId, pyramidId)
-                )
-        );
-    }
-
-    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/my-pyramid/{pyramidId}")
     @Operation(summary = "Pobierz swoją opinię dla wybranej piramidy",
             description = "Dostępne dla CLIENT.")
