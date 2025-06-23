@@ -85,12 +85,7 @@ public class MOD30Test extends BaseIntegrationTest {
 
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void edit_SUCCESS_test() throws Exception {
-//        SecurityContext context = SecurityContextHolder.createEmptyContext();
-//        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
-//        context.setAuthentication(auth);
-//        SecurityContextHolder.setContext(context);
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
                 .filter(r -> "PLT".equals(r.getBloodParameter().name()))
@@ -134,7 +129,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void edit_bloodTestResultVersion_CONFLICT_test() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -205,7 +199,7 @@ public class MOD30Test extends BaseIntegrationTest {
 
 
 //    @Test
-//    @WithMockUser(roles = {"DIETICIAN"})
+//
 //    void edit_invalidToken_Test() throws Exception {
 //        ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
 //        BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -243,12 +237,7 @@ public class MOD30Test extends BaseIntegrationTest {
 //                .andExpect(status().isNotFound());
 //    }
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void edit_clientBloodTestReportIdNotFound_Test() throws Exception {
-//        SecurityContext context = SecurityContextHolder.createEmptyContext();
-//        Authentication auth = new UsernamePasswordAuthenticationToken("drice", "P@ssw0rd!", List.of(new SimpleGrantedAuthority("ROLE_DIETICIAN")));
-//        context.setAuthentication(auth);
-//        SecurityContextHolder.setContext(context);
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
                 .filter(r -> "PLT".equals(r.getBloodParameter().name()))
@@ -297,7 +286,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void edit_bloodTestResultIdNotFound_Test() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -393,7 +381,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"CLIENT"})
     void edit_FORBIDDEN_test() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -455,7 +442,6 @@ public class MOD30Test extends BaseIntegrationTest {
      */
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportID_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -505,7 +491,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportVersion_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -555,7 +540,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportClient_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -605,7 +589,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportTimestamp_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -655,7 +638,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportResults_Null() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -690,7 +672,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_ClientBloodTestReportLockToken_Null() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -742,7 +723,6 @@ public class MOD30Test extends BaseIntegrationTest {
      */
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultId_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -791,7 +771,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultVersion_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -840,7 +819,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultLockToken_Null() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -886,7 +864,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultResult_Null() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -934,7 +911,6 @@ public class MOD30Test extends BaseIntegrationTest {
 
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultBloodParameter_Null() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()
@@ -975,7 +951,6 @@ public class MOD30Test extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"DIETICIAN"})
     void violation_BloodTestResultReport_notNull() throws Exception {
         ClientBloodTestReport beforeReport = helper.getClientBloodTestReportById(reportId);
         BloodTestResult pltBefore = beforeReport.getResults().stream()

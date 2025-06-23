@@ -1,6 +1,11 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.helpers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +30,13 @@ public class ClientBloodTestReportTestHelper {
     @Autowired
     private BloodTestResultRepository resultRepo;
 
-    // Metoda do ustawiania PLT - używa nowej transakcji aby zmiana została commitowana
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
     public void setPLTValueTo250(UUID reportId) {
-        ClientBloodTestReport report = reportRepo.findById(reportId)
+        ClientBloodTestReport report = reportRepo.findByIdForTest(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found"));
 
-        // Inicjalizujemy kolekcję
         report.getResults().size();
 
-        // Znajdujemy wynik o parametrze PLT
         BloodTestResult pltResult = report.getResults().stream()
                 .filter(result -> "PLT".equals(result.getBloodParameter().name()))
                 .findFirst()
@@ -48,7 +50,7 @@ public class ClientBloodTestReportTestHelper {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     public ClientBloodTestReport getClientBloodTestReportById(UUID reportId) {
-        ClientBloodTestReport report = reportRepo.findById(reportId)
+        ClientBloodTestReport report = reportRepo.findByIdForTest(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found with id: " + reportId));
 
         report.getResults().size();
@@ -61,13 +63,11 @@ public class ClientBloodTestReportTestHelper {
         return report;
     }
 
-    // Metoda do odczytu wartości PLT - używa nowej transakcji read-only aby zawsze czytać aktualny stan
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     public Double getPLTValue(UUID reportId) {
-        ClientBloodTestReport report = reportRepo.findById(reportId)
+        ClientBloodTestReport report = reportRepo.findByIdForTest(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found"));
 
-        // Inicjalizujemy kolekcję
         report.getResults().size();
 
         return report.getResults().stream()
@@ -77,13 +77,11 @@ public class ClientBloodTestReportTestHelper {
                 .orElseThrow(() -> new IllegalStateException("PLT result not found in report"));
     }
 
-    // Metoda do przywracania stanu - używa nowej transakcji i WYMUSZA ustawienie wartości
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
     public void restorePLTValueTo250(UUID reportId) {
-        ClientBloodTestReport report = reportRepo.findById(reportId)
+        ClientBloodTestReport report = reportRepo.findByIdForTest(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found"));
 
-        // Inicjalizujemy kolekcję
         report.getResults().size();
 
         BloodTestResult pltResult = report.getResults().stream()
@@ -91,7 +89,6 @@ public class ClientBloodTestReportTestHelper {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("PLT result not found in report"));
 
-        // ZAWSZE ustawiamy wartość na 250.0, niezależnie od aktualnej wartości
         Double currentValue = pltResult.getResult();
         pltResult.setResult(250.0);
         reportRepo.saveAndFlush(report);
@@ -107,13 +104,11 @@ public class ClientBloodTestReportTestHelper {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     public ClientBloodTestReport getReport(UUID id) {
-        ClientBloodTestReport report = reportRepo.findById(id).orElseThrow();
-        // Inicjalizujemy kolekcję wyników aby uniknąć lazy loading exception
+        ClientBloodTestReport report = reportRepo.findByIdForTest(id).orElseThrow();
         report.getResults().size();
         return report;
     }
 
-    // Dodatkowa metoda pomocnicza do weryfikacji stanu
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     public void verifyPLTValue(UUID reportId, Double expectedValue) {
         Double actualValue = getPLTValue(reportId);
@@ -125,14 +120,11 @@ public class ClientBloodTestReportTestHelper {
         }
     }
 
-    // Metoda do bezpośredniego update'u wartości PLT przez JPQL - bardziej niezawodna
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
     public void forcePLTValueTo250(UUID reportId) {
-        // Najpierw sprawdzamy czy raport istnieje
-        ClientBloodTestReport report = reportRepo.findById(reportId)
+        ClientBloodTestReport report = reportRepo.findByIdForTest(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found"));
 
-        // Inicjalizujemy kolekcję aby upewnić się że PLT result istnieje
         report.getResults().size();
 
         BloodTestResult pltResult = report.getResults().stream()
@@ -140,16 +132,13 @@ public class ClientBloodTestReportTestHelper {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("PLT result not found in report"));
 
-        // Bezpośrednio ustawiamy wartość i zapisujemy
         Double oldValue = pltResult.getResult();
         pltResult.setResult(250.0);
 
-        // Używamy merge zamiast save aby upewnić się że zmiana zostanie zapisana
         BloodTestResult savedResult = resultRepo.saveAndFlush(pltResult);
 
         System.out.println("PLT value FORCED from " + oldValue + " to " + savedResult.getResult() + " for report: " + reportId);
 
-        // Dodatkowa weryfikacja
         Double verificationValue = getPLTValue(reportId);
         if (!verificationValue.equals(250.0)) {
             throw new IllegalStateException("Failed to set PLT value to 250.0. Current value: " + verificationValue);
