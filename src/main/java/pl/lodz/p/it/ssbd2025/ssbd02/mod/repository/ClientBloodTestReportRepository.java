@@ -22,9 +22,7 @@ import java.util.Optional;
 @EnableMethodSecurity(prePostEnabled=true)
 @Transactional(propagation = Propagation.MANDATORY)
 public interface ClientBloodTestReportRepository extends JpaRepository<ClientBloodTestReport, UUID> {
-
-//    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
-    @PreAuthorize("permitAll()")//<- co to ma byc???
+    @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @Query("""
         select r from ClientBloodTestReport r where r.client.id=:clientId
@@ -43,9 +41,4 @@ public interface ClientBloodTestReportRepository extends JpaRepository<ClientBlo
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
     Optional<ClientBloodTestReport> findById(UUID id);
-
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("permitAll()")
-    @Query("SELECT r FROM ClientBloodTestReport r WHERE r.id = :id")
-    Optional<ClientBloodTestReport> findByIdForTest(@Param("id") UUID id);
 }

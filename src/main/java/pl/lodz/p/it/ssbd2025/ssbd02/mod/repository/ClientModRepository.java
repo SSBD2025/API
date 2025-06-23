@@ -49,15 +49,6 @@ public interface ClientModRepository extends AbstractRepository<Client> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     Optional<Client> findClientById(@Param("clientId") UUID id);
 
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @Query("SELECT c.id FROM Client c WHERE c.account.id = :clientId")
-    Optional<UUID> findClientIdByUserId(@Param("clientId") UUID clientId);
-
-    @PreAuthorize("hasRole('DIETICIAN')")
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @Query("SELECT c FROM Client c WHERE c.account.id = :clientId")
-    Optional<Client> findClientByAccountId(@Param("clientId") UUID clientId); // <- no usages ???
-
     @PreAuthorize("permitAll()")
     @Query("""
         SELECT c

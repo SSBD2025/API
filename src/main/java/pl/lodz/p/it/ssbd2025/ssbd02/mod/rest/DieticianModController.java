@@ -158,4 +158,18 @@ public class DieticianModController {
                 before != null ? Timestamp.valueOf(before) : null);
         return ResponseEntity.status(HttpStatus.OK).body(dtoPage);
     }
+
+    @GetMapping("/{clientId}/last-order")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    @Operation(summary = "Pobranie ostatniego niewypełnionego zleconego badania krwi",
+            description = "Dostępne dla DIETICIAN")
+    @AuthorizedEndpoint
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Niewypełnione zlecenie badania krwi zostało zwrócone"),
+            @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta o podanym id"),
+            @ApiResponse(responseCode = "404", description = "Klient nie ma niewypełnionego zleconego badania"),
+    })
+    public ResponseEntity<BloodTestOrderDTO> getLastOrder(@PathVariable UUID clientId) {
+        return ResponseEntity.ok(dieticianModService.getLastOrder(clientId));
+    }
 }

@@ -133,11 +133,6 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         return clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportRepository.saveAndFlush(report), survey.isGender());
     }
 
-    @Override
-    public void deleteReport(UUID reportId) {
-
-    }
-
     @PreAuthorize("hasRole('DIETICIAN')")
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager" , readOnly = false, timeoutString = "${transaction.timeout}")

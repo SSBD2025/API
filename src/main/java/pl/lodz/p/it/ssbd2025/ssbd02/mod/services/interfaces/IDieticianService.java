@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IDieticianService {
-    Dietician getById(UUID id);
-    List<Client> getClients(UUID dieticianId);
     List<Client> getClientsByDietician(String searchPhrase);
     Survey getPermanentSurveyByClientId(UUID clientId);
     Client getClientDetails(UUID clientId);
@@ -22,4 +20,6 @@ public interface IDieticianService {
     List<BloodTestOrder> getUnfulfilledBloodTestOrders();
     Page<PeriodicSurveyDTO> getPeriodicSurveysByClientId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
     Client getDieticiansClientById(UUID id);
+    BloodTestOrderDTO getLastOrder(UUID clientId);
+    void confirmBloodTestOrder(UUID orderId);
 }

@@ -70,16 +70,6 @@ public class DieticianModService implements IDieticianService {
     }
 
     @Override
-    public Dietician getById(UUID id) {
-        return null;
-    }
-
-    @Override
-    public List<Client> getClients(UUID dieticianId) {
-        return List.of();
-    }
-
-    @Override
     @Transactional(
             propagation = Propagation.REQUIRES_NEW,
             transactionManager = "modTransactionManager",
@@ -218,5 +208,47 @@ public class DieticianModService implements IDieticianService {
         }
         if(surveysPage == null || surveysPage.isEmpty()) throw new PeriodicSurveyNotFound();
         return surveysPage.map(periodicSurveyMapper::toPeriodicSurveyDTO);
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = true,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(retryFor = {
+            JpaSystemException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public BloodTestOrderDTO getLastOrder(UUID clientId) {
+        Client client = clientModRepository.findClientById(clientId).orElseThrow(ClientNotFoundException::new);
+
+        BloodTestOrder bloodTestOrder = bloodTestOrderRepository.findTopByClient_IdAndFulfilledFalseOrderByOrderDateDesc(clientId)
+                .orElseThrow(BloodTestOrderNotFoundException::new);
+
+        return bloodTestOrderMapper.toBloodTestOrderDTO(bloodTestOrder);
+    }
+
+    @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW, readOnly = false,
+            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
+    @PreAuthorize("hasRole('DIETICIAN')")
+    public void confirmBloodTestOrder(UUID orderId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Dietician dietician = dieticianModRepository.findByLogin(login)
+                .orElseThrow(DieticianNotFoundException::new);
+        BloodTestOrder bloodTestOrder = bloodTestOrderRepository.findById(orderId)
+                .orElseThrow(BloodTestOrderNotFoundException::new);
+        if (!bloodTestOrder.getDietician().equals(dietician)) {
+            throw new DieticianAccessDeniedException();
+        }
+        if (bloodTestOrder.isFulfilled()) {
+            throw new BloodTestOrderAlreadyFulfilledException();
+        }
+        bloodTestOrder.setFulfilled(true);
+        bloodTestOrderRepository.saveAndFlush(bloodTestOrder);
     }
 }
