@@ -89,7 +89,9 @@ public class SecurityConfig {
                                 "/api/mod/client-food-pyramids/client-pyramids",
                                 "/api/mod/feedbacks/client/{clientId}/pyramid/{pyramidId}",
                                 "/api/mod/feedbacks/my-pyramid/{pyramidId}",
-                                "/api/mod/clients/permanent-survey"
+                                "/api/mod/clients/permanent-survey",
+                                "/api/mod/blood-test-reports/client",
+                                "/api/mod/blood-test-reports/{reportId}"
                         ).hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/mod/clients/periodic-survey",
@@ -99,7 +101,8 @@ public class SecurityConfig {
                                 "/api/blood-test-reports/{clientId}",
                                 "/api/mod/blood-test-reports/client/{clientId}",
                                 "/api/mod/dieticians/order-medical-examinations",
-                                "/api/mod/client-food-pyramids"
+                                "/api/mod/client-food-pyramids",
+                                "/api/mod/client-food-pyramids/new/{clientId}"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/mod/algorithm/{clientId}",
@@ -113,7 +116,12 @@ public class SecurityConfig {
                                 "/api/mod/client-food-pyramids/dietician/{clientId}",
                                 "/api/mod/food-pyramids",
                                 "/api/mod/client-food-pyramids/client/{clientId}/current",
-                                "/api/mod/food-pyramids/{id}"
+                                "/api/mod/food-pyramids/{id}",
+                                "/api/mod/blood-test-reports/client/{clientId}",
+                                "/api/mod/blood-test-reports/{reportId}"
+                        ).hasRole("DIETICIAN")
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/mod/blood-test-reports"
                         ).hasRole("DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account",
