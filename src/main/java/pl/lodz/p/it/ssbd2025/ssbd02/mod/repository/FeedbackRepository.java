@@ -40,14 +40,6 @@ public interface FeedbackRepository extends AbstractRepository<Feedback> {
     void delete(Feedback feedback);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("hasRole('DIETICIAN')")
-    List<Feedback> findAllByClient(Client client);
-
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("hasRole('DIETICIAN')")
-    List<Feedback> findAllByFoodPyramid(FoodPyramid pyramid);
-
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('CLIENT')")
     Optional<Feedback> findByClientIdAndFoodPyramidId(UUID clientId, UUID pyramidId);
 
