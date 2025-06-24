@@ -126,7 +126,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(87.7))
+                .andExpect(jsonPath("$.weight").value(88.8))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -156,7 +156,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                 .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(87.7))
+                .andExpect(jsonPath("$.weight").value(88.8))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -170,11 +170,11 @@ public class MOD29Test extends BaseIntegrationTest {
 
         String updatedPayload = objectMapper.writeValueAsString(jsonMap);
 
-//        mockMvc.perform(put("/api/mod/clients/periodic-survey") //todo odkomentowac po poprawce
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(updatedPayload)
-//                .header("Authorization", "Bearer " + clientToken))
-//                .andExpect(status().isConflict());
+        mockMvc.perform(put("/api/mod/clients/periodic-survey")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedPayload)
+                .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(87.7))
+                .andExpect(jsonPath("$.weight").value(88.8))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -199,51 +199,51 @@ public class MOD29Test extends BaseIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-//    @Test
-//    public void conflictOccursOnConcurrentUpdate() throws Exception {
-//        MvcResult result1 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
-//                        .header("Authorization", "Bearer " + clientToken))
-//                .andExpect(status().isOk())
-//                .andReturn();
-//        MvcResult result2 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
-//                        .header("Authorization", "Bearer " + clientToken))
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        Map<String, Object> map1 = objectMapper.readValue(result1.getResponse().getContentAsString(), new TypeReference<>() {});
-//        Map<String, Object> map2 = objectMapper.readValue(result2.getResponse().getContentAsString(), new TypeReference<>() {});
-//
-//        map1.put("weight", 88.8);
-//        map1.put("id", null);
-//        map1.put("measurementDate", null);
-//        map1.put("clientId", null);
-//        String payload1 = objectMapper.writeValueAsString(map1);
-//
-//        mockMvc.perform(put("/api/mod/clients/periodic-survey")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(payload1)
-//                        .header("Authorization", "Bearer " + clientToken))
-//                .andExpect(status().isOk());
-//
-//        map2.put("bloodSugarLevel", 123.45);
-//        map2.put("id", null);
-//        map2.put("measurementDate", null);
-//        map2.put("clientId", null);
-//        String payload2 = objectMapper.writeValueAsString(map2);
-//
-//        mockMvc.perform(put("/api/mod/clients/periodic-survey")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(payload2)
-//                        .header("Authorization", "Bearer " + clientToken))
-//                .andExpect(status().isConflict());
-//    }
+    @Test
+    public void conflictOccursOnConcurrentUpdate() throws Exception {
+        MvcResult result1 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        MvcResult result2 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Map<String, Object> map1 = objectMapper.readValue(result1.getResponse().getContentAsString(), new TypeReference<>() {});
+        Map<String, Object> map2 = objectMapper.readValue(result2.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        map1.put("weight", 88.8);
+        map1.put("id", null);
+        map1.put("measurementDate", null);
+        map1.put("clientId", null);
+        String payload1 = objectMapper.writeValueAsString(map1);
+
+        mockMvc.perform(put("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload1)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isOk());
+
+        map2.put("bloodSugarLevel", 123.45);
+        map2.put("id", null);
+        map2.put("measurementDate", null);
+        map2.put("clientId", null);
+        String payload2 = objectMapper.writeValueAsString(map2);
+
+        mockMvc.perform(put("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload2)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isConflict());
+    }
 
     @Test
     public void editFailure_BadRequest_tooHeavy() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(87.7))
+                .andExpect(jsonPath("$.weight").value(88.8))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -265,7 +265,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(87.7))
+                .andExpect(jsonPath("$.weight").value(88.8))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();

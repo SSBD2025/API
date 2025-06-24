@@ -70,6 +70,7 @@ public class MOD26Test extends BaseIntegrationTest {
     private EmailService emailService;
 
     private final UUID clientId = UUID.fromString("00000000-0000-0000-0000-000000000006");
+    private final UUID nonExistentClientId = UUID.randomUUID();
 
     @Autowired
     private ClientBloodTestReportService clientBloodTestReportService;
@@ -137,6 +138,14 @@ public class MOD26Test extends BaseIntegrationTest {
     // NEGATIVE TESTS //
     // NEGATIVE TESTS //
     // NEGATIVE TESTS //
+
+    @Test
+    public void mod26_dietician_not_found() throws Exception {
+        mockMvc.perform(get("http://localhost:8080/api/mod/dieticians/{clientId}/periodic-surveys", nonExistentClientId)
+                        .header("Authorization", "Bearer " + dietToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     public void mod26_client_unauthorized() throws Exception {
