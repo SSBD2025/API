@@ -21,5 +21,4 @@ public interface IDieticianService {
     Page<PeriodicSurveyDTO> getPeriodicSurveysByClientId(UUID clientId, Pageable pageable, @Nullable Timestamp since, @Nullable Timestamp before);
     Client getDieticiansClientById(UUID id);
     BloodTestOrderDTO getLastOrder(UUID clientId);
-    void confirmBloodTestOrder(UUID orderId);
 }

@@ -230,25 +230,4 @@ public class DieticianModService implements IDieticianService {
 
         return bloodTestOrderMapper.toBloodTestOrderDTO(bloodTestOrder);
     }
-
-    @Override
-    @Transactional(
-            propagation = Propagation.REQUIRES_NEW, readOnly = false,
-            transactionManager = "modTransactionManager", timeoutString = "${transaction.timeout}")
-    @PreAuthorize("hasRole('DIETICIAN')")
-    public void confirmBloodTestOrder(UUID orderId) {
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Dietician dietician = dieticianModRepository.findByLogin(login)
-                .orElseThrow(DieticianNotFoundException::new);
-        BloodTestOrder bloodTestOrder = bloodTestOrderRepository.findById(orderId)
-                .orElseThrow(BloodTestOrderNotFoundException::new);
-        if (!bloodTestOrder.getDietician().equals(dietician)) {
-            throw new DieticianAccessDeniedException();
-        }
-        if (bloodTestOrder.isFulfilled()) {
-            throw new BloodTestOrderAlreadyFulfilledException();
-        }
-        bloodTestOrder.setFulfilled(true);
-        bloodTestOrderRepository.saveAndFlush(bloodTestOrder);
-    }
 }

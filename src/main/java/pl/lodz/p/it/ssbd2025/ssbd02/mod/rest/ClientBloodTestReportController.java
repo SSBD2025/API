@@ -19,7 +19,7 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnCreate;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
-import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.SurveyNotFoundException;
+import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.AuthorizedEndpoint;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
@@ -49,8 +49,12 @@ public class ClientBloodTestReportController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Utworzony został raport wyników badań klienta"),
             @ApiResponse(responseCode = "400", description = "Niepoprawnie sformatowane żądanie"),
+            @ApiResponse(responseCode = "403", description = "Brak dostępu do zasobu innego dietetyka"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety parametrów stałych"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiety dietetyka"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono odpowiedniego zlecenia badania krwi"),
+            @ApiResponse(responseCode = "409", description = "Zlecenie zostało już wypełnione"),
     })
     public ResponseEntity<Object> createClientBloodTestReport(@PathVariable SensitiveDTO clientId, @RequestBody @Validated(OnCreate.class) ClientBloodTestReportDTO report) {
         ClientBloodTestReport newClientBloodTestResult = clientBloodTestReportMapper.toNewClientBloodTestReport(report);
