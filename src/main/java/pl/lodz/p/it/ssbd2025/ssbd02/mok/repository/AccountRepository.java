@@ -52,7 +52,6 @@ public interface AccountRepository extends AbstractRepository<Account> {
     """)
     List<AccountRolesProjection> findAccountRolesByLogin(@NotBlank @Size(min = AccountConsts.LOGIN_MIN, max = AccountConsts.LOGIN_MAX) String login);
 
-    //Uses only in test scope
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("hasRole('ADMIN')||hasRole('CLIENT')||hasRole('DIETICIAN')")
     @Modifying

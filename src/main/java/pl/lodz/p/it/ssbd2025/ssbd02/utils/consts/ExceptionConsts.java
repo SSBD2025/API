@@ -8,7 +8,6 @@ public final class ExceptionConsts {
     public static final String ACCOUNT_ALREADY_BLOCKED = "account_already_blocked";
     public static final String ACCOUNT_ALREADY_UNBLOCKED = "account_already_unblocked";
     public static final String ACCOUNT_ALREADY_VERIFIED = "account_already_verified";
-    //TODO ACCOUNT_CONSTRAINT_VIOLATION
     public static final String ACCOUNT_CONSTRAINT_VIOLATION = "account_constraint_violation";
     public static final String FOOD_PYRAMID_NAME_ALREADY_IN_USE = "food_pyramid_name_already_in_use";
     public static final String ACCOUNT_EMAIL_ALREADY_IN_USE = "account_email_already_in_use";

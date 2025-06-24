@@ -64,8 +64,6 @@ public class TokenUtil {
         return new SensitiveDTO(code);
     }
 
-    //TODO sprawdzic
-
     @PreAuthorize("permitAll()")
     public Date generateMillisecondExpiration(long value){
         return new Date(new Date().getTime() + value);
