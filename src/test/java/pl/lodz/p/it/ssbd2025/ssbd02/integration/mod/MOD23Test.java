@@ -162,7 +162,7 @@ public class MOD23Test extends BaseIntegrationTest {
     // NEGATIVE TESTS //
 
     @Test
-    public void insertFailure_BadRequest() throws Exception {
+    public void insertFailure_BadRequest_malformed() throws Exception {
         String payload = """
     {
         "results": [
@@ -172,6 +172,70 @@ public class MOD23Test extends BaseIntegrationTest {
                     "name": "HGB"
                     "description": "cool description"
                 },
+            }
+        ]
+    }
+    """;
+
+        mockMvc.perform(post("http://localhost:8080/api/mod/blood-test-reports/client/{clientId}", clientId)
+                        .content(payload)
+                        .header("Authorization", "Bearer " + dietToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void insertFailure_BadRequest_negative() throws Exception {
+        String payload = """
+    {
+        "results": [
+            {
+                "result": -1,
+                "bloodParameter": {
+                    "name": "HGB"
+                    "description": "cool description"
+                },
+            }
+        ]
+    }
+    """;
+
+        mockMvc.perform(post("http://localhost:8080/api/mod/blood-test-reports/client/{clientId}", clientId)
+                        .content(payload)
+                        .header("Authorization", "Bearer " + dietToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void insertFailure_BadRequest_missing_parameter() throws Exception {
+        String payload = """
+    {
+        "results": [
+            {
+                "result": 1,
+            }
+        ]
+    }
+    """;
+
+        mockMvc.perform(post("http://localhost:8080/api/mod/blood-test-reports/client/{clientId}", clientId)
+                        .content(payload)
+                        .header("Authorization", "Bearer " + dietToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void insertFailure_BadRequest_nonexistent_parameter() throws Exception {
+        String payload = """
+    {
+        "results": [
+            {
+                "result": 44.444,
+                "bloodParameter": {
+                    "name": "NONEXISTENT"
+                }
             }
         ]
     }

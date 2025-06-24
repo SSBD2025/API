@@ -72,6 +72,7 @@ public class MOD12Test extends BaseIntegrationTest {
     private EmailService emailService;
 
     private final UUID clientId = UUID.fromString("00000000-0000-0000-0000-000000000006");
+    private final UUID invalidId = UUID.fromString("10100102-0304-0060-0a00-000000000006");
 
     @Autowired
     private ClientBloodTestReportService clientBloodTestReportService;
@@ -285,6 +286,14 @@ public class MOD12Test extends BaseIntegrationTest {
     public void mod12_client_not_found_between() throws Exception {
         mockMvc.perform(get("http://localhost:8080/api/mod/clients/periodic-survey?before=2025-01-02T12:00:00&since=2025-01-01T12:00:00")
                         .header("Authorization", "Bearer " + clientToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void mod12_diet_client_not_found() throws Exception {
+        mockMvc.perform(get("http://localhost:8080/api/mod/dieticians/{clientId}/periodic-surveys?before=2025-06-10T12:00:00&since=2025-06-06T12:00:00&sort=measurementDate,desc", invalidId)
+                        .header("Authorization", "Bearer " + dietToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
