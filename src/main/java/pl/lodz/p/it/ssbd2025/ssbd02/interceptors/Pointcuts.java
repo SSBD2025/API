@@ -36,4 +36,10 @@ public class Pointcuts {
                     "|| within(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.UserRoleChangeLogged *)"
     )
     public void userRoleChangeLoggedAnnotatedMethods() {}
+
+    @Pointcut(
+            "execution(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RollbackUnknown * *(..)) " +
+                    "|| within(@pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RollbackUnknown *)"
+    )
+    public void transactionRollbackOnUnknown() {}
 }

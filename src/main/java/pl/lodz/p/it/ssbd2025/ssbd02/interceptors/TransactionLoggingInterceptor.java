@@ -22,9 +22,15 @@ public class TransactionLoggingInterceptor {
         final String transactionId = TransactionSynchronizationManager.getCurrentTransactionName() + ":" + String.valueOf(Thread.currentThread().threadId())
         + (null != RetrySynchronizationManager.getContext()?" (retry # "+RetrySynchronizationManager.getContext().getRetryCount()+")":"");
 
-        TransactionSynchronizationLogger synchronizationLogger = new TransactionSynchronizationLogger(transactionId);
-        TransactionSynchronizationManager.registerSynchronization(synchronizationLogger);
-        log.trace("[TRANSACTION LOGGER] Transaction synchronization: {} registered", synchronizationLogger.getTransactionId());
+        TransactionSynchronizationLogger logger = TransactionSynchronizationLogger.threadLocalTSLogger.get();
+
+        if (logger == null) {
+            logger = new TransactionSynchronizationLogger();
+        }
+
+        logger.setTransactionId(transactionId);
+        TransactionSynchronizationManager.registerSynchronization(logger);
+        log.trace("[TRANSACTION LOGGER] Transaction synchronization: {} registered", logger.getTransactionId());
     }
 
 }
