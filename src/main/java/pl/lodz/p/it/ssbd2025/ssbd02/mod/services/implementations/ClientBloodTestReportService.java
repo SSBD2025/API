@@ -19,15 +19,14 @@ import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodParameterMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.BloodTestResultMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.mappers.ClientBloodTestReportMapper;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.vgroups.OnUpdate;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.BloodTestResult;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Client;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.ClientBloodTestReport;
-import pl.lodz.p.it.ssbd2025.ssbd02.entities.Survey;
+import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.BloodTestOrderRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientBloodTestReportRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.ClientModRepository;
+import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.DieticianModRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
 
@@ -57,6 +56,8 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
     private final BloodParameterMapper bloodParameterMapper;
     private final BloodTestResultMapper bloodTestResultMapper;
     private final ClientBloodTestReportMapper clientBloodTestReportMapper;
+    private final DieticianModRepository dieticianModRepository;
+    private final BloodTestOrderRepository bloodTestOrderRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = true, timeoutString = "${transaction.timeout}")
     @PreAuthorize("hasRole('CLIENT')||hasRole('DIETICIAN')")
@@ -118,9 +119,18 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         return new ClientBloodTestReportDTO(null, null, null, report.getTimestamp(), resultsDTO, lockTokenService.generateToken(report.getId(), report.getVersion()).getValue());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
-    @PreAuthorize("hasRole('DIETICIAN')")
     @Override
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW,
+            transactionManager = "modTransactionManager",
+            readOnly = false,
+            timeoutString = "${transaction.timeout}")
+    @Retryable(
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
+            backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
+            maxAttemptsExpression = "${app.retry.maxattempts}"
+    )
+    @PreAuthorize("hasRole('DIETICIAN')")
     public ClientBloodTestReportDTO createReport(SensitiveDTO clientId, ClientBloodTestReport report) {
         Client client = clientModRepository.findClientById(UUID.fromString(clientId.getValue())).orElseThrow(ClientNotFoundException::new);
         report.setClient(client);
@@ -130,6 +140,19 @@ public class ClientBloodTestReportService implements IClientBloodTestReportServi
         if(survey == null) {
             throw new PermanentSurveyNotFoundException();
         }
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Dietician dietician = dieticianModRepository.findByLogin(login)
+                .orElseThrow(DieticianNotFoundException::new);
+        BloodTestOrder bloodTestOrder = bloodTestOrderRepository.findTopByClient_IdAndFulfilledFalseOrderByOrderDateDesc(client.getId())
+                .orElseThrow(BloodTestOrderNotFoundException::new);
+        if (!bloodTestOrder.getDietician().equals(dietician)) {
+            throw new DieticianAccessDeniedException();
+        }
+        if (bloodTestOrder.isFulfilled()) {
+            throw new BloodTestOrderAlreadyFulfilledException();
+        }
+        bloodTestOrder.setFulfilled(true);
+        bloodTestOrderRepository.saveAndFlush(bloodTestOrder);
         return clientBloodTestReportMapper.toClientBloodTestReportDTO(clientBloodTestReportRepository.saveAndFlush(report), survey.isGender());
     }
 

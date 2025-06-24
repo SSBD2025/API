@@ -1304,5 +1304,15 @@
             <column name="order_id" value="00000000-0000-0000-0000-000000000001"/>
             <column name="parameter" value="HGB"/>
         </insert>
+
+        <insert tableName="blood_test_order_parameters">
+            <column name="order_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="parameter" value="RBC"/>
+        </insert>
+
+        <insert tableName="blood_test_order_parameters">
+            <column name="order_id" value="00000000-0000-0000-0000-000000000001"/>
+            <column name="parameter" value="HCT"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>

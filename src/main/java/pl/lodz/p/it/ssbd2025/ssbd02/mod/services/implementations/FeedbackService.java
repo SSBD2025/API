@@ -113,7 +113,7 @@ public class FeedbackService implements IFeedbackService {
             readOnly = false,
             timeoutString = "${transaction.timeout}")
     @Retryable(
-            retryFor = {JpaSystemException.class},
+            retryFor = {JpaSystemException.class, ConcurrentUpdateException.class},
             backoff = @Backoff(delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
     public void deleteFeedback(UUID feedbackId) {
