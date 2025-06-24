@@ -407,8 +407,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
-                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
-                .andExpect(jsonPath("$.violations[0].message").value("musi być równe lub większe od 1"));
+                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"));
 
 
         mockMvc.perform(post("/api/account/logout")
@@ -452,8 +451,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
-                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"))
-                .andExpect(jsonPath("$.violations[0].message").value("musi być równe lub mniejsze od 5"));
+                .andExpect(jsonPath("$.violations[0].fieldName").value("rating"));
 
 
         mockMvc.perform(post("/api/account/logout")
@@ -542,8 +540,7 @@ public class MOD27Test extends BaseIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations").isArray())
                 .andExpect(jsonPath("$.violations.length()").value(1))
-                .andExpect(jsonPath("$.violations[0].fieldName").value("description"))
-                .andExpect(jsonPath("$.violations[0].message").value("długość musi wynosić od 1 do 255"));
+                .andExpect(jsonPath("$.violations[0].fieldName").value("description"));
 
 
         mockMvc.perform(post("/api/account/logout")

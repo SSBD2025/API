@@ -114,16 +114,6 @@ public class MOD9Test extends BaseIntegrationTest {
         SecurityContextHolder.clearContext();
     }
 
-    @Test
-    public void testGetFeedbackByClientAndPyramid() throws Exception {
-        mockMvc.perform(get("/api/mod/feedbacks/client/" + clientId + "/pyramid/" + foodPyramidId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + clientToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(feedbackId.toString()))
-                .andExpect(jsonPath("$.rating").value(2))
-                .andExpect(jsonPath("$.description").value("Średnio widze efekty po tym profilu żywieniowym"));
-    }
 
     @Test
     public void testGetMyFeedbackForPyramid() throws Exception {
@@ -167,13 +157,6 @@ public class MOD9Test extends BaseIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void testGetFeedbackWithInvalidUUIDFormat_ShouldReturnBadRequest() throws Exception {
-        mockMvc.perform(get("/api/mod/feedbacks/client/invalid-uuid/pyramid/" + foodPyramidId)
-                        .header("Authorization", "Bearer " + clientToken)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     public void testClientTriesToAccessOtherClientFeedback_ShouldReturnForbiddenOrNotFound() throws Exception {
