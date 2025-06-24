@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pl.lodz.p.it.ssbd2025.ssbd02.common.AbstractRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.dto.AccountRolesProjection;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
@@ -23,12 +24,7 @@ import java.util.UUID;
 @Repository
 @MethodCallLogged
 @EnableMethodSecurity(prePostEnabled=true)
-public interface UserRoleRepository extends JpaRepository<UserRole, UUID> {
-    //    List<Admin> findAdminsByAccount(Account account);
-//    List<Client> findClientsByAccount(Account account);
-//    List<Dietician> findDieticiansByAccount(Account account);
-//    @Override
-//    <S extends UserRole> S saveAndFlush(S entity);
+public interface UserRoleRepository extends AbstractRepository<UserRole> {
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
     @PreAuthorize("hasRole('ADMIN')")
     UserRole saveAndFlush(UserRole userRole);

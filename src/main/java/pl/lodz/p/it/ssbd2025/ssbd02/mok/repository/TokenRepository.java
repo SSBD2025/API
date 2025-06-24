@@ -1,6 +1,5 @@
 package pl.lodz.p.it.ssbd2025.ssbd02.mok.repository;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +15,6 @@ import pl.lodz.p.it.ssbd2025.ssbd02.entities.Account;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.TokenEntity;
 import pl.lodz.p.it.ssbd2025.ssbd02.enums.TokenType;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
-import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
 
 import java.util.Date;
 import java.util.List;
@@ -28,7 +26,7 @@ import java.util.UUID;
 @EnableMethodSecurity(prePostEnabled=true)
 @Component("MOKTokenRepository")
 @Transactional(propagation = Propagation.MANDATORY)
-public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, AbstractRepository<TokenEntity> { // TODO zastanowic sie czy zostawic JpaRepository
+public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, AbstractRepository<TokenEntity> {
     List<TokenEntity> findByAccount(Account account);
 
     @Transactional(propagation = Propagation.MANDATORY, readOnly = false)
@@ -55,8 +53,6 @@ public interface TokenRepository extends JpaRepository<TokenEntity, UUID>, Abstr
 
     boolean existsByToken(String token);
 
-//    @Query("SELECT j FROM TokenEntity j WHERE j.token = :token")
-//    TokenEntity findByTokenValue(String token);
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("permitAll()")
     Optional<TokenEntity> findByToken(String token);
