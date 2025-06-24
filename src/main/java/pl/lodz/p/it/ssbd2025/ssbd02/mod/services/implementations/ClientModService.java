@@ -25,7 +25,9 @@ import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.NoAssignedDieticianException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.PermanentSurveyAlreadyExistsException;
 import pl.lodz.p.it.ssbd2025.ssbd02.exceptions.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.MethodCallLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.RollbackUnknown;
 import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionLogged;
+import pl.lodz.p.it.ssbd2025.ssbd02.interceptors.TransactionSynchronizationLogger;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.*;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.interfaces.IClientService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.LockTokenService;
@@ -92,10 +94,12 @@ public class ClientModService implements IClientService {
             timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {
             JpaSystemException.class,
-            ConcurrentUpdateException.class},
+            ConcurrentUpdateException.class,
+            TransactionSynchronizationLogger.TransactionNotCommittedException.class},
             backoff = @Backoff(
                     delayExpression = "${app.retry.backoff}"),
             maxAttemptsExpression = "${app.retry.maxattempts}")
+    @RollbackUnknown
     public void assignDietician(UUID dieticianId) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Client client = clientModRepository.findByLogin(login).orElseThrow(ClientNotFoundException::new);
