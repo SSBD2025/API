@@ -34,19 +34,13 @@ public class FoodPyramidTestHelper {
     @Autowired
     private FoodPyramidRepository foodPyramidRepository;
 
-    @Autowired
-    private ClientModRepository clientModRepository;
 
     @Autowired
     private ClientFoodPyramidRepository clientFoodPyramidRepository;
 
     @Autowired
-    private MockMvc mockMvc;
+    private ModTestHelper modTestHelper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private SecurityContext securityContext;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "modTransactionManager")
     public FoodPyramid getFoodPyramid(UUID id) {
@@ -73,8 +67,11 @@ public class FoodPyramidTestHelper {
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true, transactionManager = "modTransactionManager")
     @WithMockUser(roles = "DIETICIAN")
     public FoodPyramid findByName(String name) {
-        return Optional.ofNullable(foodPyramidRepository.findByNameForTests(name))
+        modTestHelper.setDieticianContext();
+        FoodPyramid foodPyramid = Optional.ofNullable(foodPyramidRepository.findByName(name))
                 .orElseThrow(() -> new IllegalArgumentException("Food pyramid with name " + name + " not found"));
+        modTestHelper.resetContext();
+        return foodPyramid;
     }
 
     @Transactional(propagation = Propagation.MANDATORY, transactionManager = "modTransactionManager")

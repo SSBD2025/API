@@ -33,16 +33,7 @@ public interface FoodPyramidRepository extends AbstractRepository<FoodPyramid> {
     @PreAuthorize("hasRole('DIETICIAN')")
     FoodPyramid findByName(String name);
 
-    @PreAuthorize("permitAll()") //FOR TESTS ONLY <- po co ???
-    @Transactional(propagation = Propagation.MANDATORY) // <- brak readonly
-    void delete(FoodPyramid foodPyramid);
-
     @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
     @PreAuthorize("hasRole('DIETICIAN') || hasRole('CLIENT')")
     Optional<FoodPyramid> findById(UUID id);
-
-    @Transactional(propagation = Propagation.MANDATORY, readOnly = true)
-    @PreAuthorize("permitAll()")
-    @Query("SELECT p FROM FoodPyramid p WHERE p.name = :name")
-    FoodPyramid findByNameForTests(@Param("name") String name);
 }
