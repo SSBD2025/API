@@ -80,7 +80,7 @@ public class ClientModService implements IClientService {
     @Transactional(propagation = Propagation.MANDATORY, transactionManager = "modTransactionManager", readOnly = true)
     @Override
     public Client getClientByLogin(SensitiveDTO login) {
-        return clientModRepository.findByLogin(login.getValue()).orElseThrow(AccountNotFoundException::new);
+        return clientModRepository.findByLogin(login.getValue()).orElseThrow(ClientNotFoundException::new);
     }
 
     @Override
