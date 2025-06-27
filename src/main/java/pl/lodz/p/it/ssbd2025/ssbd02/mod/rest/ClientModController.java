@@ -9,7 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -174,12 +177,13 @@ public class ClientModController {
             @ApiResponse(responseCode = "404", description = "Nie znaleziono klienta o podanym id"),
             @ApiResponse(responseCode = "404", description = "Nie znaleziono ankiet okresowych")
     })
-    public ResponseEntity<Page<PeriodicSurveyDTO>> getPeriodicSurveysByClientId(
+    public ResponseEntity<PagedModel<EntityModel<PeriodicSurveyDTO>>> getPeriodicSurveysByClientId(
             @PathVariable UUID clientId,
-            Pageable pageable) {
+            Pageable pageable,
+            PagedResourcesAssembler<PeriodicSurveyDTO> pagedResourcesAssembler) {
 
         Page<PeriodicSurveyDTO> dtoPage = clientService.getPeriodicSurveys(clientId, pageable);
-        return ResponseEntity.ok(dtoPage);
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(dtoPage));
     }
 
     @GetMapping("/periodic-survey/{surveyId}")
@@ -209,19 +213,20 @@ public class ClientModController {
             @ApiResponse(responseCode = "404", description = "Nie odnaleziono ankiet okresowych"),
             @ApiResponse(responseCode = "404", description = "Nie odnaleziono klienta")
     })
-    public ResponseEntity<Object> getMyPeriodicSurveys(
+    public ResponseEntity<PagedModel<EntityModel<PeriodicSurveyDTO>>> getMyPeriodicSurveys(
             Pageable pageable,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime since,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime before
+            LocalDateTime before,
+            PagedResourcesAssembler<PeriodicSurveyDTO> pagedResourcesAssembler
     ) {
         Page<PeriodicSurveyDTO> periodicSurveyDTO = clientService.getPeriodicSurveys(pageable,
                 since != null ? Timestamp.valueOf(since) : null,
                 before != null ? Timestamp.valueOf(before) : null);
-        return ResponseEntity.status(HttpStatus.OK).body(periodicSurveyDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(pagedResourcesAssembler.toModel(periodicSurveyDTO));
     }
 
     @PutMapping("/periodic-survey")
