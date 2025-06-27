@@ -11,6 +11,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -116,7 +119,7 @@ public class AccountController {
     @PostMapping("/force/changePassword")
     @PreAuthorize("permitAll()")
     @Operation(summary = "Zmień hasło po pierwszym uwierzytelnieniu lub po zmianie hasła przez administratora",
-    description = "Dostępne dla wszystkich")
+            description = "Dostępne dla wszystkich")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Operacja powiodła się"),
             @ApiResponse(responseCode = "401", description = "Niepoprawne hasło"),
@@ -300,8 +303,8 @@ public class AccountController {
     @PreAuthorize("permitAll()")
     @Operation(summary = "Otrzymaj link do resetu hasła na podany adres e-mail", description = "Dostępne dla wszystkich")
     @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Operacja powiodła się, podano poprawny e-mail"),
-      @ApiResponse(responseCode = "204", description = "Operacja nie powiodła się, podano niepoprawny e-mail"),
+            @ApiResponse(responseCode = "204", description = "Operacja powiodła się, podano poprawny e-mail"),
+            @ApiResponse(responseCode = "204", description = "Operacja nie powiodła się, podano niepoprawny e-mail"),
     })
     public ResponseEntity<Void> resetPasswordRequest(@RequestBody @Validated(OnRequest.class) ResetPasswordDTO resetPasswordDTO) {
         accountService.sendResetPasswordEmail(resetPasswordDTO.getEmail());
@@ -334,13 +337,15 @@ public class AccountController {
             @ApiResponse(responseCode = "403", description = "Brak uprawnień"),
             @ApiResponse(responseCode = "400", description = "Nieprawidłowe parametry zapytania")
     })
-    public Page<AccountWithRolesDTO> getAllAccounts(
+    public ResponseEntity<PagedModel<EntityModel<AccountWithRolesDTO>>> getAllAccounts(
             @RequestParam(required = false) Boolean active,
             @RequestParam(required = false) Boolean verified,
             @RequestParam(required = false) String searchPhrase,
-            Pageable pageable
+            Pageable pageable,
+            PagedResourcesAssembler<AccountWithRolesDTO> pagedAssembler
     ) {
-        return accountService.getAllAccounts(active, verified, searchPhrase, pageable);
+        Page<AccountWithRolesDTO> page = accountService.getAllAccounts(active, verified, searchPhrase, pageable);
+        return ResponseEntity.ok(pagedAssembler.toModel(page));
     }
 
     @GetMapping("/{id}")
