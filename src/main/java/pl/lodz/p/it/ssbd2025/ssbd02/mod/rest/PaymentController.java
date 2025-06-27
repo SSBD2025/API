@@ -63,4 +63,22 @@ public class PaymentController {
 
         return responseData;
     }
+
+    @GetMapping("/session-status")
+    @PreAuthorize("permitAll()")
+    public Map<String, String> getSessionStatus(@RequestParam("session_id") String sessionId) {
+        Stripe.apiKey = stripeApiKey;
+        Session session;
+
+        try {
+            session = Session.retrieve(sessionId);
+        } catch (StripeException e) {
+            throw new PaymentException();
+        }
+        Map<String, String> responseData = new HashMap<>();
+        responseData.put("status", session.getStatus());
+        responseData.put("customer_email", session.getCustomerDetails().getEmail());
+
+        return responseData;
+    }
 }
