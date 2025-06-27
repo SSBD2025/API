@@ -54,7 +54,9 @@ public class SecurityConfig {
                                 "/api/account/confirm-email",
                                 "/api/account/revert-email-change",
                                 "/api/account/verify",
-                                "/api/account/unlock"
+                                "/api/account/unlock",
+                                "/api/sse/subscribe/block",
+                                "/api/sse/subscribe/unblock"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/account/login/2fa"
@@ -69,7 +71,9 @@ public class SecurityConfig {
                                 "/api/account/{id}/unblock"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/account/me"
+                                "/api/account/me",
+                                "/api/sse/subscribe/block",
+                                "/api/sse/subscribe/unblock"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/account/me"
