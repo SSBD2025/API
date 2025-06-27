@@ -130,7 +130,11 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>27.1.0</version>
+		</dependency>
 		<!-- security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
