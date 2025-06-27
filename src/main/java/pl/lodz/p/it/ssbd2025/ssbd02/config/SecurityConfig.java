@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 "/api/account/auth/email/request",
                                 "/api/account/auth/email",
                                 "/api/client/register",
-                                "/api/dietician/register"
+                                "/api/dietician/register",
+                                "/api/mod/payment/create-checkout-session"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/account/confirm-email",
@@ -154,7 +155,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/error",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/api/mod/payment/session-status"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
