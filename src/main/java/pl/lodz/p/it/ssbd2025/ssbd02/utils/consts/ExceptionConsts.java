@@ -65,4 +65,5 @@ public final class ExceptionConsts {
     public static final String BLOOD_TEST_ORDER_NOT_FOUND = "blood_test_order_not_found";
     public static final String BLOOD_TEST_ALREADY_FULFILLED = "blood_test_already_fulfilled";
     public static final String PAYMENT_STRIPE_EXCEPTION = "payment_stripe_exception";
+    public static final String LATE_UPDATE = "late_update";
 }

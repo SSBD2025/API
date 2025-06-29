@@ -215,6 +215,7 @@ public class ClientModService implements IClientService {
 
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
         periodicSurvey.setMeasurementDate(now);
+        periodicSurvey.setCreatedAt(now);
         return periodicSurveyRepository.saveAndFlush(periodicSurvey);
     }
 
