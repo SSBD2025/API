@@ -43,4 +43,8 @@ public class PeriodicSurvey extends AbstractEntity {
     @Column(name = PeriodicSurveyConsts.COLUMN_MEASUREMENT_DATE, nullable = false, updatable = true, unique = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp measurementDate;
+
+    @Column(name = PeriodicSurveyConsts.COLUMN_CREATED_AT, nullable = false, updatable = true, unique = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp createdAt;
 }

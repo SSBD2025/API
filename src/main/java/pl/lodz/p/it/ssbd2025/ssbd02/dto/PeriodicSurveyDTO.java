@@ -50,6 +50,11 @@ public class PeriodicSurveyDTO { //zrobione
     private Timestamp measurementDate;
 
     @Setter
+    @Null(groups = {OnCreate.class, OnUpdate.class})
+    @NotNull(groups = OnRead.class)
+    private Timestamp createdAt;
+
+    @Setter
     @NotNull(groups = {OnUpdate.class})
     @Null(groups = {OnCreate.class, OnRead.class})
     private String lockToken;
