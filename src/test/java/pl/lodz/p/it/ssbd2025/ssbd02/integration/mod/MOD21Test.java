@@ -65,6 +65,7 @@ public class MOD21Test extends BaseIntegrationTest {
             "120/80",
             100.0,
             null,
+            null,
             null
     );
 
@@ -107,10 +108,10 @@ public class MOD21Test extends BaseIntegrationTest {
         String body = objectMapper.writeValueAsString(periodicSurveyDTO);
 
         MvcResult result = mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-                .header("Authorization", "Bearer " + clientToken))
-        .andExpect(status().isCreated())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.clientId").value("00000000-0000-0000-0000-000000000006"))
                 .andExpect(jsonPath("$.weight").value(80.0))
                 .andExpect(jsonPath("$.bloodPressure").value("120/80"))
@@ -168,9 +169,9 @@ public class MOD21Test extends BaseIntegrationTest {
         Assertions.assertEquals(100.0, periodicSurveyFromDB.getBloodSugarLevel());
 
         MvcResult result2 = mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(body)
-                    .header("Authorization", "Bearer " + token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isConflict())
                 .andReturn();
         Assertions.assertEquals("periodic_survey_too_soon", result2.getResponse().getErrorMessage());
@@ -182,13 +183,13 @@ public class MOD21Test extends BaseIntegrationTest {
     @Test
     public void submitPeriodicSurveyNoTokenProvidedTest() throws Exception {
         mockMvc.perform(post("/api/mod/clients/periodic-survey"))
-        .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void submitPeriodicSurveyInvalidTokenProvidedTest() throws Exception {
         mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                .header("Authorization", "Bearer " + clientToken + "1"))
+                        .header("Authorization", "Bearer " + clientToken + "1"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -212,9 +213,9 @@ public class MOD21Test extends BaseIntegrationTest {
         String body = objectMapper.writeValueAsString(periodicSurveyDTO);
 
         mockMvc.perform(post("/api/mod/clients/periodic-survey")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-                .header("Authorization", "Bearer " + dToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + dToken))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/account/logout")
@@ -260,6 +261,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 "120/80",
                 100.0,
                 null,
+                null,
                 null
         );
 
@@ -285,6 +287,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 10.0,
                 "120/80",
                 100.0,
+                null,
                 null,
                 null
         );
@@ -312,6 +315,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 "120/80",
                 100.0,
                 null,
+                null,
                 null
         );
 
@@ -338,6 +342,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 null,
                 100.0,
                 null,
+                null,
                 null
         );
 
@@ -363,6 +368,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 80.0,
                 "120-80",
                 100.0,
+                null,
                 null,
                 null
         );
@@ -391,6 +397,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 "120/80",
                 null,
                 null,
+                null,
                 null
         );
 
@@ -417,6 +424,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 "120/80",
                 -100.0,
                 null,
+                null,
                 null
         );
 
@@ -442,6 +450,7 @@ public class MOD21Test extends BaseIntegrationTest {
                 80.0,
                 "120/80",
                 10000.0,
+                null,
                 null,
                 null
         );

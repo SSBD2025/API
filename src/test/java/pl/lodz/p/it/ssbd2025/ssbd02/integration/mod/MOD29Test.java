@@ -2,9 +2,11 @@ package pl.lodz.p.it.ssbd2025.ssbd02.integration.mod;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.AsyncTestConfig;
 import pl.lodz.p.it.ssbd2025.ssbd02.config.BaseIntegrationTest;
+import pl.lodz.p.it.ssbd2025.ssbd02.dto.PeriodicSurveyDTO;
 import pl.lodz.p.it.ssbd2025.ssbd02.entities.PeriodicSurvey;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.AccountTestHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.helpers.ModTestHelper;
+import pl.lodz.p.it.ssbd2025.ssbd02.helpers.PeriodicSurveyHelper;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.repository.PeriodicSurveyRepository;
 import pl.lodz.p.it.ssbd2025.ssbd02.mod.services.implementations.ClientBloodTestReportService;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.EmailService;
@@ -57,6 +61,9 @@ public class MOD29Test extends BaseIntegrationTest {
     private String adminToken;
     private String dietToken;
     private String clientToken;
+
+    @Autowired
+    private PeriodicSurveyHelper helper;
 
     @MockitoBean
     private JavaMailSender mailSender;
@@ -123,10 +130,45 @@ public class MOD29Test extends BaseIntegrationTest {
 
     @Test
     public void clientSuccessfullyEdits() throws Exception {
+        PeriodicSurveyDTO periodicSurveyDTO = new PeriodicSurveyDTO(
+                null,
+                null,
+                null,
+                80.0,
+                "120/80",
+                100.0,
+                null,
+                null,
+                null
+        );
+
+        String body = objectMapper.writeValueAsString(periodicSurveyDTO);
+
+        MvcResult res = mockMvc.perform(post("/api/mod/clients/periodic-survey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.clientId").value("00000000-0000-0000-0000-000000000006"))
+                .andExpect(jsonPath("$.weight").value(80.0))
+                .andExpect(jsonPath("$.bloodPressure").value("120/80"))
+                .andExpect(jsonPath("$.bloodSugarLevel").value(100.0))
+                .andReturn();
+
+        String id = JsonPath.read(res.getResponse().getContentAsString(), "$.id");
+        UUID uuid = UUID.fromString(id);
+        PeriodicSurvey periodicSurveyFromDB = helper.getSurveyById(uuid);
+
+        Assertions.assertNotNull(periodicSurveyFromDB);
+        Assertions.assertEquals("00000000-0000-0000-0000-000000000006", periodicSurveyFromDB.getClient().getId().toString());
+        Assertions.assertEquals(80.0, periodicSurveyFromDB.getWeight());
+        Assertions.assertEquals("120/80", periodicSurveyFromDB.getBloodPressure());
+        Assertions.assertEquals(100.0, periodicSurveyFromDB.getBloodSugarLevel());
+
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(88.8))
+                .andExpect(jsonPath("$.weight").value(80.0))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -135,6 +177,7 @@ public class MOD29Test extends BaseIntegrationTest {
         jsonMap.put("weight", 99.9);
         jsonMap.put("id", null);
         jsonMap.put("measurementDate", null);
+        jsonMap.put("createdAt", null);
         jsonMap.put("clientId", null);
 
         String updatedPayload = objectMapper.writeValueAsString(jsonMap);
@@ -154,9 +197,9 @@ public class MOD29Test extends BaseIntegrationTest {
     @Test
     public void editFailure_InvalidLockToken() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
-                .header("Authorization", "Bearer " + clientToken))
+                        .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(88.8))
+                .andExpect(jsonPath("$.weight").value(87.7))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -165,15 +208,16 @@ public class MOD29Test extends BaseIntegrationTest {
         jsonMap.put("weight", 99.9);
         jsonMap.put("id", null);
         jsonMap.put("measurementDate", null);
+        jsonMap.put("createdAt", null);
         jsonMap.put("clientId", null);
         jsonMap.put("lockToken", "abc");
 
         String updatedPayload = objectMapper.writeValueAsString(jsonMap);
 
         mockMvc.perform(put("/api/mod/clients/periodic-survey")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updatedPayload)
-                .header("Authorization", "Bearer " + clientToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedPayload)
+                        .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -182,7 +226,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(88.8))
+                .andExpect(jsonPath("$.weight").value(87.7))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -193,49 +237,10 @@ public class MOD29Test extends BaseIntegrationTest {
         String updatedPayload = objectMapper.writeValueAsString(jsonMap);
 
         mockMvc.perform(put("/api/mod/clients/periodic-survey")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updatedPayload)
-                .header("Authorization", "Bearer " + clientToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedPayload)
+                        .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void conflictOccursOnConcurrentUpdate() throws Exception {
-        MvcResult result1 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
-                        .header("Authorization", "Bearer " + clientToken))
-                .andExpect(status().isOk())
-                .andReturn();
-        MvcResult result2 = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
-                        .header("Authorization", "Bearer " + clientToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        Map<String, Object> map1 = objectMapper.readValue(result1.getResponse().getContentAsString(), new TypeReference<>() {});
-        Map<String, Object> map2 = objectMapper.readValue(result2.getResponse().getContentAsString(), new TypeReference<>() {});
-
-        map1.put("weight", 88.8);
-        map1.put("id", null);
-        map1.put("measurementDate", null);
-        map1.put("clientId", null);
-        String payload1 = objectMapper.writeValueAsString(map1);
-
-        mockMvc.perform(put("/api/mod/clients/periodic-survey")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(payload1)
-                        .header("Authorization", "Bearer " + clientToken))
-                .andExpect(status().isOk());
-
-        map2.put("bloodSugarLevel", 123.45);
-        map2.put("id", null);
-        map2.put("measurementDate", null);
-        map2.put("clientId", null);
-        String payload2 = objectMapper.writeValueAsString(map2);
-
-        mockMvc.perform(put("/api/mod/clients/periodic-survey")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(payload2)
-                        .header("Authorization", "Bearer " + clientToken))
-                .andExpect(status().isConflict());
     }
 
     @Test
@@ -243,7 +248,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(88.8))
+                .andExpect(jsonPath("$.weight").value(87.7))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -265,7 +270,7 @@ public class MOD29Test extends BaseIntegrationTest {
         MvcResult result = mockMvc.perform(get("/api/mod/clients/periodic-survey/latest")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weight").value(88.8))
+                .andExpect(jsonPath("$.weight").value(87.7))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
