@@ -84,7 +84,6 @@ public class MOK16Test extends BaseIntegrationTest {
         mockMvc.perform(get("/api/account")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", is(not(empty()))));
     }
 

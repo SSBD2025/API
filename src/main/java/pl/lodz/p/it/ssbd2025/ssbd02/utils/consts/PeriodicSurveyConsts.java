@@ -17,4 +17,5 @@ public class PeriodicSurveyConsts {
     public static final String BLOOD_PRESSURE_PATTERN = "(\\d{2,3})/(\\d{2,3})";
     public static final String BLOOD_PRESSURE_MESSAGE = "Blood pressure must be in the format 'XX/XX'";
     public static final String FIELD_CLIENT = "client";
+    public static final String COLUMN_CREATED_AT = "created_at";
 }

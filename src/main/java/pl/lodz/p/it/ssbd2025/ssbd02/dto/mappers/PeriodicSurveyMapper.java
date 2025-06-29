@@ -23,6 +23,7 @@ public abstract class PeriodicSurveyMapper {
     @Mappings({
             @Mapping(target = "clientId", source = "client.id"),
             @Mapping(target = "version", ignore = true),
+            @Mapping(target = "createdAt", source = "periodicSurvey.createdAt"),
             @Mapping(target = "lockToken", ignore = true)
     })
     public abstract PeriodicSurveyDTO toPeriodicSurveyDTO(PeriodicSurvey periodicSurvey);
