@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import pl.lodz.p.it.ssbd2025.ssbd02.utils.PersistenceListeners;
 import pl.lodz.p.it.ssbd2025.ssbd02.utils.consts.PeriodicSurveyConsts;
 
 import java.sql.Timestamp;
@@ -20,6 +21,7 @@ import java.sql.Timestamp;
                 @Index(name = PeriodicSurveyConsts.CLIENT_ID_INDEX, columnList = PeriodicSurveyConsts.COLUMN_CLIENT_ID)
         })
 @ToString(callSuper = true)
+@EntityListeners(PersistenceListeners.class)
 public class PeriodicSurvey extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = PeriodicSurveyConsts.COLUMN_CLIENT_ID, nullable = false, updatable = false, unique = false)
