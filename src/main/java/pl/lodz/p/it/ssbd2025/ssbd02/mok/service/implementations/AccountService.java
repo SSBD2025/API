@@ -103,8 +103,6 @@ public class AccountService implements IAccountService {
     private String unlockURL;
     @NotNull
     private final UserRoleRepository userRoleRepository;
-    @NotNull
-    private final SseEmitterManager emitterManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, transactionManager = "mokTransactionManager", readOnly = false, timeoutString = "${transaction.timeout}")
     @Retryable(retryFor = {JpaSystemException.class, ConcurrentUpdateException.class}, backoff = @Backoff(delayExpression = "${app.retry.backoff}"), maxAttemptsExpression = "${app.retry.maxattempts}")
@@ -312,7 +310,6 @@ public class AccountService implements IAccountService {
 
         account.setActive(false);
         accountRepository.saveAndFlush(account);
-        emitterManager.sendBlockedNotification(id);
         emailService.sendBlockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
@@ -329,7 +326,6 @@ public class AccountService implements IAccountService {
 
         account.setActive(true);
         accountRepository.saveAndFlush(account);
-        emitterManager.sendUnblockedNotification(id);
         emailService.sendUnblockAccountEmail(account.getEmail(), account.getLogin(), account.getLanguage());
     }
 
