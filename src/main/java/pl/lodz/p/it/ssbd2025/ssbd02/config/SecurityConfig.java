@@ -71,9 +71,7 @@ public class SecurityConfig {
                                 "/api/account/{id}/unblock"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.GET,
-                                "/api/account/me",
-                                "/api/sse/subscribe/block",
-                                "/api/sse/subscribe/unblock"
+                                "/api/account/me"
                         ).hasAnyRole("ADMIN", "CLIENT", "DIETICIAN")
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/account/me"
