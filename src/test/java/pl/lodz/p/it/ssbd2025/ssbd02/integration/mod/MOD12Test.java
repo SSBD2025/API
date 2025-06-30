@@ -129,16 +129,21 @@ public class MOD12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        JsonNode root = objectMapper.readTree(content).get("content");
+        JsonNode root = objectMapper.readTree(content);
+        JsonNode listNode = root.path("_embedded").path("periodicSurveyDTOList");
+
         List<LocalDateTime> dates = new ArrayList<>();
-        root.forEach(node -> {
+        listNode.forEach(node -> {
             String dateStr = node.get("measurementDate").asText();
             dates.add(OffsetDateTime.parse(dateStr).toLocalDateTime());
         });
+
         List<LocalDateTime> sorted = new ArrayList<>(dates);
         sorted.sort(Comparator.reverseOrder());
+
         Assertions.assertEquals(sorted, dates);
     }
+
 
     @Test
     public void mod12_client_ok_sort_date_asc() throws Exception {
@@ -148,9 +153,10 @@ public class MOD12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        JsonNode root = objectMapper.readTree(content).get("content");
+        JsonNode root = objectMapper.readTree(content);
+        JsonNode listNode = root.path("_embedded").path("periodicSurveyDTOList");
         List<LocalDateTime> dates = new ArrayList<>();
-        root.forEach(node -> {
+        listNode.forEach(node -> {
             String dateStr = node.get("measurementDate").asText();
             dates.add(OffsetDateTime.parse(dateStr).toLocalDateTime());
         });
@@ -207,9 +213,10 @@ public class MOD12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        JsonNode root = objectMapper.readTree(content).get("content");
+        JsonNode root = objectMapper.readTree(content);
+        JsonNode listNode = root.path("_embedded").path("periodicSurveyDTOList");
         List<LocalDateTime> dates = new ArrayList<>();
-        root.forEach(node -> {
+        listNode.forEach(node -> {
             String dateStr = node.get("measurementDate").asText();
             dates.add(OffsetDateTime.parse(dateStr).toLocalDateTime());
         });
@@ -226,9 +233,10 @@ public class MOD12Test extends BaseIntegrationTest {
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        JsonNode root = objectMapper.readTree(content).get("content");
+        JsonNode root = objectMapper.readTree(content);
+        JsonNode listNode = root.path("_embedded").path("periodicSurveyDTOList");
         List<LocalDateTime> dates = new ArrayList<>();
-        root.forEach(node -> {
+        listNode.forEach(node -> {
             String dateStr = node.get("measurementDate").asText();
             dates.add(OffsetDateTime.parse(dateStr).toLocalDateTime());
         });
